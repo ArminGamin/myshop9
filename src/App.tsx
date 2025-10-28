@@ -1,0 +1,2099 @@
+import React, { useState, useEffect, Suspense, useMemo, useCallback, lazy } from "react";
+import {
+  ShoppingCart,
+  Heart,
+  X,
+  Star,
+  Mail,
+  Phone,
+  Truck,
+  Shield,
+  RotateCcw,
+  Headphones,
+  Gift,
+  Trash2,
+  Check,
+  Package,
+  CreditCard,
+  Lock,
+  Share2,
+  Clock,
+  Users,
+  Eye,
+  AlertTriangle,
+} from "lucide-react";
+import { Routes, Route, Link, useNavigate } from "react-router-dom";
+import { ThankYouModal } from "./components/ThankYouModal";
+import CookieConsent from "./components/CookieConsent";
+import { useCartStore } from "./store/cartStore";
+import { useProductStore } from "./store/productStore";
+import { initialProducts } from "./data/products";
+
+// Lazy load non-critical components for code splitting
+const ProductComparison = lazy(() => import("./components/ProductComparison").then(module => ({ default: module.ProductComparison })));
+
+// Info Pages Components
+const PristatymoInfo = () => (
+  <PageWrapper title="Pristatymo Informacija">
+    <p className="text-gray-700 mb-4">Pristatymas tikimasi per 8-12 darbo dienų.</p>
+    <p className="text-gray-700">
+      Atkreipkite dėmesį, kad pristatymo laikas gali skirtis dėl nuo mūsų
+      nepriklausančių veiksnių, tokių kaip muitinės formalumai ir vietinės
+      pristatymo paslaugos. Būkite tikri, kad stengiamės apdoroti ir išsiųsti
+      jūsų užsakymą kuo greičiau, kad užtikrintume pristatymą laiku.
+    </p>
+  </PageWrapper>
+);
+
+const Grazinimai = () => (
+  <PageWrapper title="Grąžinimai">
+    <p className="text-gray-700 whitespace-pre-line">
+      Kokybiškų prekių grąžinimas, remiantis Lietuvos Respublikos civiliniu
+      kodeksu bei Lietuvos Respublikos Vyriausybės nutarimu (2014-07-22) dėl
+      mažmeninės prekybos taisyklių patvirtinimo ir pačiomis Mažmeninės prekybos
+      taisyklėmis.
+    </p>
+    <br />
+    <p className="text-gray-700 whitespace-pre-line">
+      Tuo atveju, jei Vartotojas sudaro pirkimo-pardavimo sutartį (toliau
+      Sutartis) naudojantis tik ryšio priemonėmis (nuotolinė sutartis) ir dėl to
+      negali prieš sudarant sutartį pasinaudoti įstatymais įtvirtinta teise
+      apžiūrėti prekes ir įvertinti teikiamų paslaugų pobūdį, jis turi teisę
+      atsisakyti pirkimo-pardavimo sutarties, raštu pranešdamas apie tai
+      Pardavėjui per 14 (keturiolika) dienų nuo prekių pristatymo dienos...
+    </p>
+  </PageWrapper>
+);
+
+const PrivatumoPolitika = () => (
+  <PageWrapper title="Privatumo Politika">
+    <div className="text-gray-700 space-y-4">
+      <p>
+        Mes renkame informaciją iš klientų, kai jie atlieka pirkimą arba užsiprenumeruoja naujienlaiškį. 
+        Ši informacija gali apimti jūsų vardą, el. pašto adresą, pašto adresą ir mokėjimo informaciją. 
+        Taip pat galime rinkti informaciją apie jūsų pageidavimus ir produktus, kuriuos įsigyjate mūsų parduotuvėje.
+      </p>
+      
+      <h3 className="font-semibold text-lg">Informacijos naudojimas</h3>
+      <p>
+        Surinktą informaciją naudojame užsakymų apdorojimui, klientų aptarnavimui ir apsipirkimo patirčiai mūsų svetainėje gerinti. 
+        Jūsų el. pašto adresas gali būti naudojamas naujienoms, pasiūlymams ar akcijoms siųsti. 
+        Galite bet kada atsisakyti šių pranešimų.
+      </p>
+      
+      <h3 className="font-semibold text-lg">Informacijos bendrinimas</h3>
+      <p>
+        Asmeninė informacija nėra parduodama, nuomojama ar kitaip perduodama trečiosioms šalims, išskyrus atvejus, 
+        kai tai būtina užsakymui įvykdyti, laikantis įstatymų reikalavimų arba siekiant apsaugoti mūsų teises.
+      </p>
+      
+      <h3 className="font-semibold text-lg">Saugumas</h3>
+      <p>
+        Mes rimtai žiūrime į asmeninės informacijos apsaugą ir taikome tinkamas technines bei organizacines priemones, 
+        siekiant apsaugoti ją nuo neteisėtos prieigos, praradimo ar paviešinimo. 
+        Mokėjimai atliekami per saugius serverius, o klientų duomenys saugomi apsaugotoje duomenų bazėje.
+      </p>
+      
+      <h3 className="font-semibold text-lg">Privatumo politikos pakeitimai</h3>
+      <p>
+        Ši privatumo politika gali būti atnaujinama be išankstinio įspėjimo. 
+        Atnaujinta versija visada bus pateikta šioje svetainėje ir įsigalios nuo paskelbimo momento.
+      </p>
+      
+      <h3 className="font-semibold text-lg">Kontaktai</h3>
+      <p>
+        Jei turite klausimų ar pastebėjimų dėl šios privatumo politikos, galite susisiekti per svetainėje pateiktą 
+        kontaktų formą arba el. paštą, nurodytą kontaktų skiltyje.
+      </p>
+    </div>
+  </PageWrapper>
+);
+
+
+// --- Reusable Page Wrapper ---
+const PageWrapper = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) => {
+  const navigate = useNavigate();
+  return (
+    <div className="min-h-screen flex flex-col">
+      <div className="bg-red-600 text-white py-3 text-center text-lg font-bold">
+        {title}
+      </div>
+      <div className="max-w-4xl mx-auto px-6 py-10 text-lg">{children}</div>
+      <div className="text-center mb-10">
+        <button
+          onClick={() => navigate("/")}
+          className="bg-green-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-700 transition"
+        >
+          Grįžti atgal
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// --- Main Shop Page ---
+function HomePage() {
+  const { items: cartItems, totalItems, totalPrice, addItem, removeItem, updateQuantity, clearCart } = useCartStore();
+  const { products, setProducts } = useProductStore();
+  const [cartOpen, setCartOpen] = useState(false);
+  const [wishlistOpen, setWishlistOpen] = useState(false);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [productModalOpen, setProductModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [selectedColor, setSelectedColor] = useState(0);
+  const [selectedSize, setSelectedSize] = useState(0);
+  const [quantity, setQuantity] = useState(1);
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [wishlist, setWishlist] = useState<number[]>([]);
+  const [recentlyViewed, setRecentlyViewed] = useState<number[]>([]);
+  const [orderHistory, setOrderHistory] = useState<any[]>([]);
+  const [giftWrapping, setGiftWrapping] = useState(false);
+  const [formErrors, setFormErrors] = useState<any>({});
+  const [thankYouModalOpen, setThankYouModalOpen] = useState(false);
+  const [completedOrderNumber, setCompletedOrderNumber] = useState('');
+  const [completedOrderEmail, setCompletedOrderEmail] = useState('');
+  const [checkoutFormData, setCheckoutFormData] = useState({
+    email: '',
+    name: '',
+    surname: '',
+    address: '',
+    city: '',
+    region: '',
+    postalCode: '',
+    phone: '',
+    cardNumber: '',
+    expiry: '',
+    cvv: ''
+  });
+  const language = 'lt'; // Fixed to Lithuanian only
+  
+  // Urgency and scarcity features
+  const [urgencyTimer, setUrgencyTimer] = useState({
+    hours: 0,
+    minutes: 45,
+    seconds: 0,
+  });
+  const [viewersCount, setViewersCount] = useState(12);
+  
+  // Weighted random stock counter (3-15, lower numbers prioritized)
+  const getWeightedStockCount = () => {
+    // Create weighted array with more lower numbers
+    const weights = [
+      3, 3, 3, 3, 3,  // 3 appears 5 times (most common)
+      4, 4, 4, 4,     // 4 appears 4 times
+      5, 5, 5,        // 5 appears 3 times
+      6, 6,           // 6 appears 2 times
+      7, 7,           // 7 appears 2 times
+      8,              // 8 appears 1 time
+      9,              // 9 appears 1 time
+      10, 11, 12, 13, 14, 15  // Higher numbers appear once
+    ];
+    return weights[Math.floor(Math.random() * weights.length)];
+  };
+  
+  const [stockCount, setStockCount] = useState(getWeightedStockCount());
+  const [recentOrders, setRecentOrders] = useState([
+    { name: 'Jonas P.', location: 'Vilnius', time: '3 min', product: 'Kalėdinis namelis' },
+    { name: 'Eglė K.', location: 'Klaipėda', time: '7 min', product: 'LED girlianda' },
+    { name: 'Darius R.', location: 'Šiauliai', time: '12 min', product: 'Žaisliukų rinkinys' },
+    { name: 'Lina B.', location: 'Panevėžys', time: '15 min', product: 'Kalėdinis puokštė' },
+    { name: 'Mantas S.', location: 'Alytus', time: '18 min', product: 'Dekoracijos' },
+    { name: 'Gintarė V.', location: 'Marijampolė', time: '22 min', product: 'LED apšvietimas' },
+    { name: 'Tomas M.', location: 'Utena', time: '25 min', product: 'Kalėdinis namelis' },
+    { name: 'Rūta L.', location: 'Tauragė', time: '28 min', product: 'Žaisliukai' },
+    { name: 'Arūnas K.', location: 'Telšiai', time: '31 min', product: 'Girliandos' },
+    { name: 'Ieva N.', location: 'Mažeikiai', time: '35 min', product: 'Puokštės' },
+  ]);
+
+  // Mobile-specific state
+  const [isMobile, setIsMobile] = useState(false);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0
+  });
+  
+  // Initialize products from centralized data source
+  useEffect(() => {
+    setProducts(initialProducts);
+  }, [setProducts]);
+
+  // Translations
+  const translations = {
+    lt: {
+      saleBanner: 'IŠPARDAVIMAS DABAR',
+      shopName: 'Kalėdų Kampelis',
+      cart: 'Krepšelis',
+      wishlist: 'Pageidavimų sąrašas',
+      products: 'Mūsų Produktai',
+      recentlyViewed: 'Neseniai žiūrėti',
+      addToCart: 'Įdėti į Krepšelį',
+      viewProduct: 'Peržiūrėti',
+      checkout: 'Atsiskaityti',
+      freeShipping: 'Nemokamas Pristatymas',
+      securePayment: 'Saugus Mokėjimas',
+      easyReturns: 'Lengvas Grąžinimas',
+      support: '24/7 Pagalba',
+      christmasCountdown: 'Laikas Iki Kalėdų',
+      countdownSubtitle: 'Nepraleiskite mūsų švenčių pasiūlymų!',
+      days: 'Dienos',
+      hours: 'Valandos',
+      minutes: 'Minutės',
+      seconds: 'Sekundės',
+      emptyCart: 'Jūsų krepšelis tuščias',
+      continueShopping: 'Tęsti apsipirkimą',
+      recommendations: 'Rekomenduojame Jums',
+      shareProduct: 'Dalintis',
+      shareText: 'Pažiūrėkite šį gražų Kalėdų dekoraciją!',
+      giftWrapping: 'Dovanų pakavimas',
+      orderTotal: 'Viso',
+      subtotal: 'Tarpinė suma',
+      shipping: 'Pristatymas',
+      placeOrder: 'Pateikti Užsakymą',
+      lastOrder: 'Paskutinis užsakymas',
+      processing: 'Apdorojama',
+      addedToCart: 'Pridėta į krepšelį!',
+      orderPlaced: 'Užsakymas sėkmingai pateiktas!',
+      addedToWishlist: 'Pridėta į pageidavimų sąrašą',
+      removedFromWishlist: 'Pašalinta iš pageidavimų sąrašo',
+      happyCustomers: 'Patenkinti klientai'
+    }
+  };
+
+  const t = translations.lt;
+  const { products: storeProducts } = useProductStore();
+  
+  const renderStars = useCallback((_rating: number, size: string = 'w-4 h-4') => (
+    <div className="flex text-yellow-400">
+      {[...Array(5)].map((_, i) => (
+        <Star key={i} className={`${size} fill-yellow-400`} />
+      ))}
+    </div>
+  ), []);
+  
+  const resolveImagePath = useCallback((path: string) => {
+    if (!path || path.startsWith('http')) return path;
+    const base = (import.meta as any).env?.BASE_URL || '/';
+    return `${base}${path.startsWith('/') ? path.slice(1) : path}`;
+  }, []);
+  
+  const validateEmail = (email: string) => {
+    const validDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'yahoo.co.uk', 'hotmail.co.uk', 'outlook.co.uk'];
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return false;
+    const domain = email.split('@')[1].toLowerCase();
+    return validDomains.includes(domain);
+  };
+
+  const validateForm = (formData: any) => {
+    const errors: any = {};
+    
+    // Email validation
+    if (!formData.email || !validateEmail(formData.email)) {
+      errors.email = 'Įveskite galiojantį el. pašto adresą (gmail.com, yahoo.com, hotmail.com, outlook.com)';
+    }
+    
+    // Name validation (letters only)
+    if (!formData.name || formData.name.trim().length < 2) {
+      errors.name = 'Vardas yra privalomas (mažiausiai 2 raidės)';
+    } else if (!/^[a-zA-ZąčęėįšųūžĄČĘĖĮŠŲŪŽ\s]+$/.test(formData.name)) {
+      errors.name = 'Vardas gali turėti tik raides';
+    }
+    
+    // Surname validation (letters only)
+    if (!formData.surname || formData.surname.trim().length < 2) {
+      errors.surname = 'Pavardė yra privaloma (mažiausiai 2 raidės)';
+    } else if (!/^[a-zA-ZąčęėįšųūžĄČĘĖĮŠŲŪŽ\s]+$/.test(formData.surname)) {
+      errors.surname = 'Pavardė gali turėti tik raides';
+    }
+    
+    // Address validation
+    if (!formData.address || formData.address.trim().length < 5) {
+      errors.address = 'Įveskite pilną adresą';
+    }
+    
+    // City validation (letters only)
+    if (!formData.city || formData.city.trim().length < 2) {
+      errors.city = 'Miestas yra privalomas';
+    } else if (!/^[a-zA-ZąčęėįšųūžĄČĘĖĮŠŲŪŽ\s]+$/.test(formData.city)) {
+      errors.city = 'Miesto pavadinimas gali turėti tik raides';
+    }
+    
+    // Postal code validation (numbers only, 5 digits)
+    if (!formData.postalCode) {
+      errors.postalCode = 'Pašto kodas yra privalomas';
+    } else if (!/^\d{5}$/.test(formData.postalCode)) {
+      errors.postalCode = 'Pašto kodas turi būti 5 skaitmenys';
+    }
+    
+    // Phone validation (numbers, +, spaces, dashes)
+    if (!formData.phone) {
+      errors.phone = 'Telefonas yra privalomas';
+    } else {
+      const cleanPhone = formData.phone.replace(/[\s\-\(\)]/g, '');
+      if (!/^\+?\d{9,15}$/.test(cleanPhone)) {
+        errors.phone = 'Įveskite galiojantį telefono numerį (pvz., +37060000000)';
+      }
+    }
+    
+    // Card number validation (16 digits)
+    if (!formData.cardNumber) {
+      errors.cardNumber = 'Kortelės numeris yra privalomas';
+    } else {
+      const cleanCard = formData.cardNumber.replace(/\s/g, '');
+      if (!/^\d{16}$/.test(cleanCard)) {
+        errors.cardNumber = 'Kortelės numeris turi būti 16 skaitmenų';
+      }
+    }
+    
+    // Expiry validation (MM/YY format)
+    if (!formData.expiry) {
+      errors.expiry = 'Galiojimo data yra privaloma';
+    } else if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(formData.expiry)) {
+      errors.expiry = 'Formatas turi būti MM/YY';
+    } else {
+      const [month, year] = formData.expiry.split('/');
+      const expDate = new Date(2000 + parseInt(year), parseInt(month) - 1);
+      const now = new Date();
+      if (expDate < now) {
+        errors.expiry = 'Kortelės galiojimas pasibaigęs';
+      }
+    }
+    
+    // CVV validation (3 digits)
+    if (!formData.cvv) {
+      errors.cvv = 'CVV yra privalomas';
+    } else if (!/^\d{3}$/.test(formData.cvv)) {
+      errors.cvv = 'CVV turi būti 3 skaitmenys';
+    }
+    
+    return errors;
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setCheckoutFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    
+    // Clear error for this field when user starts typing
+    if (formErrors[field]) {
+      setFormErrors((prev: any) => ({
+        ...prev,
+        [field]: ''
+      }));
+    }
+  };
+
+  const formatCardNumber = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    const limited = numbers.slice(0, 16);
+    const formatted = limited.match(/.{1,4}/g)?.join(' ') || limited;
+    return formatted;
+  };
+
+  const formatExpiry = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length >= 2) {
+      return numbers.slice(0, 2) + '/' + numbers.slice(2, 4);
+    }
+    return numbers;
+  };
+
+  const formatPhone = (value: string) => {
+    // Allow only numbers, +, spaces, dashes, and parentheses
+    return value.replace(/[^\d\+\s\-\(\)]/g, '');
+  };
+
+  const addToWishlist = useCallback((productId: number) => {
+    setWishlist(prev => prev.includes(productId) 
+      ? prev.filter(id => id !== productId)
+      : [...prev, productId]
+    );
+    setSuccessMessage(wishlist.includes(productId) ? t.removedFromWishlist : t.addedToWishlist);
+    setTimeout(() => setSuccessMessage(''), 3000);
+  }, [wishlist, t]);
+
+  const shareProduct = (product: any) => {
+    const shareUrl = window.location.href;
+    const shareText = `${t.shareText} ${product.name} - €${product.price}`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: product.name,
+        text: shareText,
+        url: shareUrl
+      });
+    } else {
+      // Fallback for browsers that don't support Web Share API
+      const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
+      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+      
+      const shareWindow = window.open('', '_blank', 'width=600,height=400');
+      if (shareWindow) {
+        shareWindow.document.write(`
+          <html>
+            <head><title>Share Product</title></head>
+            <body style="font-family: Arial, sans-serif; padding: 20px;">
+              <h2>Share this product</h2>
+              <p>${shareText}</p>
+              <div style="margin-top: 20px;">
+                <a href="${facebookUrl}" target="_blank" style="margin-right: 10px; padding: 10px; background: #3b5998; color: white; text-decoration: none; border-radius: 5px;">Share on Facebook</a>
+                <a href="${twitterUrl}" target="_blank" style="padding: 10px; background: #1da1f2; color: white; text-decoration: none; border-radius: 5px;">Share on Twitter</a>
+              </div>
+            </body>
+          </html>
+        `);
+      }
+    }
+  };
+
+  const recommendations = useMemo(() => 
+    products.filter(product => !wishlist.includes(product.id)).slice(0, 3)
+  , [products, wishlist]);
+
+  const addToRecentlyViewed = useCallback((productId: number) => {
+    setRecentlyViewed(prev => [productId, ...prev.filter(id => id !== productId)].slice(0, 3));
+  }, []);
+  
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const christmas = new Date("2025-12-25T00:00:00");
+      const now = new Date();
+      const difference = christmas.getTime() - now.getTime();
+      
+      if (difference > 0) {
+        setTimeLeft({
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+          minutes: Math.floor((difference / 1000 / 60) % 60),
+          seconds: Math.floor((difference / 1000) % 60)
+        });
+      }
+    };
+    
+    calculateTimeLeft();
+    const timer = setInterval(calculateTimeLeft, 1000);
+    
+    return () => clearInterval(timer);
+  }, []);
+
+  // Mobile detection and touch handlers
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Touch gesture handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe && cartOpen) setCartOpen(false);
+    if (isRightSwipe && !cartOpen) setCartOpen(true);
+  };
+
+  // Prevent scroll when modal is open on mobile
+  useEffect(() => {
+    if (isMobile && (productModalOpen || cartOpen)) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobile, productModalOpen, cartOpen]);
+
+  // Urgency timer effect
+  useEffect(() => {
+    const urgencyInterval = setInterval(() => {
+      setUrgencyTimer(prev => {
+        if (prev.seconds > 0) {
+          return { ...prev, seconds: prev.seconds - 1 };
+        } else if (prev.minutes > 0) {
+          return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
+        } else if (prev.hours > 0) {
+          return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
+        } else {
+          return { hours: 0, minutes: 45, seconds: 0 }; // Reset for demo
+        }
+      });
+    }, 1000);
+
+    // Update viewers count randomly
+    const viewersInterval = setInterval(() => {
+      setViewersCount(prev => Math.max(5, prev + Math.floor(Math.random() * 6) - 3));
+    }, 15000);
+
+    // Update stock count every 10 minutes with weighted random
+    const stockInterval = setInterval(() => {
+      setStockCount(getWeightedStockCount());
+    }, 600000); // 10 minutes = 600000ms
+
+    // Update recent orders
+    const ordersInterval = setInterval(() => {
+      const names = ['Ana', 'Petras', 'Marija', 'Jonas', 'Elena', 'Tomas', 'Lina', 'Darius', 'Gintarė', 'Arūnas', 'Rūta', 'Mantas', 'Ieva', 'Tomas', 'Eglė'];
+      const lastNames = ['K.', 'L.', 'S.', 'M.', 'R.', 'N.', 'P.', 'B.', 'V.', 'G.', 'J.', 'D.', 'T.', 'A.', 'Z.'];
+      const locations = ['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys', 'Alytus', 'Marijampolė', 'Utena', 'Tauragė', 'Telšiai', 'Mažeikiai', 'Plungė', 'Radviliškis', 'Kretinga'];
+      const products = ['Kalėdinis namelis', 'LED girlianda', 'Žaisliukų rinkinys', 'Puokštė', 'Dekoracijos'];
+      
+      const newOrder = {
+        name: names[Math.floor(Math.random() * names.length)] + ' ' + 
+              lastNames[Math.floor(Math.random() * lastNames.length)],
+        location: locations[Math.floor(Math.random() * locations.length)],
+        time: Math.floor(Math.random() * 45) + 1 + ' min',
+        product: products[Math.floor(Math.random() * products.length)]
+      };
+      
+      setRecentOrders(prev => [newOrder, ...prev.slice(0, 2)]);
+    }, 20000);
+
+    return () => {
+      clearInterval(urgencyInterval);
+      clearInterval(viewersInterval);
+      clearInterval(stockInterval);
+      clearInterval(ordersInterval);
+    };
+  }, []);
+
+  return (
+    <>
+      <div 
+        className="min-h-screen bg-red-50 flex flex-col touch-action-pan-y"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+      {/* Sale Banner */}
+      <div className="bg-gradient-to-r from-red-600 to-green-600 text-white py-2 text-center text-sm font-medium">
+        {t.saleBanner}
+      </div>
+
+      {/* Header */}
+      {/* JSON-LD dynamic for products */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        name: "Produktų sąrašas",
+        itemListElement: (storeProducts.length ? storeProducts : []).map((p, idx) => ({
+          "@type": "ListItem",
+          position: idx + 1,
+          item: {
+            "@type": "Product",
+            name: p.name,
+            image: p.images?.[0] || p.image,
+            description: p.description,
+            sku: `KK-${p.id}`,
+            brand: { "@type": "Brand", name: "Kalėdų Kampelis" },
+            offers: {
+              "@type": "Offer",
+              price: p.price,
+              priceCurrency: "EUR",
+              availability: "https://schema.org/InStock"
+            },
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: p.rating,
+              reviewCount: p.reviews,
+              bestRating: 5,
+              worstRating: 1
+            }
+          }
+        }))
+      }) }} />
+      <header className="bg-white shadow-lg sticky top-0 z-50 ios-safe-area">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center h-16 sm:h-20">
+          <div className="flex items-center space-x-2 group">
+            <div className="text-2xl sm:text-3xl animate-bounce group-hover:animate-spin">🎄</div>
+            <h1 className="text-lg sm:text-2xl font-bold text-red-600 group-hover:text-green-600 transition-colors duration-300">{t.shopName}</h1>
+          </div>
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            <button
+              className="relative text-gray-700 hover:text-red-600 p-3 sm:p-2 rounded-lg hover:bg-red-50 touch-manipulation"
+              onClick={() => setWishlistOpen((s) => !s)}
+              title={t.wishlist}
+            >
+              <Heart className="w-5 h-5 sm:w-5 sm:h-5" />
+              {wishlist.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs">
+                  {wishlist.length}
+                </span>
+              )}
+            </button>
+            <button
+              className="relative text-gray-700 hover:text-red-600 p-3 sm:p-2 rounded-lg hover:bg-red-50 touch-manipulation"
+              onClick={() => setCartOpen((s) => !s)}
+              title={t.cart}
+            >
+              <ShoppingCart className="w-5 h-5 sm:w-5 sm:h-5" />
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs">
+                  {totalItems}
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <div className="relative bg-gradient-to-b from-red-600 via-red-500 to-green-700 py-12 sm:py-16 overflow-hidden">
+        {/* Decorative background elements */}
+        <div className="absolute top-4 left-4 text-white opacity-10">
+          <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+        </div>
+        <div className="absolute top-12 right-16 text-white opacity-10">
+          <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+          <div className="text-center">
+            {/* Main Headline */}
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4">
+              <span className="text-white block mb-2">Padarykite šias Kalėdas</span>
+              <span className="text-yellow-400 block">Nepamirštamas!</span>
+            </h1>
+            
+            {/* Sub-headline */}
+            <p className="text-lg sm:text-xl text-white mb-8 max-w-3xl mx-auto">
+              Aukščiausios kokybės kalėdinės dekoracijos su nuolaida iki 55%. Pristatymas per 10-14 dienų!
+            </p>
+            
+            {/* Call-to-Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+              <button className="bg-white text-red-600 px-8 py-4 rounded-lg font-semibold border-2 border-red-600 hover:bg-red-50 transition-all duration-300 transform hover:scale-105 touch-manipulation min-h-[48px] flex items-center justify-center gap-2">
+                <ShoppingCart className="w-5 h-5" />
+                Pirkinių pradžia
+              </button>
+              <button className="bg-red-600 text-white px-8 py-4 rounded-lg font-semibold border-2 border-white hover:bg-red-700 transition-all duration-300 transform hover:scale-105 touch-manipulation min-h-[48px]">
+                Peržiūrėti rinkinius
+              </button>
+            </div>
+            
+            {/* Informational Sections */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+              <div className="flex flex-col items-center text-white">
+                <div className="bg-white bg-opacity-20 rounded-full p-4 mb-3">
+                  <Truck className="w-8 h-8" />
+                </div>
+                <p className="font-semibold text-center">Nemokamas pristatymas</p>
+              </div>
+              
+              <div className="flex flex-col items-center text-white">
+                <div className="bg-white bg-opacity-20 rounded-full p-4 mb-3">
+                  <Shield className="w-8 h-8" />
+                </div>
+                <p className="font-semibold text-center">Saugus mokėjimas</p>
+              </div>
+              
+              <div className="flex flex-col items-center text-white">
+                <div className="bg-white bg-opacity-20 rounded-full p-4 mb-3">
+                  <Gift className="w-8 h-8" />
+                </div>
+                <p className="font-semibold text-center">14 dienų grąžinimas</p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Discount Badge */}
+          <div className="absolute bottom-0 right-0 sm:right-8 mb-4 sm:mb-8">
+            <div className="bg-yellow-400 px-6 py-4 rounded-lg shadow-2xl transform -rotate-3 hover:rotate-0 transition-transform">
+              <div className="text-black text-center">
+                <div className="text-4xl font-bold">-55%</div>
+                <div className="text-sm font-semibold uppercase">Nuolaida</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Service Banner */}
+      <div className="bg-white py-8">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="flex items-center space-x-3">
+              <div className="bg-red-50 p-3 rounded-full">
+                <Truck className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900">{t.freeShipping}</h3>
+                <p className="text-sm text-gray-600">{language === 'lt' ? 'Užsakymams virš 30€' : 'For orders over €30'}</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="bg-red-50 p-3 rounded-full">
+                <Shield className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900">{t.securePayment}</h3>
+                <p className="text-sm text-gray-600">{language === 'lt' ? '100% saugios transakcijos' : '100% secure transactions'}</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="bg-red-50 p-3 rounded-full">
+                <RotateCcw className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900">{t.easyReturns}</h3>
+                <p className="text-sm text-gray-600">{language === 'lt' ? '30 dienų grąžinimo politika' : '30-day return policy'}</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="bg-red-50 p-3 rounded-full">
+                <Headphones className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900">{t.support}</h3>
+                <p className="text-sm text-gray-600">{language === 'lt' ? 'Atsidėjęs klientų aptarnavimas' : 'Dedicated customer service'}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Christmas Countdown */}
+      <div className="bg-gradient-to-r from-red-600 to-green-600 text-white py-12">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="text-4xl font-bold mb-2">{t.christmasCountdown}</h2>
+          <p className="text-lg mb-8">{t.countdownSubtitle}</p>
+          <div className="flex justify-center space-x-4">
+            <div className="bg-white bg-opacity-20 rounded-lg p-4 min-w-[100px]">
+              <div className="text-3xl font-bold">{timeLeft.days}</div>
+              <div className="text-sm">{t.days}</div>
+            </div>
+            <div className="bg-white bg-opacity-20 rounded-lg p-4 min-w-[100px]">
+              <div className="text-3xl font-bold">{timeLeft.hours}</div>
+              <div className="text-sm">{t.hours}</div>
+            </div>
+            <div className="bg-white bg-opacity-20 rounded-lg p-4 min-w-[100px]">
+              <div className="text-3xl font-bold">{timeLeft.minutes}</div>
+              <div className="text-sm">{t.minutes}</div>
+            </div>
+            <div className="bg-white bg-opacity-20 rounded-lg p-4 min-w-[100px]">
+              <div className="text-3xl font-bold">{timeLeft.seconds}</div>
+              <div className="text-sm">{t.seconds}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Success Message */}
+      {successMessage && (
+        <div className="fixed top-20 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50">
+          {successMessage}
+        </div>
+      )}
+
+      {/* Error Message */}
+      {errorMessage && (
+        <div className="fixed top-20 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50">
+          {errorMessage}
+        </div>
+      )}
+
+      {/* Recently Viewed */}
+      {recentlyViewed.length > 0 && (
+        <div className="bg-white py-4">
+          <div className="max-w-7xl mx-auto px-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">{t.recentlyViewed}</h3>
+            <div className="flex space-x-3">
+                  {recentlyViewed.map(productId => {
+                const product = products.find(p => p.id === productId);
+                return product ? (
+                  <div key={productId} className="w-16 h-16 rounded-lg overflow-hidden">
+                    <img
+                      src={product.image}
+                      alt={`${product.name} - Neseniai žiūrėtas produktas`}
+                      className="w-full h-full object-cover cursor-pointer"
+                      loading="lazy"
+                      decoding="async"
+                      onClick={() => {
+                        setSelectedProduct(product);
+                        setProductModalOpen(true);
+                      }}
+                    />
+                  </div>
+                ) : null;
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Product Recommendations */}
+      {recommendations.length > 0 && (
+        <div className="bg-gray-50 py-6">
+          <div className="max-w-7xl mx-auto px-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t.recommendations}</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {recommendations.map((product) => (
+                <div key={product.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+                  <img
+                    src={product.image}
+                    alt={`${product.name} - Rekomenduojamas produktas`}
+                    className="w-full h-40 object-cover"
+                    loading="lazy"
+                    decoding="async"
+                    width="400"
+                    height="160"
+                  />
+                  <div className="p-4">
+                    <div className="flex items-center mb-1">
+                  {renderStars(product.rating, 'w-3 h-3')}
+                      <span className="ml-1 text-xs text-gray-600">
+                        {product.rating} ({product.reviews})
+                      </span>
+                    </div>
+                    <h3 className="text-sm font-semibold mb-1 text-gray-900 line-clamp-2">
+                      {product.name}
+                    </h3>
+                    <p className="text-lg font-bold text-red-600">
+                      €{product.price}
+                      <span className="text-xs text-gray-400 line-through ml-1">
+                        €{product.originalPrice}
+                      </span>
+                    </p>
+                    <div className="flex space-x-2 mt-2">
+                      <button
+                        onClick={() => {
+                          setSelectedProduct(product);
+                          setSelectedColor(0);
+                          setSelectedSize(0);
+                          setQuantity(1);
+                          addToRecentlyViewed(product.id);
+                          setProductModalOpen(true);
+                        }}
+                        className="flex-1 bg-gradient-to-r from-red-600 to-green-600 text-white py-2 rounded-lg font-semibold hover:from-red-700 hover:to-green-700 text-sm"
+                      >
+                        {t.viewProduct}
+                      </button>
+                      <button
+                        onClick={() => addToWishlist(product.id)}
+                        className={`p-2 rounded-lg transition ${
+                          wishlist.includes(product.id)
+                            ? 'bg-red-600 text-white'
+                            : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                        }`}
+                      >
+                        <Heart className={`w-4 h-4 ${wishlist.includes(product.id) ? 'fill-current' : ''}`} />
+                      </button>
+                      <button
+                        onClick={() => shareProduct(product)}
+                        className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                        title={t.shareProduct}
+                      >
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Products */}
+      <main className="max-w-7xl mx-auto px-6 py-8 flex-1">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+          {t.products}
+        </h2>
+        {products.length === 0 ? (
+          <div className="text-center text-gray-600 py-12">
+            Šiuo metu nėra prekių. Pridėkite naujų įrašų – aš paruošiau vietą nuotraukoms ir aprašymams.
+          </div>
+        ) : (
+        <div className={`grid grid-cols-1 md:grid-cols-3 gap-8`}>
+          {products.map((product, index) => (
+            <div
+              key={product.id}
+              className={`bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 group ${products.length === 1 ? 'lg:col-span-2' : ''}`}
+            >
+              <div className={`w-full ${products.length === 1 ? 'h-96' : 'h-80'} bg-gray-50 flex items-center justify-center overflow-hidden`}>
+                  <img
+                    src={product.image}
+                    alt={`${product.name} - Premium Kalėdų dekoracija | Kalėdų Kampelis`}
+                    className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 p-4"
+                    loading="lazy"
+                    decoding="async"
+                    width="800"
+                    height="600"
+                  />
+              </div>
+              <div className="p-6">
+                <div className="flex items-center mb-3">
+                    {renderStars(product.rating, 'w-4 h-4')}
+                  <span className="ml-2 text-sm font-semibold text-gray-800 group-hover:text-gray-900 transition-colors duration-300">
+                    {product.rating} ({product.reviews})
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold mb-3 text-gray-900 line-clamp-2 group-hover:text-red-600 transition-colors duration-300">
+                  {product.name}
+                </h3>
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <p className="text-2xl font-bold text-red-600 group-hover:text-green-600 transition-colors duration-300">
+                      €{product.price}
+                    </p>
+                    <p className="text-sm font-semibold text-gray-600 line-through">€{product.originalPrice}</p>
+                  </div>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => addToWishlist(product.id)}
+                      className="text-gray-400 hover:text-red-600 p-2 rounded-full hover:bg-red-50 transition-all duration-300 transform hover:scale-110"
+                    >
+                      <Heart className="w-4 h-4" />
+                    </button>
+                    <button className="text-gray-400 hover:text-blue-600 p-2 rounded-full hover:bg-blue-50 transition-all duration-300 transform hover:scale-110">
+                      <Share2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                {/* Stock Warning */}
+                {stockCount <= 3 && (
+                  <div className="mb-3 bg-orange-100 border border-orange-200 rounded-lg p-3">
+                    <div className="flex items-center space-x-2 text-orange-900">
+                      <AlertTriangle className="w-5 h-5" />
+                      <span className="text-sm font-bold">Liko tik {stockCount} vnt.!</span>
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  onClick={() => {
+                    setSelectedProduct(product);
+                    setSelectedColor(0);
+                    setSelectedSize(0);
+                    setQuantity(1);
+                    addToRecentlyViewed(product.id);
+                    setProductModalOpen(true);
+                  }}
+                  className="w-full bg-gradient-to-r from-red-600 to-green-600 text-white py-3 sm:py-4 px-4 rounded-full font-bold hover:from-red-700 hover:to-green-700 text-base transition-all duration-300 transform hover:scale-105 hover:shadow-lg touch-manipulation min-h-[48px]"
+                >
+                  {t.viewProduct}
+                </button>
+
+                {/* Recent Orders */}
+                <div className="mt-3 text-sm text-gray-800">
+                  <div className="flex items-center space-x-2">
+                    <Users className="w-4 h-4" />
+                    <span className="font-medium">{recentOrders[product.id % recentOrders.length]?.name} iš {recentOrders[product.id % recentOrders.length]?.location} užsakė {recentOrders[product.id % recentOrders.length]?.time}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+          </div>
+        )}
+      </main>
+
+      {/* Newsletter */}
+      <section className="bg-gradient-to-r from-green-600 to-red-600 text-white py-16 px-6 text-center">
+        <div className="max-w-2xl mx-auto">
+          <Mail className="mx-auto mb-4 w-10 h-10" />
+          <h3 className="text-2xl font-bold mb-3">
+            Gaukite Išskirtinius Švenčių Pasiūlymus
+          </h3>
+          <p className="text-sm mb-6">
+            Užsiprenumeruokite mūsų naujienlaiškį ir gaukite 15% nuolaidą
+            pirmajam užsakymui!
+          </p>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (validateEmail(email)) {
+                alert("Ačiū, jūsų prenumerata sėkminga!");
+                setEmail('');
+              } else {
+                alert("Prašome įvesti galiojantį el. pašto adresą (gmail.com, yahoo.com, hotmail.com, outlook.com)");
+              }
+            }}
+            className="flex flex-col sm:flex-row gap-3 justify-center"
+          >
+            <input
+              placeholder="Įveskite savo el. paštą"
+              className="flex-1 px-4 py-3 rounded-md text-black"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <button className="bg-white text-red-600 font-semibold px-6 py-3 rounded-md hover:bg-gray-100">
+              Prenumeruoti
+            </button>
+          </form>
+        </div>
+      </section>
+
+      {/* Shopping Cart Sidebar */}
+      {cartOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
+          <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-xl overflow-y-auto">
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold">Krepšelis • {totalItems}</h2>
+                <button
+                  onClick={() => setCartOpen(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Free Gift Progress */}
+              {totalItems > 0 && (
+                <div className="bg-red-50 p-4 rounded-lg mb-6">
+                  <p className="text-sm font-medium mb-2">Jūs esate €{Math.max(0, 30 - totalPrice).toFixed(2)} nuo NEMOKAMO dovanos!</p>
+                  <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                    <div 
+                      className="bg-red-600 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${Math.min(100, (totalPrice / 30) * 100)}%` }}
+                    ></div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Gift className="w-4 h-4 text-red-600" />
+                      <span className="text-xs text-gray-600">Nemokama dovana</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Gift className="w-4 h-4 text-red-600" />
+                      <span className="text-xs text-gray-600">Nemokamas pristatymas</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Urgency in Cart - Only show when cart has items */}
+              {totalItems > 0 && (
+                <div className="bg-orange-50 border border-orange-200 p-4 rounded-lg mb-6">
+                  <div className="flex items-center space-x-2 text-orange-800">
+                    <Clock className="w-4 h-4" />
+                    <span className="font-semibold text-sm">Pasiūlymas baigiasi:</span>
+                    <span className="font-bold">
+                      {urgencyTimer.hours}:{urgencyTimer.minutes.toString().padStart(2, '0')}:{urgencyTimer.seconds.toString().padStart(2, '0')}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Cart Items */}
+              {totalItems === 0 ? (
+                <div className="text-center py-12">
+                  <ShoppingCart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500 mb-4">{t.emptyCart}</p>
+                  <button
+                    onClick={() => setCartOpen(false)}
+                    className="bg-gradient-to-r from-red-600 to-green-600 text-white px-4 py-2 rounded-lg text-sm hover:from-red-700 hover:to-green-700"
+                  >
+                    {t.continueShopping}
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4 mb-6">
+                  {cartItems.map((item) => (
+                    <div key={item.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                    <img
+                      src={item.image}
+                      alt={`${item.name} - Krepšelyje`}
+                      className="w-16 h-16 object-cover rounded"
+                      loading="lazy"
+                      decoding="async"
+                      width="64"
+                      height="64"
+                    />
+                      <div className="flex-1">
+                        <h3 className="font-medium text-sm">{item.name}</h3>
+                        {item.selectedColor && (
+                          <p className="text-xs text-gray-500">Spalva: {item.selectedColor}</p>
+                        )}
+                        {item.selectedSize && (
+                          <p className="text-xs text-gray-500">Dydis: {item.selectedSize}</p>
+                        )}
+                        <div className="flex items-center space-x-2 mt-1">
+                          <span className="text-lg font-bold text-red-600">€{item.price}</span>
+                        </div>
+                        <div className="flex items-center justify-between mt-2">
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              className="w-6 h-6 bg-gray-200 rounded flex items-center justify-center text-sm hover:bg-gray-300"
+                            >
+                              -
+                            </button>
+                            <span className="text-sm font-medium">{item.quantity}</span>
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              className="w-6 h-6 bg-gray-200 rounded flex items-center justify-center text-sm hover:bg-gray-300"
+                            >
+                              +
+                            </button>
+                          </div>
+                          <button
+                            onClick={() => removeItem(item.id)}
+                            className="text-gray-400 hover:text-red-600"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Checkout Button */}
+              {totalItems > 0 && (
+                <div className="space-y-4">
+                  <div className="border-t pt-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-medium">{t.orderTotal}:</span>
+                      <span className="text-xl font-bold text-red-600">€{totalPrice.toFixed(2)}</span>
+                    </div>
+                    <button 
+                      onClick={() => setCheckoutOpen(true)}
+                      className="w-full bg-gradient-to-r from-red-600 to-green-600 text-white py-3 rounded-lg font-semibold hover:from-red-700 hover:to-green-700 transition"
+                    >
+                      {t.checkout} • €{totalPrice.toFixed(2)}
+                    </button>
+                  </div>
+
+                  {/* Payment Logos */}
+                  <div className="flex justify-center space-x-3 pt-4">
+                    <img
+                      src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png"
+                      className="h-6 opacity-60"
+                      alt="Mastercard"
+                    />
+                    <div className="bg-white border border-gray-300 px-2 py-1 rounded">
+                      <span className="text-blue-600 font-bold text-sm">VISA</span>
+                    </div>
+                    <img
+                      src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
+                      className="h-6 opacity-60"
+                      alt="PayPal"
+                    />
+                  </div>
+
+                  {/* Money Back Guarantee */}
+                  <div className="flex items-center justify-center space-x-2 text-xs text-gray-500">
+                    <Shield className="w-4 h-4" />
+                    <span>100% pinigų grąžinimo garantija</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Wishlist Sidebar */}
+      {wishlistOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
+          <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-xl overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold">{t.wishlist} • {wishlist.length}</h2>
+                <button
+                  onClick={() => setWishlistOpen(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {wishlist.length === 0 ? (
+                <div className="text-center py-12">
+                  <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500 mb-4">{language === 'lt' ? 'Jūsų pageidavimų sąrašas tuščias' : 'Your wishlist is empty'}</p>
+                  <button
+                    onClick={() => setWishlistOpen(false)}
+                    className="bg-gradient-to-r from-red-600 to-green-600 text-white px-4 py-2 rounded-lg text-sm hover:from-red-700 hover:to-green-700"
+                  >
+                    {t.continueShopping}
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {wishlist.map((productId) => {
+                    const product = products.find(p => p.id === productId);
+                    return product ? (
+                      <div key={productId} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                        <img
+                          src={product.image}
+                          alt={`${product.name} - Pageidavimų sąraše`}
+                          className="w-16 h-16 object-cover rounded"
+                          loading="lazy"
+                          decoding="async"
+                          width="64"
+                          height="64"
+                        />
+                        <div className="flex-1">
+                          <h3 className="font-medium text-sm">{product.name}</h3>
+                          <div className="flex items-center space-x-2 mt-1">
+                            <span className="text-lg font-bold text-red-600">€{product.price}</span>
+                            <span className="text-sm text-gray-400 line-through">€{product.originalPrice}</span>
+                          </div>
+                        </div>
+                        <div className="flex flex-col space-y-2">
+                          <button
+                            onClick={() => {
+                              setSelectedProduct(product);
+                              setSelectedColor(0);
+                              setSelectedSize(0);
+                              setQuantity(1);
+                              setWishlistOpen(false);
+                              setProductModalOpen(true);
+                            }}
+                            className="bg-gradient-to-r from-red-600 to-green-600 text-white px-3 py-1 rounded text-xs font-semibold hover:from-red-700 hover:to-green-700"
+                          >
+                            {t.viewProduct}
+                          </button>
+                          <button
+                            onClick={() => addToWishlist(productId)}
+                            className="text-gray-400 hover:text-red-600 text-xs"
+                          >
+                            {language === 'lt' ? 'Pašalinti' : 'Remove'}
+                          </button>
+                        </div>
+                      </div>
+                    ) : null;
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Product Detail Modal */}
+      {productModalOpen && selectedProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-7xl h-[90vh] overflow-hidden shadow-2xl">
+            <div className="h-full flex flex-col overflow-y-auto p-6">
+              {/* Header with badge, rating and close button */}
+              <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+                <div className="flex items-center space-x-4">
+                  <span className="bg-gradient-to-r from-yellow-400 to-orange-400 text-black px-4 py-2 rounded-full text-sm font-bold shadow-md">
+                    POPULIARIAUSIAS
+                  </span>
+                  <div className="flex items-center space-x-2">
+                    <div className="flex">
+                      {[...Array(5)].map((_, i) => {
+                        const filled = i < Math.round(selectedProduct.rating);
+                        return (
+                          <Star key={i} className={`w-4 h-4 ${filled ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
+                        );
+                      })}
+                    </div>
+                    <span className="text-sm text-gray-600">
+                      {selectedProduct.rating} | {selectedProduct.reviews} Klientai
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setProductModalOpen(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Left Column - Images */}
+                <div>
+                  <div className="mb-3 bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden" style={{ minHeight: '400px' }}>
+                    <img
+                      src={resolveImagePath(selectedProduct.images?.[selectedColor] || selectedProduct.image)}
+                      alt={`${selectedProduct.name} - Produkto nuotrauka`}
+                      className="w-full h-full object-contain p-4"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                  {selectedProduct.images && selectedProduct.images.length > 0 && (
+                    <div className="grid grid-cols-5 sm:grid-cols-6 gap-2">
+                      {selectedProduct.images.slice(0, 6).map((img: string, index: number) => (
+                        <button
+                          key={index}
+                          onClick={() => setSelectedColor(index)}
+                          className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden border-2 bg-gray-50 touch-manipulation ${
+                            selectedColor === index ? 'border-red-500 ring-2 ring-red-300' : 'border-gray-300'
+                          }`}
+                          title={`Variantas ${index + 1}`}
+                        >
+                          <img
+                            src={resolveImagePath(img)}
+                            alt={`${selectedProduct.name} - Nuotrauka ${index + 1}`}
+                            className="w-full h-full object-contain p-1"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Right Column - Product Info */}
+                <div>
+                  <div className="mb-2">
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
+                      NAUJIENA: Šių metų būtinai reikalingas švenčių žavesys
+                    </span>
+                  </div>
+                  <h1 className="text-2xl font-bold text-gray-900 mb-4">{selectedProduct.name}</h1>
+                  
+                  {/* Price */}
+                  <div className="mb-4">
+                    <div className="flex items-center space-x-3">
+                      <span className="text-2xl font-bold text-red-600">€{(selectedProduct.pricesByColor && selectedProduct.pricesByColor[selectedColor] !== undefined) ? selectedProduct.pricesByColor[selectedColor].toFixed(2) : selectedProduct.price}</span>
+                      <span className="text-lg text-gray-400 line-through">€{(selectedProduct.originalPricesByColor && selectedProduct.originalPricesByColor[selectedColor] !== undefined) ? selectedProduct.originalPricesByColor[selectedColor].toFixed(2) : selectedProduct.originalPrice}</span>
+                      <span className="bg-red-600 text-white px-2 py-1 rounded text-sm font-bold">
+                        SUTAUPYKITE {selectedProduct.discount}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-gray-900 mb-6 font-medium leading-relaxed">{selectedProduct.description}</p>
+
+                  {/* Features */}
+                  <div className="mb-6">
+                    {selectedProduct.features.map((feature: string, index: number) => (
+                      <div key={index} className="flex items-center space-x-2 mb-2">
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                        <span className="text-gray-900 font-medium">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Color Selection */}
+                  <div className="mb-4">
+                    <h3 className="font-bold mb-3 text-base text-gray-900">Spalva</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedProduct.colors.map((color: any, index: number) => (
+                        <button
+                          key={index}
+                          onClick={() => setSelectedColor(index)}
+                          className={`px-3 py-2 border-2 rounded-lg text-sm font-semibold touch-manipulation min-h-[44px] transition-all ${
+                            selectedColor === index
+                              ? 'border-red-500 bg-red-50 text-red-700 shadow-md'
+                              : 'border-gray-300 hover:border-gray-400 text-gray-800'
+                          }`}
+                        >
+                          {color.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Size Selection */}
+                  <div className="mb-4">
+                    <h3 className="font-bold mb-3 text-base text-gray-900">Dydis</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedProduct.sizes.map((size: any, index: number) => (
+                        <button
+                          key={index}
+                          onClick={() => setSelectedSize(index)}
+                          className={`px-3 py-2 border-2 rounded-lg text-sm font-semibold touch-manipulation min-h-[44px] transition-all ${
+                            selectedSize === index
+                              ? 'border-red-500 bg-red-50 text-red-700 shadow-md'
+                              : 'border-gray-300 hover:border-gray-400 text-gray-800'
+                          }`}
+                        >
+                          {size.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Quantity */}
+                  <div className="mb-4">
+                    <h3 className="font-bold mb-3 text-base text-gray-900">Kiekis</h3>
+                    <div className="flex items-center space-x-4">
+                      <button 
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        className="w-12 h-12 border-2 border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 text-lg font-bold touch-manipulation"
+                      >
+                        -
+                      </button>
+                      <span className="text-xl font-bold w-12 text-center text-gray-900">{quantity}</span>
+                      <button 
+                        onClick={() => setQuantity(quantity + 1)}
+                        className="w-12 h-12 border-2 border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 text-lg font-bold touch-manipulation"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Urgency Timer in Modal */}
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-2 text-red-800">
+                        <Clock className="w-4 h-4" />
+                        <span className="font-semibold text-sm">Pasiūlymas baigiasi:</span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-orange-700">
+                        <Eye className="w-4 h-4" />
+                        <span className="text-sm">Liko tik {stockCount} vnt.</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <div className="text-center">
+                        <div className="text-xl font-bold text-red-600">{urgencyTimer.hours}</div>
+                        <div className="text-xs text-red-500">Valandos</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-xl font-bold text-red-600">{urgencyTimer.minutes}</div>
+                        <div className="text-xs text-red-500">Minutės</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-xl font-bold text-red-600">{urgencyTimer.seconds}</div>
+                        <div className="text-xs text-red-500">Sekundės</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Social Proof in Modal */}
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+                    <div className="flex items-center space-x-2 text-green-800 mb-2">
+                      <Users className="w-4 h-4" />
+                      <span className="font-semibold text-sm">Neseniai užsakyta:</span>
+                    </div>
+                    <div className="space-y-1">
+                      {recentOrders.slice(0, 2).map((order, index) => (
+                        <div key={index} className="flex items-center justify-between text-xs text-gray-600">
+                          <span>{order.name} iš {order.location}</span>
+                          <span>{order.time}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Add to Cart Button */}
+                  <button 
+                    onClick={async () => {
+                      setLoading(true);
+                      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate loading
+                      const effectivePrice = (selectedProduct.pricesByColor && selectedProduct.pricesByColor[selectedColor] !== undefined)
+                        ? selectedProduct.pricesByColor[selectedColor]
+                        : (typeof selectedProduct.price === 'number' ? selectedProduct.price : parseFloat(selectedProduct.price));
+                      const imageUrl = selectedProduct.images?.[selectedColor] || selectedProduct.image;
+                      addItem({
+                        productId: selectedProduct.id,
+                        name: selectedProduct.name,
+                        price: effectivePrice,
+                        image: imageUrl,
+                        quantity: quantity,
+                        selectedColor: selectedProduct.colors[selectedColor]?.name || '',
+                        selectedSize: selectedProduct.sizes[selectedSize]?.name || ''
+                      });
+                      setSuccessMessage(t.addedToCart);
+                      setProductModalOpen(false);
+                      setLoading(false);
+                      setTimeout(() => setSuccessMessage(''), 3000);
+                    }}
+                    disabled={loading}
+                    className="w-full bg-gradient-to-r from-red-600 to-green-600 text-white py-3 rounded-lg font-bold hover:from-red-700 hover:to-green-700 transition mb-3 disabled:opacity-50"
+                  >
+                    {loading ? (language === 'lt' ? 'Pridedama...' : 'Adding...') : t.addToCart}
+                  </button>
+
+                  {/* Note */}
+                  <p className="text-sm font-semibold text-gray-900 mb-4 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                    Pastaba: Jūs prašėte. Mes papildėme atsargas (vėl). Ribotas kiekis!
+                  </p>
+
+                  {/* Delivery Info */}
+                  <p className="text-base font-semibold text-gray-900 mb-6">
+                    Pristatysime per 14 dienų, jei užsakysite dabar
+                  </p>
+
+                  {/* Service Guarantees */}
+                  <div className="flex flex-wrap gap-4">
+                    <div className="flex items-center space-x-2">
+                      <Package className="w-6 h-6 text-gray-800" />
+                      <span className="text-sm font-semibold text-gray-900">Lengvas Grąžinimas</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Star className="w-6 h-6 text-yellow-400" />
+                      <span className="text-sm font-semibold text-gray-900">Penkių Žvaigždžių</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Headphones className="w-6 h-6 text-gray-800" />
+                      <span className="text-sm font-semibold text-gray-900">24/7 VIP Pagalba</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Checkout Modal */}
+      {checkoutOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg max-w-5xl w-full max-h-[95vh] overflow-y-auto">
+            <div className="p-4">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold">Apmokėjimas</h2>
+                <button
+                  onClick={() => setCheckoutOpen(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Left Column - Forms */}
+                <div className="space-y-4">
+                  {/* Contact Information */}
+                  <div>
+                    <h3 className="text-base font-semibold mb-2">Kontaktinė Informacija</h3>
+                    <div>
+                      <input
+                        type="email"
+                        placeholder="El. paštas (pvz., vardas@gmail.com)"
+                        value={checkoutFormData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                          formErrors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-red-500'
+                        }`}
+                      />
+                      {formErrors.email && (
+                        <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Delivery Address */}
+                  <div>
+                    <h3 className="text-base font-semibold mb-2">Pristatymo Adresas</h3>
+                    <div className="space-y-3">
+                      <div>
+                        <input
+                          type="text"
+                          placeholder="Vardas"
+                          value={checkoutFormData.name}
+                          onChange={(e) => handleInputChange('name', e.target.value.replace(/[^a-zA-ZąčęėįšųūžĄČĘĖĮŠŲŪŽ\s]/g, ''))}
+                          className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                            formErrors.name ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-red-500'
+                          }`}
+                        />
+                        {formErrors.name && (
+                          <p className="text-red-500 text-xs mt-1">{formErrors.name}</p>
+                        )}
+                      </div>
+                      
+                      <div>
+                        <input
+                          type="text"
+                          placeholder="Pavardė"
+                          value={checkoutFormData.surname}
+                          onChange={(e) => handleInputChange('surname', e.target.value.replace(/[^a-zA-ZąčęėįšųūžĄČĘĖĮŠŲŪŽ\s]/g, ''))}
+                          className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                            formErrors.surname ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-red-500'
+                          }`}
+                        />
+                        {formErrors.surname && (
+                          <p className="text-red-500 text-xs mt-1">{formErrors.surname}</p>
+                        )}
+                      </div>
+                      
+                      <div>
+                        <input
+                          type="text"
+                          placeholder="Adresas (gatvė, namo nr., buto nr.)"
+                          value={checkoutFormData.address}
+                          onChange={(e) => handleInputChange('address', e.target.value)}
+                          className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                            formErrors.address ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-red-500'
+                          }`}
+                        />
+                        {formErrors.address && (
+                          <p className="text-red-500 text-xs mt-1">{formErrors.address}</p>
+                        )}
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <input
+                            type="text"
+                            placeholder="Miestas"
+                            value={checkoutFormData.city}
+                            onChange={(e) => handleInputChange('city', e.target.value.replace(/[^a-zA-ZąčęėįšųūžĄČĘĖĮŠŲŪŽ\s]/g, ''))}
+                            className={`p-2 border rounded-lg focus:outline-none focus:ring-2 w-full ${
+                              formErrors.city ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-red-500'
+                            }`}
+                          />
+                          {formErrors.city && (
+                            <p className="text-red-500 text-xs mt-1">{formErrors.city}</p>
+                          )}
+                        </div>
+                        
+                        <div>
+                          <input
+                            type="text"
+                            placeholder="Rajonas (neprivaloma)"
+                            value={checkoutFormData.region}
+                            onChange={(e) => handleInputChange('region', e.target.value)}
+                            className="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 w-full"
+                          />
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          placeholder="Pašto kodas (5 skaitmenys)"
+                          value={checkoutFormData.postalCode}
+                          onChange={(e) => handleInputChange('postalCode', e.target.value.replace(/\D/g, '').slice(0, 5))}
+                          maxLength={5}
+                          className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                            formErrors.postalCode ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-red-500'
+                          }`}
+                        />
+                        {formErrors.postalCode && (
+                          <p className="text-red-500 text-xs mt-1">{formErrors.postalCode}</p>
+                        )}
+                      </div>
+                      
+                      <div>
+                        <input
+                          type="tel"
+                          inputMode="tel"
+                          placeholder="Telefonas (pvz., +37060000000)"
+                          value={checkoutFormData.phone}
+                          onChange={(e) => handleInputChange('phone', formatPhone(e.target.value))}
+                          className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                            formErrors.phone ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-red-500'
+                          }`}
+                        />
+                        {formErrors.phone && (
+                          <p className="text-red-500 text-xs mt-1">{formErrors.phone}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Payment Information */}
+                  <div>
+                    <div className="flex items-center space-x-2 mb-2">
+                      <CreditCard className="w-4 h-4" />
+                      <h3 className="text-base font-semibold">Mokėjimo Informacija</h3>
+                    </div>
+                    <div className="space-y-3">
+                      <div>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9\s]*"
+                          placeholder="Kortelės numeris (16 skaitmenų)"
+                          value={checkoutFormData.cardNumber}
+                          onChange={(e) => handleInputChange('cardNumber', formatCardNumber(e.target.value))}
+                          maxLength={19}
+                          className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                            formErrors.cardNumber ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-red-500'
+                          }`}
+                        />
+                        {formErrors.cardNumber && (
+                          <p className="text-red-500 text-xs mt-1">{formErrors.cardNumber}</p>
+                        )}
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            pattern="[0-9/]*"
+                            placeholder="MM/YY"
+                            value={checkoutFormData.expiry}
+                            onChange={(e) => handleInputChange('expiry', formatExpiry(e.target.value))}
+                            maxLength={5}
+                            className={`p-2 border rounded-lg focus:outline-none focus:ring-2 w-full ${
+                              formErrors.expiry ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-red-500'
+                            }`}
+                          />
+                          {formErrors.expiry && (
+                            <p className="text-red-500 text-xs mt-1">{formErrors.expiry}</p>
+                          )}
+                        </div>
+                        
+                        <div>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            placeholder="CVV (3 skaitmenys)"
+                            value={checkoutFormData.cvv}
+                            onChange={(e) => handleInputChange('cvv', e.target.value.replace(/\D/g, '').slice(0, 3))}
+                            maxLength={3}
+                            className={`p-2 border rounded-lg focus:outline-none focus:ring-2 w-full ${
+                              formErrors.cvv ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-red-500'
+                            }`}
+                          />
+                          {formErrors.cvv && (
+                            <p className="text-red-500 text-xs mt-1">{formErrors.cvv}</p>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-lg p-3 text-xs text-green-800">
+                        <Lock className="w-4 h-4" />
+                        <div>
+                          <div className="font-semibold">256-bit SSL Secure Checkout</div>
+                          <div>Jūsų mokėjimo informacija yra visiškai saugi</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column - Order Summary */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="text-base font-semibold mb-3">Užsakymo Santrauka</h3>
+                  
+                  {/* Products in Order */}
+                  <div className="space-y-3 mb-3 max-h-48 overflow-y-auto">
+                    {cartItems.map((item) => (
+                      <div key={item.id} className="flex items-center space-x-3">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-12 h-12 object-cover rounded"
+                        />
+                        <div className="flex-1">
+                          <h4 className="font-medium text-sm line-clamp-1">{item.name}</h4>
+                          <p className="text-xs text-gray-600">Kiekis: {item.quantity}</p>
+                          <p className="font-semibold text-red-600 text-sm">€{(item.price * item.quantity).toFixed(2)}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Price Breakdown */}
+                  <div className="space-y-1 mb-3">
+                    <div className="flex justify-between text-sm">
+                      <span>{t.subtotal}</span>
+                      <span>€{totalPrice.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>{t.shipping}</span>
+                      <span className={totalPrice >= 30 ? "text-green-600" : "text-gray-600"}>
+                        {totalPrice >= 30 ? (language === 'lt' ? 'Nemokamas' : 'Free') : '€2.99'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Total */}
+                  <div className="border-t pt-3 mb-4">
+                    {giftWrapping && (
+                      <div className="flex justify-between text-sm">
+                        <span>{t.giftWrapping}</span>
+                        <span>€2.99</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-base font-bold">
+                      <span>{t.orderTotal}</span>
+                      <span>€{(totalPrice + (totalPrice >= 30 ? 0 : 2.99) + (giftWrapping ? 2.99 : 0)).toFixed(2)}</span>
+                    </div>
+                  </div>
+
+                  {/* Gift Wrapping Option */}
+                  <div className="flex items-center justify-between mb-3 p-2 bg-gray-100 rounded">
+                    <span className="text-sm">{t.giftWrapping}</span>
+                    <button
+                      onClick={() => setGiftWrapping(!giftWrapping)}
+                      className={`w-12 h-6 rounded-full transition ${
+                        giftWrapping ? 'bg-green-600' : 'bg-gray-300'
+                      }`}
+                    >
+                      <div className={`w-5 h-5 bg-white rounded-full transition transform ${
+                        giftWrapping ? 'translate-x-6' : 'translate-x-0.5'
+                      }`} />
+                    </button>
+                  </div>
+
+                  {/* Place Order Button */}
+                  <button 
+                    onClick={async () => {
+                      try {
+                        setLoading(true);
+                        setFormErrors({});
+                        
+                        const errors = validateForm(checkoutFormData);
+                        if (Object.keys(errors).length > 0) {
+                          setFormErrors(errors);
+                          setErrorMessage('Prašome taisyklingai užpildyti visus privalomus laukus');
+                          setTimeout(() => setErrorMessage(''), 3000);
+                          setLoading(false);
+                          return;
+                        }
+                        
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        
+                        const orderNumber = `ORD-${Date.now()}237Q799-JWUM3`;
+                        const order = {
+                          id: Date.now(),
+                          items: totalItems,
+                          total: (totalPrice + (totalPrice >= 30 ? 0 : 2.99) + (giftWrapping ? 2.99 : 0)).toFixed(2),
+                          giftWrapping,
+                          date: new Date().toLocaleDateString('lt-LT'),
+                          status: 'Apdorojama',
+                          orderNumber
+                        };
+                        
+                        setOrderHistory([order, ...orderHistory]);
+                        setCompletedOrderNumber(orderNumber);
+                        setCompletedOrderEmail(checkoutFormData.email);
+                        setCheckoutOpen(false);
+                        setThankYouModalOpen(true);
+                        clearCart();
+                        setGiftWrapping(false);
+                        
+                        // Reset form
+                        setCheckoutFormData({
+                          email: '',
+                          name: '',
+                          surname: '',
+                          address: '',
+                          city: '',
+                          region: '',
+                          postalCode: '',
+                          phone: '',
+                          cardNumber: '',
+                          expiry: '',
+                          cvv: ''
+                        });
+                      } catch (error) {
+                        setErrorMessage('Įvyko klaida. Bandykite dar kartą.');
+                        setTimeout(() => setErrorMessage(''), 3000);
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}
+                    disabled={loading}
+                    className="w-full bg-gradient-to-r from-red-600 to-green-600 text-white py-2 rounded-lg font-semibold hover:from-red-700 hover:to-green-700 transition mb-3 disabled:opacity-50"
+                  >
+                    {loading ? t.processing : t.placeOrder}
+                  </button>
+
+                  {/* Payment Logos */}
+                  <div className="flex justify-center space-x-3 mb-3">
+                    <img
+                      src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png"
+                      className="h-6 opacity-60"
+                      alt="Mastercard"
+                    />
+                    <div className="bg-white border border-gray-300 px-2 py-1 rounded">
+                      <span className="text-blue-600 font-bold text-sm">VISA</span>
+                    </div>
+                    <img
+                      src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
+                      className="h-6 opacity-60"
+                      alt="PayPal"
+                    />
+                  </div>
+
+                  {/* SSL Security Badge */}
+                  <div className="flex items-center justify-center space-x-2 mb-4 bg-gray-100 rounded-lg py-2">
+                    <Lock className="w-4 h-4 text-green-600" />
+                    <span className="text-xs text-gray-700 font-semibold">256-bit SSL Secure Checkout</span>
+                  </div>
+
+                  {/* Terms */}
+                  <p className="text-xs text-gray-500 text-center">
+                    Pateikdami užsakymą, sutinkate su mūsų Taisyklėmis ir Sąlygomis
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Bottom Navigation */}
+      {isMobile && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 ios-safe-area">
+          <div className="grid grid-cols-3 h-16">
+            <button 
+              onClick={() => setCartOpen(false)}
+              className="flex flex-col items-center justify-center space-y-1 text-gray-600 hover:text-red-600 transition-colors"
+            >
+              <div className="text-2xl">🏠</div>
+              <span className="text-xs">Pagrindinis</span>
+            </button>
+            <button 
+              onClick={() => setCartOpen(true)}
+              className="flex flex-col items-center justify-center space-y-1 text-gray-600 hover:text-red-600 transition-colors relative"
+            >
+              <div className="text-2xl">🛒</div>
+              <span className="text-xs">Krepšelis</span>
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
+            </button>
+            <button 
+              onClick={() => setWishlistOpen(true)}
+              className="flex flex-col items-center justify-center space-y-1 text-gray-600 hover:text-red-600 transition-colors relative"
+            >
+              <div className="text-2xl">❤️</div>
+              <span className="text-xs">Mėgstami</span>
+              {wishlist.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {wishlist.length}
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Thank You Modal */}
+      <ThankYouModal
+        isOpen={thankYouModalOpen}
+        onClose={() => setThankYouModalOpen(false)}
+        orderNumber={completedOrderNumber}
+        email={completedOrderEmail}
+      />
+
+      {/* Footer */}
+      <footer className="bg-slate-900 text-white">
+        <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div>
+            <h4 className="font-bold text-lg mb-3">{t.shopName}</h4>
+            <p className="text-sm text-gray-300 mb-3">
+              {language === 'lt' ? 'Jūsų patikima Kalėdų dekoracijų parduotuvė.' : 'Your trusted Christmas decorations store.'}
+            </p>
+          </div>
+          <div>
+            <h5 className="font-semibold mb-3">Teisinė informacija</h5>
+            <ul className="text-sm space-y-2 text-gray-300">
+              <li>
+                <Link to="/pristatymo-info" className="hover:text-white cursor-pointer">
+                  Pristatymo Info
+                </Link>
+              </li>
+              <li>
+                <Link to="/grazinimai" className="hover:text-white cursor-pointer">
+                  Grąžinimai
+                </Link>
+              </li>
+              <li>
+                <Link to="/privatumo-politika" className="hover:text-white cursor-pointer">
+                  Privatumo Politika
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h5 className="font-semibold mb-3">Kontaktai</h5>
+            <ul className="text-sm space-y-2 text-gray-300">
+              <li className="flex items-center gap-2">
+                <Mail className="w-4 h-4" /> kaleddovanos@gmail.com
+              </li>
+              <li className="flex items-center gap-2">
+                <Phone className="w-4 h-4" /> +37060523397
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div className="border-t border-slate-800 py-4 text-center text-sm text-gray-400">
+          © 2025 Kalėdų Kampelis. Visos teisės saugomos. Sukurta su meile šventėms ❤️
+          <div className="flex justify-center gap-4 mt-3 opacity-80">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png"
+              className="h-5"
+              alt="Mastercard"
+            />
+            <div className="bg-white border border-gray-300 px-2 py-1 rounded">
+              <span className="text-blue-600 font-bold text-xs">VISA</span>
+            </div>
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
+              className="h-5"
+              alt="PayPal"
+            />
+          </div>
+          <div className="flex items-center justify-center space-x-2 mt-3 text-gray-400">
+            <Lock className="w-4 h-4" />
+            <span className="text-xs">SSL Secure Checkout | 256-bit Encryption</span>
+          </div>
+        </div>
+      </footer>
+      
+      {/* Cookie Consent Banner */}
+      <CookieConsent />
+    </div>
+    </>
+  );
+}
+
+
+// --- Main Router ---
+export default function App() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-red-50">
+        <div className="text-center">
+          <div className="text-6xl animate-bounce mb-4">🎄</div>
+          <div className="text-xl font-bold text-red-600">Kalėdų Kampelis</div>
+          <div className="text-gray-600 mt-2">Kraunama...</div>
+        </div>
+      </div>
+    }>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/pristatymo-info" element={<PristatymoInfo />} />
+        <Route path="/grazinimai" element={<Grazinimai />} />
+        <Route path="/privatumo-politika" element={<PrivatumoPolitika />} />
+      </Routes>
+    </Suspense>
+  );
+}

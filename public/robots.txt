@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kaledukampelis.lt/sitemap.xml
+
+# Optimize crawling
+Crawl-delay: 1
+
+# Block unnecessary paths
+Disallow: /node_modules/
+Disallow: /src/
+Disallow: /.git/
+Disallow: /dist/
+
+

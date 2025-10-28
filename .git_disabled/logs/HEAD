@@ -1,0 +1,9 @@
+0000000000000000000000000000000000000000 a2bb2fc94f7ab76a8a25aded0e3f9b46fa35ca3b ArminGamin <42342874+ArminGamin@users.noreply.github.com> 1760296449 -0400	commit (initial): Initial commit
+a2bb2fc94f7ab76a8a25aded0e3f9b46fa35ca3b 0000000000000000000000000000000000000000 ArminGamin <42342874+ArminGamin@users.noreply.github.com> 1760296646 -0400	Branch: renamed refs/heads/master to refs/heads/main
+0000000000000000000000000000000000000000 a2bb2fc94f7ab76a8a25aded0e3f9b46fa35ca3b ArminGamin <42342874+ArminGamin@users.noreply.github.com> 1760296646 -0400	Branch: renamed refs/heads/master to refs/heads/main
+a2bb2fc94f7ab76a8a25aded0e3f9b46fa35ca3b 0000000000000000000000000000000000000000 ArminGamin <42342874+ArminGamin@users.noreply.github.com> 1760296733 -0400	Branch: renamed refs/heads/main to refs/heads/main
+a2bb2fc94f7ab76a8a25aded0e3f9b46fa35ca3b a2bb2fc94f7ab76a8a25aded0e3f9b46fa35ca3b ArminGamin <42342874+ArminGamin@users.noreply.github.com> 1760296733 -0400	Branch: renamed refs/heads/main to refs/heads/main
+a2bb2fc94f7ab76a8a25aded0e3f9b46fa35ca3b 732c2e58144586cedfd8526c555ed282b15e02af ArminGamin <42342874+ArminGamin@users.noreply.github.com> 1760297756 -0400	commit: Add .gitignore and remove node_modules
+732c2e58144586cedfd8526c555ed282b15e02af 064de37cde6999ed909cec7f27c3da6bdb708402 ArminGamin <42342874+ArminGamin@users.noreply.github.com> 1760298223 -0400	commit: Trigger rebuild
+064de37cde6999ed909cec7f27c3da6bdb708402 415684142c34a44298068900cd9676cb89032859 ArminGamin <42342874+ArminGamin@users.noreply.github.com> 1760298332 -0400	commit: Fix rollup dependency issue
+415684142c34a44298068900cd9676cb89032859 66ef61cdc62ab6dda432d312d2df42fc3dfddd0c ArminGamin <42342874+ArminGamin@users.noreply.github.com> 1760298443 -0400	commit: Fix package.json syntax error
