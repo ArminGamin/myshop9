@@ -63,10 +63,13 @@
       .font-medium { font-weight: 500; }
     </style>
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/logo.png" sizes="any" />
+    <!-- Favicon - Multiple formats for better browser/Google compatibility -->
+    <link rel="icon" type="image/png" href="/logo.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/logo.png" sizes="16x16" />
     <link rel="shortcut icon" href="/logo.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/logo.png" />
+    <!-- Google requires favicon at /favicon.ico for search results -->
+    <link rel="icon" type="image/png" href="/logo.png" />
     <meta name="mobile-web-app-capable" content="yes" />
     
     <!-- PWA Manifest -->
