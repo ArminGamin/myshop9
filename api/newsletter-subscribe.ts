@@ -56,8 +56,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(500).json({ error: 'Missing RESEND_API_KEY' });
     }
 
+    // Use Resend onboarding sender for testing if you haven't verified a domain yet
+    const fromAddress = process.env.RESEND_FROM || 'onboarding@resend.dev';
     const emailBody = {
-      from: 'newsletter@kaledukampelis.lt', // update to a verified sender in Resend
+      from: fromAddress,
       to: ['kaleddovanos@gmail.com'],
       subject: 'Naujas naujienlaiškio prenumeratorius',
       text: `Gautas naujas prenumeratos adresas: ${e}`,
@@ -73,7 +75,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     if (!forward.ok) {
-      const msg = await forward.text().catch(() => '');
+      const msg = await forward.json().catch(async () => ({ message: await forward.text().catch(() => '') }));
       return res.status(502).json({ error: 'Failed to deliver', details: msg });
     }
 

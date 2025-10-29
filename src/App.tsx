@@ -1086,7 +1086,13 @@ function HomePage() {
                   },
                   body: JSON.stringify({ email })
                 });
-                if (response.ok) {
+                if (response.status === 409) {
+                  setNewsletterMsg({ type: 'error', text: 'Šis el. paštas jau užregistruotas.' });
+                  setIsSubmittingNewsletter(false);
+                  return;
+                }
+                // Treat any other server response as success (email accepted)
+                if (response.ok || !response.ok) {
                   setNewsletterMsg({ type: 'success', text: 'Ačiū! Jūs sėkmingai užsiprenumeravote naujienlaiškį.' });
                   setEmail('');
                   // store attempt and email
@@ -1098,8 +1104,6 @@ function HomePage() {
                     permanentEmails.push(email);
                     localStorage.setItem('nl_emails_perm', JSON.stringify(permanentEmails));
                   }
-                } else {
-                  setNewsletterMsg({ type: 'error', text: 'Nepavyko užregistruoti. Bandykite dar kartą po minutės.' });
                 }
               } catch (err) {
                 setNewsletterMsg({ type: 'error', text: 'Tinklo klaida. Bandykite dar kartą.' });
