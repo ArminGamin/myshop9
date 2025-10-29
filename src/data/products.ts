@@ -17,7 +17,7 @@ export const initialProducts: Product[] = [
       "https://ae-pic-a1.aliexpress-media.com/kf/S612c6eb10fa5471ab8f81a12a5a305b42.jpg"
     ],
     rating: 4.9,
-    reviews: 312,
+    reviews: 78,
     discount: "-45%",
     description:
       "Minkštas, neslystantis kalėdinis kilimėlis lauko ir vidaus durims. Atsparus purvui ir drėgmei, lengvai valomas. Puiki šventinė detalė Jūsų namų įėjimui.",
@@ -57,7 +57,7 @@ export const initialProducts: Product[] = [
       "https://ae-pic-a1.aliexpress-media.com/kf/Sfde8620c111046249f521e291d3b2a52L.png"
     ],
     rating: 4.8,
-    reviews: 267,
+    reviews: 55,
     discount: "-50%",
     description: "Premium stiklinių kalėdinių žaisliukų rinkinys su aukso akcentais. Aukštos kokybės, trankūs puikiai tinkantys šventiniam dekoravimui. Idėalus kalėdiniam skaičiuoklei arba eglutės puošimui.",
     features: [
@@ -83,7 +83,7 @@ export const initialProducts: Product[] = [
   },
   {
     id: 1003,
-    name: "Kalėdinis Šeimos Pyžamos Komplektas (Visiems Nariams)",
+    name: "Kalėdinis Šeimos Pyžamos Komplektas",
     price: 14.99,
     originalPrice: 34.99,
     image: "https://ae-pic-a1.aliexpress-media.com/kf/Se4e42f3e36004692bcd2bea0e11a30106.jpg",
@@ -92,7 +92,7 @@ export const initialProducts: Product[] = [
       "https://ae-pic-a1.aliexpress-media.com/kf/Sc867e2f6a41d4c14a4a1850a5d9401daF.jpg"
     ],
     rating: 4.9,
-    reviews: 312,
+    reviews: 32,
     discount: "-57%",
     description: "Puikios šeimos Kalėdų pyžamos su 'MERRY CHRISTMAS' tekstu ir šventiniais motyvais. Patogūs, minkšti, tinka visai šeimai - nuo mažiausių iki senesnio amžiaus. Puikiai tinka švenčioms švietimui arba nuotraukoms.",
     features: [
@@ -106,9 +106,12 @@ export const initialProducts: Product[] = [
       { name: "Juodas su raudonais akcentais", value: "black_red" }
     ],
     sizes: [
-      { name: "Vaikų (XS-S)", value: "kids" },
-      { name: "Paauglių (M-L)", value: "teens" },
-      { name: "Suaugusiųjų (XL-XXL)", value: "adult" }
+      { name: "XS", value: "xs_kids" },
+      { name: "S", value: "s_kids" },
+      { name: "M", value: "m_teens" },
+      { name: "L", value: "l_teens" },
+      { name: "XL", value: "xl_adult" },
+      { name: "XXL", value: "xxl_adult" }
     ],
     category: "Drabužiai",
     tags: ["pyžamos", "kalėdos", "šeima", "šventinė dovana"],

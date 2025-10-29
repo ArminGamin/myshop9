@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import { ThankYouModal } from "./components/ThankYouModal";
+import OptimizedImage from "./components/OptimizedImage";
 import CookieConsent from "./components/CookieConsent";
 import { useCartStore } from "./store/cartStore";
 import { useProductStore } from "./store/productStore";
@@ -153,6 +154,8 @@ function HomePage() {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [newsletterMsg, setNewsletterMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [isSubmittingNewsletter, setIsSubmittingNewsletter] = useState(false);
   const [wishlist, setWishlist] = useState<number[]>([]);
   const [recentlyViewed, setRecentlyViewed] = useState<number[]>([]);
   const [orderHistory, setOrderHistory] = useState<any[]>([]);
@@ -697,11 +700,17 @@ function HomePage() {
             
             {/* Call-to-Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <button className="bg-white text-red-600 px-8 py-4 rounded-lg font-semibold border-2 border-red-600 hover:bg-red-50 transition-all duration-300 transform hover:scale-105 touch-manipulation min-h-[48px] flex items-center justify-center gap-2">
+              <button
+                onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
+                className="bg-white text-red-600 px-8 py-4 rounded-lg font-semibold border-2 border-red-600 hover:bg-red-50 transition-all duration-300 transform hover:scale-105 touch-manipulation min-h-[48px] flex items-center justify-center gap-2"
+              >
                 <ShoppingCart className="w-5 h-5" />
                 Pirkinių pradžia
               </button>
-              <button className="bg-red-600 text-white px-8 py-4 rounded-lg font-semibold border-2 border-white hover:bg-red-700 transition-all duration-300 transform hover:scale-105 touch-manipulation min-h-[48px]">
+              <button
+                onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
+                className="bg-red-600 text-white px-8 py-4 rounded-lg font-semibold border-2 border-white hover:bg-red-700 transition-all duration-300 transform hover:scale-105 touch-manipulation min-h-[48px]"
+              >
                 Peržiūrėti rinkinius
               </button>
             </div>
@@ -864,14 +873,14 @@ function HomePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {recommendations.map((product) => (
                 <div key={product.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
-                  <img
+                  <OptimizedImage
                     src={product.image}
                     alt={`${product.name} - Rekomenduojamas produktas`}
                     className="w-full h-40 object-cover"
                     loading="lazy"
                     decoding="async"
-                    width="400"
-                    height="160"
+                    width={400}
+                    height={160}
                   />
                   <div className="p-4">
                     <div className="flex items-center mb-1">
@@ -932,7 +941,7 @@ function HomePage() {
       )}
 
       {/* Products */}
-      <main className="max-w-7xl mx-auto px-6 py-8 flex-1">
+      <main id="products" className="max-w-7xl mx-auto px-6 py-8 flex-1">
         <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
           {t.products}
         </h2>
@@ -948,14 +957,14 @@ function HomePage() {
               className={`bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 group ${products.length === 1 ? 'lg:col-span-2' : ''}`}
             >
               <div className={`w-full ${products.length === 1 ? 'h-96' : 'h-80'} bg-gray-50 flex items-center justify-center overflow-hidden`}>
-                  <img
+                  <OptimizedImage
                     src={product.image}
                     alt={`${product.name} - Premium Kalėdų dekoracija | Kalėdų Kampelis`}
                     className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 p-4"
                     loading="lazy"
                     decoding="async"
-                    width="800"
-                    height="600"
+                    width={800}
+                    height={600}
                   />
               </div>
               <div className="p-6">
@@ -987,15 +996,6 @@ function HomePage() {
                     </button>
                   </div>
                 </div>
-                {/* Stock Warning */}
-                {stockCount <= 3 && (
-                  <div className="mb-3 bg-orange-100 border border-orange-200 rounded-lg p-3">
-                    <div className="flex items-center space-x-2 text-orange-900">
-                      <AlertTriangle className="w-5 h-5" />
-                      <span className="text-sm font-bold">Liko tik {stockCount} vnt.!</span>
-                    </div>
-                  </div>
-                )}
 
                 <button
                   onClick={() => {
@@ -1037,14 +1037,77 @@ function HomePage() {
             pirmajam užsakymui!
           </p>
           <form
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
-              if (validateEmail(email)) {
-                alert("Ačiū, jūsų prenumerata sėkminga!");
-                setEmail('');
-              } else {
-                alert("Prašome įvesti galiojantį el. pašto adresą (gmail.com, yahoo.com, hotmail.com, outlook.com)");
+              if (!validateEmail(email)) {
+                setNewsletterMsg({ type: 'error', text: 'Prašome įvesti galiojantį el. pašto adresą.' });
+                return;
               }
+
+              // Basic client-side rate limiting to reduce spam
+              try {
+                const now = Date.now();
+                const minuteWindowMs = 60 * 1000; // 1 minute
+                const hourWindowMs = 60 * 60 * 1000; // 1 hour
+                const dayWindowMs = 24 * 60 * 60 * 1000; // 24 hours
+                const attempts: number[] = JSON.parse(localStorage.getItem('nl_attempts') || '[]').filter((t: number) => now - t < dayWindowMs);
+                // Save back filtered list in case old entries existed
+                localStorage.setItem('nl_attempts', JSON.stringify(attempts));
+                const attemptsLastMinute = attempts.filter((t) => now - t < minuteWindowMs).length;
+                const attemptsLastHour = attempts.filter((t) => now - t < hourWindowMs).length;
+                if (attemptsLastMinute >= 3) {
+                  setNewsletterMsg({ type: 'error', text: 'Per daug bandymų. Limitas: 3 per minutę.' });
+                  return;
+                }
+                if (attemptsLastHour >= 10) {
+                  setNewsletterMsg({ type: 'error', text: 'Per daug bandymų. Limitas: 10 per valandą.' });
+                  return;
+                }
+                if (attempts.length >= 15) {
+                  setNewsletterMsg({ type: 'error', text: 'Pasiektas dienos limitas (15). Pabandykite rytoj.' });
+                  return;
+                }
+                // Prevent duplicate email permanently (and keep 24h log as secondary)
+                const emailLog: Record<string, number> = JSON.parse(localStorage.getItem('nl_emails') || '{}');
+                const permanentEmails: string[] = JSON.parse(localStorage.getItem('nl_emails_perm') || '[]');
+                if (permanentEmails.includes(email) || (emailLog[email] && now - emailLog[email] < dayWindowMs)) {
+                  setNewsletterMsg({ type: 'error', text: 'Šis el. paštas jau užregistruotas.' });
+                  return;
+                }
+                setIsSubmittingNewsletter(true);
+                
+                // Proceed to submit
+              try {
+                const response = await fetch('/api/newsletter-subscribe', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                  },
+                  body: JSON.stringify({ email })
+                });
+                if (response.ok) {
+                  setNewsletterMsg({ type: 'success', text: 'Ačiū! Jūs sėkmingai užsiprenumeravote naujienlaiškį.' });
+                  setEmail('');
+                  // store attempt and email
+                  const newAttempts = [...attempts, now];
+                  localStorage.setItem('nl_attempts', JSON.stringify(newAttempts));
+                  emailLog[email] = now;
+                  localStorage.setItem('nl_emails', JSON.stringify(emailLog));
+                  if (!permanentEmails.includes(email)) {
+                    permanentEmails.push(email);
+                    localStorage.setItem('nl_emails_perm', JSON.stringify(permanentEmails));
+                  }
+                } else {
+                  setNewsletterMsg({ type: 'error', text: 'Nepavyko užregistruoti. Bandykite dar kartą po minutės.' });
+                }
+              } catch (err) {
+                setNewsletterMsg({ type: 'error', text: 'Tinklo klaida. Bandykite dar kartą.' });
+              }
+              } finally {
+                setIsSubmittingNewsletter(false);
+              }
+              setTimeout(() => setNewsletterMsg(null), 4000);
             }}
             className="flex flex-col sm:flex-row gap-3 justify-center"
           >
@@ -1052,13 +1115,33 @@ function HomePage() {
               placeholder="Įveskite savo el. paštą"
               className="flex-1 px-4 py-3 rounded-md text-black"
               type="email"
+              name="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
-            <button className="bg-white text-red-600 font-semibold px-6 py-3 rounded-md hover:bg-gray-100">
+            {/* Honeypot for additional spam protection */}
+            <input type="text" name="_honey" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
+            <button disabled={isSubmittingNewsletter} className={`bg-white text-red-600 font-semibold px-6 py-3 rounded-md hover:bg-gray-100 ${isSubmittingNewsletter ? 'opacity-60 cursor-not-allowed' : ''}`}>
               Prenumeruoti
             </button>
           </form>
+          {newsletterMsg && (
+            <div className={`mt-4 max-w-xl mx-auto rounded-lg border px-4 py-3 text-sm font-semibold shadow ${
+              newsletterMsg.type === 'success'
+                ? 'bg-green-50 border-green-200 text-green-800'
+                : 'bg-red-50 border-red-200 text-red-800'
+            }`}>
+              <div className="flex items-center gap-2 justify-center">
+                {newsletterMsg.type === 'success' ? (
+                  <Check className="w-4 h-4" />
+                ) : (
+                  <AlertTriangle className="w-4 h-4" />
+                )}
+                <span>{newsletterMsg.text}</span>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -1081,18 +1164,14 @@ function HomePage() {
               {/* Free Gift Progress */}
               {totalItems > 0 && (
                 <div className="bg-red-50 p-4 rounded-lg mb-6">
-                  <p className="text-sm font-medium mb-2">Jūs esate €{Math.max(0, 30 - totalPrice).toFixed(2)} nuo NEMOKAMO dovanos!</p>
+                  <p className="text-sm font-medium mb-2">Jūs esate €{Math.max(0, 30 - totalPrice).toFixed(2)} nuo NEMOKAMO siuntimo!</p>
                   <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
                     <div 
                       className="bg-red-600 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${Math.min(100, (totalPrice / 30) * 100)}%` }}
                     ></div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Gift className="w-4 h-4 text-red-600" />
-                      <span className="text-xs text-gray-600">Nemokama dovana</span>
-                    </div>
+                  <div className="flex items-center justify-center">
                     <div className="flex items-center space-x-2">
                       <Gift className="w-4 h-4 text-red-600" />
                       <span className="text-xs text-gray-600">Nemokamas pristatymas</span>
@@ -1130,25 +1209,25 @@ function HomePage() {
                 <div className="space-y-4 mb-6">
                   {cartItems.map((item) => (
                     <div key={item.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                    <img
-                      src={item.image}
-                      alt={`${item.name} - Krepšelyje`}
-                      className="w-16 h-16 object-cover rounded"
-                      loading="lazy"
-                      decoding="async"
-                      width="64"
-                      height="64"
-                    />
+                      <img
+                        src={item.image}
+                        alt={`${item.name} - Krepšelyje`}
+                        className="w-20 h-20 object-cover rounded"
+                        loading="lazy"
+                        decoding="async"
+                        width="80"
+                        height="80"
+                      />
                       <div className="flex-1">
-                        <h3 className="font-medium text-sm">{item.name}</h3>
+                        <h3 className="font-bold text-base">{item.name}</h3>
                         {item.selectedColor && (
-                          <p className="text-xs text-gray-500">Spalva: {item.selectedColor}</p>
+                          <p className="text-sm font-semibold text-gray-700">Spalva: {item.selectedColor}</p>
                         )}
                         {item.selectedSize && (
-                          <p className="text-xs text-gray-500">Dydis: {item.selectedSize}</p>
+                          <p className="text-sm font-semibold text-gray-700">Dydis: {item.selectedSize}</p>
                         )}
                         <div className="flex items-center space-x-2 mt-1">
-                          <span className="text-lg font-bold text-red-600">€{item.price}</span>
+                          <span className="text-xl font-extrabold text-red-600">€{item.price}</span>
                         </div>
                         <div className="flex items-center justify-between mt-2">
                           <div className="flex items-center space-x-2">
@@ -1259,11 +1338,11 @@ function HomePage() {
                         <img
                           src={product.image}
                           alt={`${product.name} - Pageidavimų sąraše`}
-                          className="w-16 h-16 object-cover rounded"
+                          className="w-20 h-20 object-cover rounded"
                           loading="lazy"
                           decoding="async"
-                          width="64"
-                          height="64"
+                          width="80"
+                          height="80"
                         />
                         <div className="flex-1">
                           <h3 className="font-medium text-sm">{product.name}</h3>
@@ -1340,7 +1419,7 @@ function HomePage() {
                 {/* Left Column - Images */}
                 <div>
                   <div className="mb-3 bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden" style={{ minHeight: '400px' }}>
-                    <img
+                    <OptimizedImage
                       src={resolveImagePath(selectedProduct.images?.[selectedColor] || selectedProduct.image)}
                       alt={`${selectedProduct.name} - Produkto nuotrauka`}
                       className="w-full h-full object-contain p-4"
@@ -1428,12 +1507,12 @@ function HomePage() {
                   {/* Size Selection */}
                   <div className="mb-4">
                     <h3 className="font-bold mb-3 text-base text-gray-900">Dydis</h3>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-3">
                       {selectedProduct.sizes.map((size: any, index: number) => (
                         <button
                           key={index}
                           onClick={() => setSelectedSize(index)}
-                          className={`px-3 py-2 border-2 rounded-lg text-sm font-semibold touch-manipulation min-h-[44px] transition-all ${
+                          className={`px-5 py-4 border-2 rounded-lg text-base font-bold touch-manipulation min-h-[52px] min-w-[60px] transition-all ${
                             selectedSize === index
                               ? 'border-red-500 bg-red-50 text-red-700 shadow-md'
                               : 'border-gray-300 hover:border-gray-400 text-gray-800'
@@ -1467,14 +1546,10 @@ function HomePage() {
 
                   {/* Urgency Timer in Modal */}
                   <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-center mb-2">
                       <div className="flex items-center space-x-2 text-red-800">
                         <Clock className="w-4 h-4" />
                         <span className="font-semibold text-sm">Pasiūlymas baigiasi:</span>
-                      </div>
-                      <div className="flex items-center space-x-2 text-orange-700">
-                        <Eye className="w-4 h-4" />
-                        <span className="text-sm">Liko tik {stockCount} vnt.</span>
                       </div>
                     </div>
                     <div className="flex items-center space-x-4">
@@ -1511,6 +1586,7 @@ function HomePage() {
 
                   {/* Add to Cart Button */}
                   <button 
+                    disabled={loading}
                     onClick={async () => {
                       setLoading(true);
                       await new Promise(resolve => setTimeout(resolve, 500)); // Simulate loading
@@ -1795,33 +1871,33 @@ function HomePage() {
 
                 {/* Right Column - Order Summary */}
                 <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="text-base font-semibold mb-3">Užsakymo Santrauka</h3>
+                  <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4">Užsakymo Santrauka</h3>
                   
                   {/* Products in Order */}
-                  <div className="space-y-3 mb-3 max-h-48 overflow-y-auto">
+                  <div className="space-y-3 sm:space-y-4 mb-3 sm:mb-4 max-h-56 overflow-y-auto">
                     {cartItems.map((item) => (
                       <div key={item.id} className="flex items-center space-x-3">
                         <img
                           src={item.image}
                           alt={item.name}
-                          className="w-12 h-12 object-cover rounded"
+                          className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded"
                         />
                         <div className="flex-1">
-                          <h4 className="font-medium text-sm line-clamp-1">{item.name}</h4>
-                          <p className="text-xs text-gray-600">Kiekis: {item.quantity}</p>
-                          <p className="font-semibold text-red-600 text-sm">€{(item.price * item.quantity).toFixed(2)}</p>
+                          <h4 className="font-semibold text-sm sm:text-base line-clamp-1">{item.name}</h4>
+                          <p className="text-xs sm:text-sm font-semibold text-gray-700">Kiekis: {item.quantity}</p>
+                          <p className="font-bold text-red-600 text-sm sm:text-base">€{(item.price * item.quantity).toFixed(2)}</p>
                         </div>
                       </div>
                     ))}
                   </div>
 
                   {/* Price Breakdown */}
-                  <div className="space-y-1 mb-3">
-                    <div className="flex justify-between text-sm">
+                  <div className="space-y-2 mb-4">
+                    <div className="flex justify-between text-sm sm:text-base font-semibold">
                       <span>{t.subtotal}</span>
                       <span>€{totalPrice.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-sm sm:text-base font-semibold">
                       <span>{t.shipping}</span>
                       <span className={totalPrice >= 30 ? "text-green-600" : "text-gray-600"}>
                         {totalPrice >= 30 ? (language === 'lt' ? 'Nemokamas' : 'Free') : '€2.99'}
@@ -1832,31 +1908,21 @@ function HomePage() {
                   {/* Total */}
                   <div className="border-t pt-3 mb-4">
                     {giftWrapping && (
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-between text-sm sm:text-base font-semibold">
                         <span>{t.giftWrapping}</span>
                         <span>€2.99</span>
                       </div>
                     )}
-                    <div className="flex justify-between text-base font-bold">
+                    <div className="flex justify-between text-lg sm:text-xl font-extrabold">
                       <span>{t.orderTotal}</span>
                       <span>€{(totalPrice + (totalPrice >= 30 ? 0 : 2.99) + (giftWrapping ? 2.99 : 0)).toFixed(2)}</span>
                     </div>
                   </div>
 
-                  {/* Gift Wrapping Option */}
-                  <div className="flex items-center justify-between mb-3 p-2 bg-gray-100 rounded">
-                    <span className="text-sm">{t.giftWrapping}</span>
-                    <button
-                      onClick={() => setGiftWrapping(!giftWrapping)}
-                      className={`w-12 h-6 rounded-full transition ${
-                        giftWrapping ? 'bg-green-600' : 'bg-gray-300'
-                      }`}
-                    >
-                      <div className={`w-5 h-5 bg-white rounded-full transition transform ${
-                        giftWrapping ? 'translate-x-6' : 'translate-x-0.5'
-                      }`} />
-                    </button>
-                  </div>
+                  {/* Gift Wrapping Option removed per request */}
+
+                  {/* Consent */}
+                  
 
                   {/* Place Order Button */}
                   <button 
@@ -1876,7 +1942,7 @@ function HomePage() {
                         
                         await new Promise(resolve => setTimeout(resolve, 1000));
                         
-                        const orderNumber = `ORD-${Date.now()}237Q799-JWUM3`;
+                        const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random()*1000)}`;
                         const order = {
                           id: Date.now(),
                           items: totalItems,
@@ -1886,7 +1952,40 @@ function HomePage() {
                           status: 'Apdorojama',
                           orderNumber
                         };
-                        
+
+                        // Simulate serverless verification of payment
+                        try {
+                          const resp = await fetch('/api/verify-payment', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ orderNumber, amount: order.total })
+                          });
+                          if (resp.ok) {
+                            order.status = 'Apmokėta';
+                            // Notify Discord
+                            try {
+                              await fetch('/api/notify-discord', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  orderNumber,
+                                  total: order.total,
+                                  items: cartItems.map(it => ({ id: it.id, name: it.name, quantity: it.quantity, price: it.price })),
+                                  customer: {
+                                    email: checkoutFormData.email,
+                                    name: checkoutFormData.name,
+                                    surname: checkoutFormData.surname,
+                                    address: checkoutFormData.address,
+                                    city: checkoutFormData.city,
+                                    postalCode: checkoutFormData.postalCode,
+                                    phone: checkoutFormData.phone
+                                  }
+                                })
+                              });
+                            } catch {}
+                          }
+                        } catch {}
+
                         setOrderHistory([order, ...orderHistory]);
                         setCompletedOrderNumber(orderNumber);
                         setCompletedOrderEmail(checkoutFormData.email);
@@ -1917,7 +2016,7 @@ function HomePage() {
                       }
                     }}
                     disabled={loading}
-                    className="w-full bg-gradient-to-r from-red-600 to-green-600 text-white py-2 rounded-lg font-semibold hover:from-red-700 hover:to-green-700 transition mb-3 disabled:opacity-50"
+                    className="w-full bg-gradient-to-r from-red-600 to-green-600 text-white py-2 rounded-lg font-semibold hover:from-red-700 hover:to-green-700 transition mb-3 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? t.processing : t.placeOrder}
                   </button>
@@ -2037,9 +2136,6 @@ function HomePage() {
             <ul className="text-sm space-y-2 text-gray-300">
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4" /> kaleddovanos@gmail.com
-              </li>
-              <li className="flex items-center gap-2">
-                <Phone className="w-4 h-4" /> +37060523397
               </li>
             </ul>
           </div>

@@ -39,18 +39,15 @@
     <meta name="apple-mobile-web-app-title" content="Kalėdų Kampelis" />
     
     <!-- Enhanced Performance -->
-    <link rel="preconnect" href="https://images.unsplash.com" />
     <link rel="preconnect" href="https://ae-pic-a1.aliexpress-media.com" />
     <link rel="dns-prefetch" href="https://ae-pic-a1.aliexpress-media.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="dns-prefetch" href="https://images.unsplash.com" />
     <!-- Preload critical resources for LCP improvement -->
     <link rel="preload" href="/src/main.tsx" as="script" />
     <link rel="preload" href="/src/index.css" as="style" />
     
-    <!-- Preload hero images to improve LCP -->
-    <link rel="preload" href="https://ae-pic-a1.aliexpress-media.com/kf/Sd0b1d77d28a24d1d9ef4bbba51142f1ac.jpg" as="image" fetchpriority="high" />
+    <!-- Consider preloading the first visible product image only if stable -->
     
     <!-- Critical CSS inline for above-the-fold content -->
     <style>
@@ -69,14 +66,14 @@
     </style>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/logo.png" />
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
     
-    <!-- Enhanced Structured Data - Organization & Store -->
-    <script type="application/ld+json">
+    <!-- Enhanced Structured Data - Organization & Store (lazy injected) -->
+    <script type="application/json" data-lazy-json>
     {
       "@context": "https://schema.org",
       "@type": ["Store", "OnlineStore", "Organization"],
@@ -170,8 +167,8 @@
     }
     </script>
 
-    <!-- WebSite Schema -->
-    <script type="application/ld+json">
+    <!-- WebSite Schema (lazy injected) -->
+    <script type="application/json" data-lazy-json>
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
@@ -194,8 +191,8 @@
     }
     </script>
 
-    <!-- BreadcrumbList Schema -->
-    <script type="application/ld+json">
+    <!-- BreadcrumbList Schema (lazy injected) -->
+    <script type="application/json" data-lazy-json>
     {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
@@ -216,8 +213,8 @@
     }
     </script>
 
-    <!-- Product Collection Schema -->
-    <script type="application/ld+json">
+    <!-- Product Collection Schema (lazy injected) -->
+    <script type="application/json" data-lazy-json>
     {
       "@context": "https://schema.org",
       "@type": "ItemList",
@@ -439,8 +436,8 @@
     }
     </script>
 
-    <!-- FAQ Schema -->
-    <script type="application/ld+json">
+    <!-- FAQ Schema (lazy injected) -->
+    <script type="application/json" data-lazy-json>
     {
       "@context": "https://schema.org",
       "@type": "FAQPage",
@@ -471,6 +468,25 @@
         }
       ]
     }
+    </script>
+
+    <script>
+      (function lazyInjectJsonLd(){
+        var inject = function(){
+          var nodes = document.querySelectorAll('script[data-lazy-json]');
+          nodes.forEach(function(n){
+            var s = document.createElement('script');
+            s.type = 'application/ld+json';
+            s.text = n.textContent || '';
+            n.parentNode && n.parentNode.replaceChild(s, n);
+          });
+        };
+        if (window.requestIdleCallback) {
+          requestIdleCallback(inject, { timeout: 2000 });
+        } else {
+          setTimeout(inject, 1500);
+        }
+      })();
     </script>
   </head>
   <body>
