@@ -15,31 +15,7 @@ export default defineConfig({
   build: {
     target: 'es2015',
     minify: 'terser',
-    rollupOptions: {
-      output: {
-        manualChunks: (id) => {
-          // More aggressive code splitting for better caching
-          if (id.includes('node_modules')) {
-            if (id.includes('react') || id.includes('react-dom')) {
-              return 'vendor-react';
-            }
-            if (id.includes('react-router')) {
-              return 'vendor-router';
-            }
-            if (id.includes('lucide-react')) {
-              return 'vendor-icons';
-            }
-            if (id.includes('zustand')) {
-              return 'vendor-store';
-            }
-            return 'vendor-other';
-          }
-        }
-      },
-      input: {
-        main: './index.html'
-      }
-    },
+    // Let Vite handle chunking to preserve correct load order in production
     terserOptions: {
       compress: {
         drop_console: true,
@@ -62,9 +38,6 @@ export default defineConfig({
     chunkSizeWarningLimit: 600,
     // Reduce asset inline limit to force separate files
     assetsInlineLimit: 4096
-  },
-  optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom', 'lucide-react']
   },
   publicDir: 'public'
 });
