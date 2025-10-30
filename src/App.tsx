@@ -1966,6 +1966,37 @@ function HomePage() {
                         // Trigger Stripe payment via bridge
                         const payResult = await (stripePayRef.current ? stripePayRef.current() : Promise.resolve({ ok: false, error: 'Mokėjimo sistema nepasiruošusi' }));
                         if (!payResult.ok) {
+                          // Fallback to Stripe Checkout (hosted) when Elements fails/blocked
+                          try {
+                            const orderTotal = (totalPrice + (isFreeShipping ? 0 : 2.99) + (giftWrapping ? 2.99 : 0));
+                            const amountCents = Math.round(orderTotal * 100);
+                            const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random()*1000)}`;
+                            const csResp = await fetch('/api/create-checkout-session', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                amount: amountCents,
+                                name: checkoutFormData.name,
+                                surname: checkoutFormData.surname,
+                                email: checkoutFormData.email,
+                                phone: checkoutFormData.phone,
+                                address: `${checkoutFormData.address}, ${checkoutFormData.city} ${checkoutFormData.postalCode}`,
+                                items: cartItems.map(it => `${it.name} × ${it.quantity} — €${(it.price*it.quantity).toFixed(2)}`).join('\n'),
+                                orderId: orderNumber,
+                                successUrl: `${window.location.origin}/?status=paid` ,
+                                cancelUrl: window.location.href
+                              })
+                            });
+                            if (csResp.ok) {
+                              const { id } = await csResp.json();
+                              const stripeClient = await stripePromise;
+                              await stripeClient?.redirectToCheckout({ sessionId: id });
+                              setLoading(false);
+                              return;
+                            }
+                          } catch (e) {
+                            // fallthrough to show error
+                          }
                           setErrorMessage(payResult.error || 'Mokėjimas nepavyko.');
                           setLoading(false);
                           return;
