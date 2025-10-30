@@ -33,7 +33,7 @@ import { Elements, useStripe, useElements, CardElement } from '@stripe/react-str
 import { loadStripe } from '@stripe/stripe-js';
 import StripeCardSection from './components/StripeCardSection';
 
-const stripePromise = loadStripe('pk_live_51SNtWjHs9y4UiPF0epelhyOOkcLOuzVOnUuB0t6RtIxl94X2iETbDDnuL6ciVEc0DJADcG2DUBMwAdwfzSIVMcK900Z2shQyYh');
+const stripePromise = loadStripe((import.meta as any).env?.VITE_STRIPE_PUBLISHABLE_KEY || '');
 
 // Bridge component that exposes a pay() function via ref so parent can trigger payment
 function StripePayBridge({

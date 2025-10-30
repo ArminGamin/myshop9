@@ -1,10 +1,16 @@
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2024-11-08" });
+const secretKey = process.env.STRIPE_SECRET_KEY;
+const stripe = new Stripe(secretKey || "");
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.status(405).send("Method not allowed");
+    return;
+  }
+
+  if (!secretKey) {
+    res.status(500).json({ error: "Missing STRIPE_SECRET_KEY" });
     return;
   }
 
@@ -34,7 +40,8 @@ export default async function handler(req, res) {
     res.status(200).json({ clientSecret: paymentIntent.client_secret });
   } catch (err) {
     console.error("Create PaymentIntent error:", err);
-    res.status(500).json({ error: err.message });
+    const message = (err && err.message) ? err.message : 'Unknown error';
+    res.status(500).json({ error: message });
   }
 }
 
