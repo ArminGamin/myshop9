@@ -38,13 +38,30 @@ export default async function handler(req, res) {
     const orderNumber = md.order_id || `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     const amount = (payment.amount / 100).toFixed(2);
 
-    const msg = `\nNaujas užsakymas (Apmokėta)\nUžsakymo numeris\n${orderNumber}\nSuma\n€${amount}\n\nVardas\n${md.name || ""}\nPavardė\n${md.surname || ""}\nEl. paštas\n${md.email || ""}\nTelefonas\n${md.phone || ""}\nAdresas\n${md.address || ""}\n\nPrekės\n${md.items || ""}\n`;
+    const fields = [
+      { name: 'Užsakymo numeris', value: String(orderNumber), inline: true },
+      { name: 'Suma', value: `€${amount}`, inline: true },
+      { name: '\u200B', value: '\u200B', inline: false },
+      { name: 'Vardas', value: md.name || '-', inline: true },
+      { name: 'Pavardė', value: md.surname || '-', inline: true },
+      { name: 'El. paštas', value: md.email || '-', inline: false },
+      { name: 'Telefonas', value: md.phone || '-', inline: false },
+      { name: 'Adresas', value: md.address || '-', inline: false },
+      { name: 'Prekės', value: md.items || '-', inline: false }
+    ];
+
+    const embed = {
+      title: 'Naujas užsakymas (Apmokėta)',
+      color: 0x2ecc71,
+      timestamp: new Date().toISOString(),
+      fields
+    };
 
     try {
       await fetch(process.env.DISCORD_WEBHOOK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: msg })
+        body: JSON.stringify({ embeds: [embed] })
       });
     } catch (err) {
       console.error("Discord webhook error:", err);

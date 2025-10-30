@@ -231,6 +231,15 @@ function HomePage() {
   // Free shipping override for test product (€0.01)
   const hasTestProduct = useMemo(() => cartItems.some((it: any) => it.productId === 10), [cartItems]);
   const isFreeShipping = hasTestProduct || totalPrice >= 30;
+  const orderCents = useMemo(() => {
+    const subtotalCents = cartItems.reduce((sum: number, it: any) => {
+      const priceCents = Math.round(Number(it.price) * 100);
+      return sum + priceCents * Number(it.quantity || 1);
+    }, 0);
+    const shippingCents = isFreeShipping ? 0 : 299; // €2.99 shipping
+    const giftWrapCents = giftWrapping ? 299 : 0;   // €2.99 gift wrap (if enabled)
+    return subtotalCents + shippingCents + giftWrapCents;
+  }, [cartItems, isFreeShipping, giftWrapping]);
   const [checkoutFormData, setCheckoutFormData] = useState({
     email: '',
     name: '',
@@ -1937,7 +1946,7 @@ function HomePage() {
                     )}
                     <div className="flex justify-between text-lg sm:text-xl font-extrabold">
                       <span>{t.orderTotal}</span>
-                      <span>€{(totalPrice + (isFreeShipping ? 0 : 2.99) + (giftWrapping ? 2.99 : 0)).toFixed(2)}</span>
+                      <span>€{(orderCents / 100).toFixed(2)}</span>
                     </div>
                   </div>
 
@@ -1972,8 +1981,7 @@ function HomePage() {
                         if (!payResult.ok) {
                           // Fallback to Stripe Checkout (hosted) when Elements fails/blocked
                           try {
-                            const orderTotal = (totalPrice + (isFreeShipping ? 0 : 2.99) + (giftWrapping ? 2.99 : 0));
-                            const amountCents = Math.round(orderTotal * 100);
+                            const amountCents = orderCents;
                             const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random()*1000)}`;
                             console.log('[Checkout] Creating Checkout Session...', amountCents);
                             const csResp = await fetch('/api/create-checkout-session', {
@@ -2019,35 +2027,15 @@ function HomePage() {
                         const order = {
                           id: Date.now(),
                           items: totalItems,
-                          total: (totalPrice + (totalPrice >= 30 ? 0 : 2.99) + (giftWrapping ? 2.99 : 0)).toFixed(2),
+                          total: (orderCents / 100).toFixed(2),
                           giftWrapping,
                           date: new Date().toLocaleDateString('lt-LT'),
                           status: 'Apdorojama',
                           orderNumber
                         };
 
-                        // Optional: notify Discord after successful payment
-                        try {
-                          order.status = 'Apmokėta';
-                          await fetch('/api/notify-discord', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                              orderNumber,
-                              total: order.total,
-                              items: cartItems.map(it => ({ id: it.id, name: it.name, quantity: it.quantity, price: it.price })),
-                              customer: {
-                                email: checkoutFormData.email,
-                                name: checkoutFormData.name,
-                                surname: checkoutFormData.surname,
-                                address: checkoutFormData.address,
-                                city: checkoutFormData.city,
-                                postalCode: checkoutFormData.postalCode,
-                                phone: checkoutFormData.phone
-                              }
-                            })
-                          });
-                        } catch {}
+                        // Webhook will send the Discord embed; no direct client notification to avoid duplicates
+                        order.status = 'Apmokėta';
 
                         setOrderHistory([order, ...orderHistory]);
                         setCompletedOrderNumber(orderNumber);
