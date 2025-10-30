@@ -1,0 +1,57 @@
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2024-11-08" });
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+function buffer(readable) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    readable.on("data", (chunk) => chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk));
+    readable.on("end", () => resolve(Buffer.concat(chunks)));
+    readable.on("error", (err) => reject(err));
+  });
+}
+
+export default async function handler(req, res) {
+  if (req.method !== "POST") return res.status(405).send("Method not allowed");
+
+  const sig = req.headers["stripe-signature"];
+  const rawBody = await buffer(req);
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET);
+  } catch (err) {
+    console.error("Webhook signature verification failed:", err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (event.type === "payment_intent.succeeded") {
+    const payment = event.data.object;
+    const md = payment.metadata || {};
+
+    const orderNumber = md.order_id || `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    const amount = (payment.amount / 100).toFixed(2);
+
+    const msg = `\nNaujas užsakymas (Apmokėta)\nUžsakymo numeris\n${orderNumber}\nSuma\n€${amount}\n\nVardas\n${md.name || ""}\nPavardė\n${md.surname || ""}\nEl. paštas\n${md.email || ""}\nTelefonas\n${md.phone || ""}\nAdresas\n${md.address || ""}\n\nPrekės\n${md.items || ""}\n`;
+
+    try {
+      await fetch(process.env.DISCORD_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: msg })
+      });
+    } catch (err) {
+      console.error("Discord webhook error:", err);
+    }
+  }
+
+  res.status(200).send("OK");
+}
+
+

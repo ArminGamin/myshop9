@@ -29,6 +29,70 @@ import CookieConsent from "./components/CookieConsent";
 import { useCartStore } from "./store/cartStore";
 import { useProductStore } from "./store/productStore";
 import { initialProducts } from "./data/products";
+import { Elements, useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+import StripeCardSection from './components/StripeCardSection';
+
+const stripePromise = loadStripe('pk_live_51SNtWjHs9y4UiPF0epelhyOOkcLOuzVOnUuB0t6RtIxl94X2iETbDDnuL6ciVEc0DJADcG2DUBMwAdwfzSIVMcK900Z2shQyYh');
+
+// Bridge component that exposes a pay() function via ref so parent can trigger payment
+function StripePayBridge({
+  payRef,
+  amountCents,
+  customer,
+  itemsSummary
+}: {
+  payRef: React.MutableRefObject<null | (() => Promise<{ ok: boolean; error?: string }>)>;
+  amountCents: number;
+  customer: { name: string; surname: string; email: string; phone: string; address: string };
+  itemsSummary: string;
+}) {
+  const stripe = useStripe();
+  const elements = useElements();
+
+  useEffect(() => {
+    payRef.current = async () => {
+      if (!stripe || !elements) {
+        return { ok: false, error: 'Mokėjimo sistema dar kraunasi' };
+      }
+      const resp = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: amountCents,
+          name: customer.name,
+          surname: customer.surname,
+          email: customer.email,
+          phone: customer.phone,
+          address: customer.address,
+          items: itemsSummary
+        })
+      });
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({} as any));
+        return { ok: false, error: err.error || resp.statusText };
+      }
+      const { clientSecret } = await resp.json();
+      const card = elements.getElement(CardElement);
+      const confirmation = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card,
+          billing_details: { name: `${customer.name} ${customer.surname}`, email: customer.email }
+        }
+      } as any);
+      if ((confirmation as any)?.error) {
+        return { ok: false, error: (confirmation as any).error.message };
+      }
+      if (!confirmation?.paymentIntent || confirmation.paymentIntent.status !== 'succeeded') {
+        return { ok: false, error: 'Mokėjimas nepatvirtintas' };
+      }
+      return { ok: true };
+    };
+    return () => { payRef.current = null; };
+  }, [stripe, elements, payRef, amountCents, customer, itemsSummary]);
+
+  return null;
+}
 
 // Lazy load non-critical components for code splitting
 const ProductComparison = lazy(() => import("./components/ProductComparison").then(module => ({ default: module.ProductComparison })));
@@ -164,6 +228,9 @@ function HomePage() {
   const [thankYouModalOpen, setThankYouModalOpen] = useState(false);
   const [completedOrderNumber, setCompletedOrderNumber] = useState('');
   const [completedOrderEmail, setCompletedOrderEmail] = useState('');
+  // Free shipping override for test product (€0.01)
+  const hasTestProduct = useMemo(() => cartItems.some((it: any) => it.productId === 10), [cartItems]);
+  const isFreeShipping = hasTestProduct || totalPrice >= 30;
   const [checkoutFormData, setCheckoutFormData] = useState({
     email: '',
     name: '',
@@ -227,6 +294,8 @@ function HomePage() {
     minutes: 0,
     seconds: 0
   });
+  // Bridge ref to trigger Stripe payment from parent button
+  const stripePayRef = React.useRef<null | (() => Promise<{ ok: boolean; error?: string }>)>(null);
   
   // Initialize products from centralized data source
   useEffect(() => {
@@ -1168,11 +1237,11 @@ function HomePage() {
               {/* Free Gift Progress */}
               {totalItems > 0 && (
                 <div className="bg-red-50 p-4 rounded-lg mb-6">
-                  <p className="text-sm font-medium mb-2">Jūs esate €{Math.max(0, 30 - totalPrice).toFixed(2)} nuo NEMOKAMO siuntimo!</p>
+                  <p className="text-sm font-medium mb-2">Jūs esate €{(isFreeShipping ? 0 : Math.max(0, 30 - totalPrice)).toFixed(2)} nuo NEMOKAMO siuntimo!</p>
                   <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
                     <div 
                       className="bg-red-600 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${Math.min(100, (totalPrice / 30) * 100)}%` }}
+                      style={{ width: `${isFreeShipping ? 100 : Math.min(100, (totalPrice / 30) * 100)}%` }}
                     ></div>
                   </div>
                   <div className="flex items-center justify-center">
@@ -1655,6 +1724,7 @@ function HomePage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg max-w-5xl w-full max-h-[95vh] overflow-y-auto">
             <div className="p-4">
+              <Elements stripe={stripePromise}>
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold">Apmokėjimas</h2>
                 <button
@@ -1805,72 +1875,21 @@ function HomePage() {
                       <CreditCard className="w-4 h-4" />
                       <h3 className="text-base font-semibold">Mokėjimo Informacija</h3>
                     </div>
-                    <div className="space-y-3">
-                      <div>
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          pattern="[0-9\s]*"
-                          placeholder="Kortelės numeris (16 skaitmenų)"
-                          value={checkoutFormData.cardNumber}
-                          onChange={(e) => handleInputChange('cardNumber', formatCardNumber(e.target.value))}
-                          maxLength={19}
-                          className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                            formErrors.cardNumber ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-red-500'
-                          }`}
-                        />
-                        {formErrors.cardNumber && (
-                          <p className="text-red-500 text-xs mt-1">{formErrors.cardNumber}</p>
-                        )}
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            pattern="[0-9/]*"
-                            placeholder="MM/YY"
-                            value={checkoutFormData.expiry}
-                            onChange={(e) => handleInputChange('expiry', formatExpiry(e.target.value))}
-                            maxLength={5}
-                            className={`p-2 border rounded-lg focus:outline-none focus:ring-2 w-full ${
-                              formErrors.expiry ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-red-500'
-                            }`}
-                          />
-                          {formErrors.expiry && (
-                            <p className="text-red-500 text-xs mt-1">{formErrors.expiry}</p>
-                          )}
-                        </div>
-                        
-                        <div>
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            pattern="[0-9]*"
-                            placeholder="CVV (3 skaitmenys)"
-                            value={checkoutFormData.cvv}
-                            onChange={(e) => handleInputChange('cvv', e.target.value.replace(/\D/g, '').slice(0, 3))}
-                            maxLength={3}
-                            className={`p-2 border rounded-lg focus:outline-none focus:ring-2 w-full ${
-                              formErrors.cvv ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-red-500'
-                            }`}
-                          />
-                          {formErrors.cvv && (
-                            <p className="text-red-500 text-xs mt-1">{formErrors.cvv}</p>
-                          )}
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-lg p-3 text-xs text-green-800">
-                        <Lock className="w-4 h-4" />
-                        <div>
-                          <div className="font-semibold">256-bit SSL Secure Checkout</div>
-                          <div>Jūsų mokėjimo informacija yra visiškai saugi</div>
-                        </div>
-                      </div>
-                    </div>
+                    <StripeCardSection />
                   </div>
+                  {/* Expose Stripe pay function to parent */}
+                  <StripePayBridge
+                    payRef={stripePayRef}
+                    amountCents={Math.round((totalPrice + (totalPrice >= 30 ? 0 : 2.99) + (giftWrapping ? 2.99 : 0)) * 100)}
+                    customer={{
+                      name: checkoutFormData.name,
+                      surname: checkoutFormData.surname,
+                      email: checkoutFormData.email,
+                      phone: checkoutFormData.phone,
+                      address: `${checkoutFormData.address}, ${checkoutFormData.city} ${checkoutFormData.postalCode}`,
+                    }}
+                    itemsSummary={cartItems.map(it => `${it.name} × ${it.quantity} — €${(it.price*it.quantity).toFixed(2)}`).join('\n')}
+                  />
                 </div>
 
                 {/* Right Column - Order Summary */}
@@ -1903,8 +1922,8 @@ function HomePage() {
                     </div>
                     <div className="flex justify-between text-sm sm:text-base font-semibold">
                       <span>{t.shipping}</span>
-                      <span className={totalPrice >= 30 ? "text-green-600" : "text-gray-600"}>
-                        {totalPrice >= 30 ? (language === 'lt' ? 'Nemokamas' : 'Free') : '€2.99'}
+                      <span className={isFreeShipping ? "text-green-600" : "text-gray-600"}>
+                        {isFreeShipping ? (language === 'lt' ? 'Nemokamas' : 'Free') : '€2.99'}
                       </span>
                     </div>
                   </div>
@@ -1919,7 +1938,7 @@ function HomePage() {
                     )}
                     <div className="flex justify-between text-lg sm:text-xl font-extrabold">
                       <span>{t.orderTotal}</span>
-                      <span>€{(totalPrice + (totalPrice >= 30 ? 0 : 2.99) + (giftWrapping ? 2.99 : 0)).toFixed(2)}</span>
+                      <span>€{(totalPrice + (isFreeShipping ? 0 : 2.99) + (giftWrapping ? 2.99 : 0)).toFixed(2)}</span>
                     </div>
                   </div>
 
@@ -1944,7 +1963,13 @@ function HomePage() {
                           return;
                         }
                         
-                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        // Trigger Stripe payment via bridge
+                        const payResult = await (stripePayRef.current ? stripePayRef.current() : Promise.resolve({ ok: false, error: 'Mokėjimo sistema nepasiruošusi' }));
+                        if (!payResult.ok) {
+                          setErrorMessage(payResult.error || 'Mokėjimas nepavyko.');
+                          setLoading(false);
+                          return;
+                        }
                         
                         const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random()*1000)}`;
                         const order = {
@@ -1957,37 +1982,27 @@ function HomePage() {
                           orderNumber
                         };
 
-                        // Simulate serverless verification of payment
+                        // Optional: notify Discord after successful payment
                         try {
-                          const resp = await fetch('/api/verify-payment', {
+                          order.status = 'Apmokėta';
+                          await fetch('/api/notify-discord', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ orderNumber, amount: order.total })
+                            body: JSON.stringify({
+                              orderNumber,
+                              total: order.total,
+                              items: cartItems.map(it => ({ id: it.id, name: it.name, quantity: it.quantity, price: it.price })),
+                              customer: {
+                                email: checkoutFormData.email,
+                                name: checkoutFormData.name,
+                                surname: checkoutFormData.surname,
+                                address: checkoutFormData.address,
+                                city: checkoutFormData.city,
+                                postalCode: checkoutFormData.postalCode,
+                                phone: checkoutFormData.phone
+                              }
+                            })
                           });
-                          if (resp.ok) {
-                            order.status = 'Apmokėta';
-                            // Notify Discord
-                            try {
-                              await fetch('/api/notify-discord', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                  orderNumber,
-                                  total: order.total,
-                                  items: cartItems.map(it => ({ id: it.id, name: it.name, quantity: it.quantity, price: it.price })),
-                                  customer: {
-                                    email: checkoutFormData.email,
-                                    name: checkoutFormData.name,
-                                    surname: checkoutFormData.surname,
-                                    address: checkoutFormData.address,
-                                    city: checkoutFormData.city,
-                                    postalCode: checkoutFormData.postalCode,
-                                    phone: checkoutFormData.phone
-                                  }
-                                })
-                              });
-                            } catch {}
-                          }
                         } catch {}
 
                         setOrderHistory([order, ...orderHistory]);
@@ -2054,6 +2069,7 @@ function HomePage() {
                   </p>
                 </div>
               </div>
+              </Elements>
             </div>
           </div>
         </div>

@@ -3,6 +3,33 @@ import type { Product } from "../store/productStore";
 
 export const initialProducts: Product[] = [
   {
+    id: 10,
+    name: "TESTAS – Produkto pirkimas (€0.01)",
+    price: 0.01,
+    originalPrice: 0.99,
+    image: "https://ae-pic-a1.aliexpress-media.com/kf/Se4e42f3e36004692bcd2bea0e11a30106.jpg",
+    images: [
+      "https://ae-pic-a1.aliexpress-media.com/kf/Se4e42f3e36004692bcd2bea0e11a30106.jpg"
+    ],
+    rating: 5,
+    reviews: 3,
+    discount: "-99%",
+    description: "Testinis produktas Stripe apmokėjimui patikrinti. Kaina €0.01.",
+    features: [
+      "Skirtas tik testavimui",
+      "Kaina – vienas centas",
+      "Pašalinkite po sėkmingo testo"
+    ],
+    colors: [ { name: "Universalus", value: "one" } ],
+    sizes: [ { name: "Universalus", value: "one" } ],
+    category: "Testas",
+    tags: ["testas", "stripe", "apmokėjimas"],
+    stock: 9999,
+    isNew: true,
+    isPopular: false,
+    createdAt: new Date()
+  },
+  {
     id: 1001,
     name: "Kalėdinis Durų Kilimėlis",
     price: 9.99,
