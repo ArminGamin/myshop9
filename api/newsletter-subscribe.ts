@@ -79,6 +79,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(502).json({ error: 'Failed to deliver', details: msg });
     }
 
+    // Notify Discord (newsletter channel)
+    try {
+      const webhook = process.env.DISCORD_NEWSLETTER_WEBHOOK_URL || process.env.DISCORD_WEBHOOK_URL || 'https://discord.com/api/webhooks/1433587314684071961/pjDZLwaQJE21dQMkXVivP-dRxLgvx75DrlSbChvOfUTLsJ6V-kuN3KVjaQ1y0EgbmbAO';
+      await fetch(webhook, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          embeds: [
+            {
+              title: 'Naujas naujienlaiškio prenumeratorius',
+              color: 0x3498db,
+              timestamp: new Date().toISOString(),
+              fields: [
+                { name: 'El. paštas', value: e, inline: false }
+              ]
+            }
+          ]
+        })
+      });
+    } catch {}
+
     return res.status(200).json({ ok: true });
   } catch (err) {
     return res.status(500).json({ error: 'Server error' });
