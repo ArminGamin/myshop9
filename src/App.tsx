@@ -1988,7 +1988,12 @@ function HomePage() {
                               })
                             });
                             if (csResp.ok) {
-                              const { id } = await csResp.json();
+                              const { id, url } = await csResp.json();
+                              // Prefer native redirect via returned URL to avoid SDK being blocked
+                              if (url) {
+                                window.location.href = url;
+                                return;
+                              }
                               const stripeClient = await stripePromise;
                               await stripeClient?.redirectToCheckout({ sessionId: id });
                               setLoading(false);
