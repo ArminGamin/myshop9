@@ -371,6 +371,7 @@ function HomePage() {
 
   const validateForm = (formData: any) => {
     const errors: any = {};
+    const useStripeElements = true;
     
     // Email validation
     if (!formData.email || !validateEmail(formData.email)) {
@@ -420,35 +421,33 @@ function HomePage() {
       }
     }
     
-    // Card number validation (16 digits)
-    if (!formData.cardNumber) {
-      errors.cardNumber = 'Kortelės numeris yra privalomas';
-    } else {
-      const cleanCard = formData.cardNumber.replace(/\s/g, '');
-      if (!/^\d{16}$/.test(cleanCard)) {
-        errors.cardNumber = 'Kortelės numeris turi būti 16 skaitmenų';
+    // When using Stripe Elements, skip card fields validation (handled by Stripe)
+    if (!useStripeElements) {
+      if (!formData.cardNumber) {
+        errors.cardNumber = 'Kortelės numeris yra privalomas';
+      } else {
+        const cleanCard = formData.cardNumber.replace(/\s/g, '');
+        if (!/^\d{16}$/.test(cleanCard)) {
+          errors.cardNumber = 'Kortelės numeris turi būti 16 skaitmenų';
+        }
       }
-    }
-    
-    // Expiry validation (MM/YY format)
-    if (!formData.expiry) {
-      errors.expiry = 'Galiojimo data yra privaloma';
-    } else if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(formData.expiry)) {
-      errors.expiry = 'Formatas turi būti MM/YY';
-    } else {
-      const [month, year] = formData.expiry.split('/');
-      const expDate = new Date(2000 + parseInt(year), parseInt(month) - 1);
-      const now = new Date();
-      if (expDate < now) {
-        errors.expiry = 'Kortelės galiojimas pasibaigęs';
+      if (!formData.expiry) {
+        errors.expiry = 'Galiojimo data yra privaloma';
+      } else if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(formData.expiry)) {
+        errors.expiry = 'Formatas turi būti MM/YY';
+      } else {
+        const [month, year] = formData.expiry.split('/');
+        const expDate = new Date(2000 + parseInt(year), parseInt(month) - 1);
+        const now = new Date();
+        if (expDate < now) {
+          errors.expiry = 'Kortelės galiojimas pasibaigęs';
+        }
       }
-    }
-    
-    // CVV validation (3 digits)
-    if (!formData.cvv) {
-      errors.cvv = 'CVV yra privalomas';
-    } else if (!/^\d{3}$/.test(formData.cvv)) {
-      errors.cvv = 'CVV turi būti 3 skaitmenys';
+      if (!formData.cvv) {
+        errors.cvv = 'CVV yra privalomas';
+      } else if (!/^\d{3}$/.test(formData.cvv)) {
+        errors.cvv = 'CVV turi būti 3 skaitmenys';
+      }
     }
     
     return errors;
