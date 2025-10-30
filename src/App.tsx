@@ -1950,6 +1950,7 @@ function HomePage() {
                   {/* Place Order Button */}
                   <button 
                     onClick={async () => {
+                      console.log('[Checkout] Clicked place order');
                       try {
                         setLoading(true);
                         setFormErrors({});
@@ -1964,13 +1965,18 @@ function HomePage() {
                         }
                         
                         // Trigger Stripe payment via bridge
-                        const payResult = await (stripePayRef.current ? stripePayRef.current() : Promise.resolve({ ok: false, error: 'Mokėjimo sistema nepasiruošusi' }));
+                        const payInvoker = stripePayRef.current;
+                        if (!payInvoker) {
+                          console.warn('[Checkout] Stripe pay bridge not ready, falling back to Checkout Session');
+                        }
+                        const payResult = await (payInvoker ? payInvoker() : Promise.resolve({ ok: false, error: 'Mokėjimo sistema nepasiruošusi' }));
                         if (!payResult.ok) {
                           // Fallback to Stripe Checkout (hosted) when Elements fails/blocked
                           try {
                             const orderTotal = (totalPrice + (isFreeShipping ? 0 : 2.99) + (giftWrapping ? 2.99 : 0));
                             const amountCents = Math.round(orderTotal * 100);
                             const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random()*1000)}`;
+                            console.log('[Checkout] Creating Checkout Session...', amountCents);
                             const csResp = await fetch('/api/create-checkout-session', {
                               method: 'POST',
                               headers: { 'Content-Type': 'application/json' },
@@ -1987,8 +1993,10 @@ function HomePage() {
                                 cancelUrl: window.location.href
                               })
                             });
+                            console.log('[Checkout] Checkout Session response status:', csResp.status);
                             if (csResp.ok) {
                               const { id, url } = await csResp.json();
+                              console.log('[Checkout] Got session', id, 'url', url);
                               // Prefer native redirect via returned URL to avoid SDK being blocked
                               if (url) {
                                 window.location.href = url;
@@ -2000,6 +2008,7 @@ function HomePage() {
                               return;
                             }
                           } catch (e) {
+                            console.error('[Checkout] Fallback to Checkout Session failed', e);
                             // fallthrough to show error
                           }
                           setErrorMessage(payResult.error || 'Mokėjimas nepavyko.');
