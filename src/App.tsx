@@ -229,8 +229,7 @@ function HomePage() {
   const [completedOrderNumber, setCompletedOrderNumber] = useState('');
   const [completedOrderEmail, setCompletedOrderEmail] = useState('');
   // Free shipping override for test product (€0.01)
-  const hasTestProduct = useMemo(() => cartItems.some((it: any) => it.productId === 10), [cartItems]);
-  const isFreeShipping = hasTestProduct || totalPrice >= 30;
+  const isFreeShipping = totalPrice >= 30;
   const orderCents = useMemo(() => {
     const subtotalCents = cartItems.reduce((sum: number, it: any) => {
       const priceCents = Math.round(Number(it.price) * 100);
