@@ -1091,7 +1091,7 @@ function HomePage() {
                 <div className="mt-3 text-sm text-gray-800">
                   <div className="flex items-center space-x-2">
                     <Users className="w-4 h-4" />
-                    <span className="font-medium">{recentOrders[product.id % recentOrders.length]?.name} iš {recentOrders[product.id % recentOrders.length]?.location} užsakė {recentOrders[product.id % recentOrders.length]?.time}</span>
+                    <span className="font-medium">{recentOrders[product.id % recentOrders.length]?.name} iš {recentOrders[product.id % recentOrders.length]?.location} užsisakė prieš {recentOrders[product.id % recentOrders.length]?.time}</span>
                   </div>
                 </div>
               </div>
@@ -1658,7 +1658,7 @@ function HomePage() {
                       {recentOrders.slice(0, 2).map((order, index) => (
                         <div key={index} className="flex items-center justify-between text-xs text-gray-600">
                           <span>{order.name} iš {order.location}</span>
-                          <span>{order.time}</span>
+                          <span>prieš {order.time}</span>
                         </div>
                       ))}
                     </div>
