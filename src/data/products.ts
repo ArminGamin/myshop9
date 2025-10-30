@@ -4,8 +4,8 @@ import type { Product } from "../store/productStore";
 export const initialProducts: Product[] = [
   {
     id: 10,
-    name: "TESTAS – Produkto pirkimas (€0.01)",
-    price: 0.01,
+    name: "TESTAS – Produkto pirkimas (€0.50)",
+    price: 0.50,
     originalPrice: 0.99,
     image: "https://ae-pic-a1.aliexpress-media.com/kf/Se4e42f3e36004692bcd2bea0e11a30106.jpg",
     images: [
