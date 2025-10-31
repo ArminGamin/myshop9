@@ -8,6 +8,8 @@ export interface Product {
   originalPrice: number;
   image: string;
   images: string[];
+  imagesBySize?: string[][]; // optional: arrays of images per size (aligned with sizes)
+  imagesByColor?: string[][]; // optional: arrays of images per color (aligned with colors)
   rating: number;
   reviews: number;
   discount: string;
@@ -15,8 +17,11 @@ export interface Product {
   features: string[];
   colors: { name: string; value: string }[];
   sizes: { name: string; value: string }[];
+  sizeLabel?: string; // optional UI label for sizes (e.g., "Tipas")
   pricesByColor?: number[]; // optional per-variant current prices (aligned with colors)
   originalPricesByColor?: number[]; // optional per-variant original prices
+  pricesBySize?: number[]; // optional per-size current prices (aligned with sizes)
+  originalPricesBySize?: number[]; // optional per-size original prices
   category: string;
   tags: string[];
   stock: number;

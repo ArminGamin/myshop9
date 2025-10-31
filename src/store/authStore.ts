@@ -42,6 +42,7 @@ export interface CartItem {
   image: string;
   selectedColor?: string;
   selectedSize?: string;
+  sizeLabel?: string;
 }
 
 interface AuthState {

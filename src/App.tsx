@@ -25,6 +25,7 @@ import {
 import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import { ThankYouModal } from "./components/ThankYouModal";
 import OptimizedImage from "./components/OptimizedImage";
+import Snowfall from "./components/Snowfall";
 import CookieConsent from "./components/CookieConsent";
 import { useCartStore } from "./store/cartStore";
 import { useProductStore } from "./store/productStore";
@@ -212,6 +213,7 @@ function HomePage() {
   const [productModalOpen, setProductModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [selectedColor, setSelectedColor] = useState(0);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [email, setEmail] = useState('');
@@ -431,30 +433,30 @@ function HomePage() {
     
     // When using Stripe Elements, skip card fields validation (handled by Stripe)
     if (!useStripeElements) {
-      if (!formData.cardNumber) {
-        errors.cardNumber = 'Kortelės numeris yra privalomas';
-      } else {
-        const cleanCard = formData.cardNumber.replace(/\s/g, '');
-        if (!/^\d{16}$/.test(cleanCard)) {
-          errors.cardNumber = 'Kortelės numeris turi būti 16 skaitmenų';
-        }
+    if (!formData.cardNumber) {
+      errors.cardNumber = 'Kortelės numeris yra privalomas';
+    } else {
+      const cleanCard = formData.cardNumber.replace(/\s/g, '');
+      if (!/^\d{16}$/.test(cleanCard)) {
+        errors.cardNumber = 'Kortelės numeris turi būti 16 skaitmenų';
       }
-      if (!formData.expiry) {
-        errors.expiry = 'Galiojimo data yra privaloma';
-      } else if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(formData.expiry)) {
-        errors.expiry = 'Formatas turi būti MM/YY';
-      } else {
-        const [month, year] = formData.expiry.split('/');
-        const expDate = new Date(2000 + parseInt(year), parseInt(month) - 1);
-        const now = new Date();
-        if (expDate < now) {
-          errors.expiry = 'Kortelės galiojimas pasibaigęs';
-        }
+    }
+    if (!formData.expiry) {
+      errors.expiry = 'Galiojimo data yra privaloma';
+    } else if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(formData.expiry)) {
+      errors.expiry = 'Formatas turi būti MM/YY';
+    } else {
+      const [month, year] = formData.expiry.split('/');
+      const expDate = new Date(2000 + parseInt(year), parseInt(month) - 1);
+      const now = new Date();
+      if (expDate < now) {
+        errors.expiry = 'Kortelės galiojimas pasibaigęs';
       }
-      if (!formData.cvv) {
-        errors.cvv = 'CVV yra privalomas';
-      } else if (!/^\d{3}$/.test(formData.cvv)) {
-        errors.cvv = 'CVV turi būti 3 skaitmenys';
+    }
+    if (!formData.cvv) {
+      errors.cvv = 'CVV yra privalomas';
+    } else if (!/^\d{3}$/.test(formData.cvv)) {
+      errors.cvv = 'CVV turi būti 3 skaitmenys';
       }
     }
     
@@ -669,15 +671,17 @@ function HomePage() {
 
   return (
     <>
-      <div 
-        className="min-h-screen bg-red-50 flex flex-col touch-action-pan-y"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      >
+    <div 
+      className="min-h-screen bg-red-50 flex flex-col touch-action-pan-y"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Global snowfall overlay for continuous flakes */}
+      <Snowfall position="fixed" zIndex={5} />
       {/* Sale Banner */}
-      <div className="bg-gradient-to-r from-red-600 to-green-600 text-white py-2 text-center text-sm font-medium">
-        {t.saleBanner}
+      <div className="relative bg-gradient-to-r from-red-600 to-green-600 text-white py-2 text-center text-sm font-medium overflow-hidden">
+        <div className="relative">{t.saleBanner}</div>
       </div>
 
       {/* Header */}
@@ -754,7 +758,7 @@ function HomePage() {
           <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
           </svg>
-        </div>
+              </div>
         <div className="absolute top-12 right-16 text-white opacity-10">
           <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
@@ -767,7 +771,7 @@ function HomePage() {
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4">
               <span className="text-white block mb-2">Padarykite šias Kalėdas</span>
               <span className="text-yellow-400 block">Nepamirštamas!</span>
-            </h1>
+              </h1>
             
             {/* Sub-headline */}
             <p className="text-lg sm:text-xl text-white mb-8 max-w-3xl mx-auto">
@@ -782,14 +786,14 @@ function HomePage() {
               >
                 <ShoppingCart className="w-5 h-5" />
                 Pirkinių pradžia
-              </button>
+                </button>
               <button
                 onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
                 className="bg-red-600 text-white px-8 py-4 rounded-lg font-semibold border-2 border-white hover:bg-red-700 transition-all duration-300 transform hover:scale-105 touch-manipulation min-h-[48px]"
               >
                 Peržiūrėti rinkinius
-              </button>
-            </div>
+                </button>
+              </div>
             
             {/* Informational Sections */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -798,14 +802,14 @@ function HomePage() {
                   <Truck className="w-8 h-8" />
                 </div>
                 <p className="font-semibold text-center">Nemokamas pristatymas</p>
-              </div>
-              
+            </div>
+            
               <div className="flex flex-col items-center text-white">
                 <div className="bg-white bg-opacity-20 rounded-full p-4 mb-3">
                   <Shield className="w-8 h-8" />
-                </div>
+                  </div>
                 <p className="font-semibold text-center">Saugus mokėjimas</p>
-              </div>
+                  </div>
               
               <div className="flex flex-col items-center text-white">
                 <div className="bg-white bg-opacity-20 rounded-full p-4 mb-3">
@@ -873,7 +877,7 @@ function HomePage() {
       </div>
 
       {/* Christmas Countdown */}
-      <div className="bg-gradient-to-r from-red-600 to-green-600 text-white py-12">
+      <div className="relative bg-gradient-to-r from-red-600 to-green-600 text-white py-12 overflow-hidden">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold mb-2">{t.christmasCountdown}</h2>
           <p className="text-lg mb-8">{t.countdownSubtitle}</p>
@@ -930,6 +934,7 @@ function HomePage() {
                       decoding="async"
                       onClick={() => {
                         setSelectedProduct(product);
+                        setSelectedImageIndex(0);
                         setProductModalOpen(true);
                       }}
                     />
@@ -978,6 +983,7 @@ function HomePage() {
                       <button
                         onClick={() => {
                           setSelectedProduct(product);
+                          setSelectedImageIndex(0);
                           setSelectedColor(0);
                           setSelectedSize(0);
                           setQuantity(1);
@@ -1017,7 +1023,7 @@ function HomePage() {
       )}
 
       {/* Products */}
-      <main id="products" className="max-w-7xl mx-auto px-6 py-8 flex-1">
+      <main id="products" className="relative z-20 max-w-7xl mx-auto px-6 py-8 flex-1">
         <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
           {t.products}
         </h2>
@@ -1032,16 +1038,17 @@ function HomePage() {
               key={product.id}
               className={`bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 group ${products.length === 1 ? 'lg:col-span-2' : ''}`}
             >
-              <div className={`w-full ${products.length === 1 ? 'h-96' : 'h-80'} bg-gray-50 flex items-center justify-center overflow-hidden`}>
+              <div className={`w-full ${products.length === 1 ? 'h-96' : 'h-56 sm:h-64 md:h-72 lg:h-80'} bg-gray-50 flex items-center justify-center overflow-hidden`}>
                   <OptimizedImage
-                    src={product.image}
-                    alt={`${product.name} - Premium Kalėdų dekoracija | Kalėdų Kampelis`}
-                    className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 p-4"
-                    loading="lazy"
-                    decoding="async"
+                  src={product.image}
+                  alt={`${product.name} - Premium Kalėdų dekoracija | Kalėdų Kampelis`}
+                  className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 p-4"
+                  loading="lazy"
+                  decoding="async"
                     width={800}
                     height={600}
-                  />
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center mb-3">
@@ -1076,6 +1083,7 @@ function HomePage() {
                 <button
                   onClick={() => {
                     setSelectedProduct(product);
+                    setSelectedImageIndex(0);
                     setSelectedColor(0);
                     setSelectedSize(0);
                     setQuantity(1);
@@ -1102,7 +1110,7 @@ function HomePage() {
       </main>
 
       {/* Newsletter */}
-      <section className="bg-gradient-to-r from-green-600 to-red-600 text-white py-16 px-6 text-center">
+      <section className="relative bg-gradient-to-r from-green-600 to-red-600 text-white py-16 px-6 text-center overflow-hidden">
         <div className="max-w-2xl mx-auto">
           <Mail className="mx-auto mb-4 w-10 h-10" />
           <h3 className="text-2xl font-bold mb-3">
@@ -1170,7 +1178,7 @@ function HomePage() {
                 // Treat any other server response as success (email accepted)
                 if (response.ok || !response.ok) {
                   setNewsletterMsg({ type: 'success', text: 'Ačiū! Jūs sėkmingai užsiprenumeravote naujienlaiškį.' });
-                  setEmail('');
+                setEmail('');
                   // store attempt and email
                   const newAttempts = [...attempts, now];
                   localStorage.setItem('nl_attempts', JSON.stringify(newAttempts));
@@ -1304,7 +1312,7 @@ function HomePage() {
                           <p className="text-sm font-semibold text-gray-700">Spalva: {item.selectedColor}</p>
                         )}
                         {item.selectedSize && (
-                          <p className="text-sm font-semibold text-gray-700">Dydis: {item.selectedSize}</p>
+                          <p className="text-sm font-semibold text-gray-700">{item.sizeLabel || 'Dydis'}: {item.selectedSize}</p>
                         )}
                         <div className="flex items-center space-x-2 mt-1">
                           <span className="text-xl font-extrabold text-red-600">€{item.price}</span>
@@ -1499,36 +1507,111 @@ function HomePage() {
                 {/* Left Column - Images */}
                 <div>
                   <div className="mb-3 bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden" style={{ minHeight: '400px' }}>
+                    {(() => {
+                      const imagesList = selectedProduct.imagesBySize
+                        ? (selectedProduct.imagesBySize[selectedSize] || selectedProduct.images)
+                        : (selectedProduct.imagesByColor
+                            ? (selectedProduct.imagesByColor[selectedColor] || selectedProduct.images)
+                            : selectedProduct.images);
+                      const mainSrc = resolveImagePath(imagesList?.[selectedImageIndex] || selectedProduct.image);
+                      return (
                     <OptimizedImage
-                      src={resolveImagePath(selectedProduct.images?.[selectedColor] || selectedProduct.image)}
+                      src={mainSrc}
                       alt={`${selectedProduct.name} - Produkto nuotrauka`}
                       className="w-full h-full object-contain p-4"
                       loading="lazy"
                       decoding="async"
                     />
+                      );
+                    })()}
                   </div>
-                  {selectedProduct.images && selectedProduct.images.length > 0 && (
-                    <div className="grid grid-cols-5 sm:grid-cols-6 gap-2">
-                      {selectedProduct.images.slice(0, 6).map((img: string, index: number) => (
-                        <button
-                          key={index}
-                          onClick={() => setSelectedColor(index)}
-                          className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden border-2 bg-gray-50 touch-manipulation ${
-                            selectedColor === index ? 'border-red-500 ring-2 ring-red-300' : 'border-gray-300'
-                          }`}
-                          title={`Variantas ${index + 1}`}
-                        >
-                          <img
-                            src={resolveImagePath(img)}
-                            alt={`${selectedProduct.name} - Nuotrauka ${index + 1}`}
-                            className="w-full h-full object-contain p-1"
-                            loading="lazy"
-                            decoding="async"
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                  {(() => {
+                    const hasBySize = !!selectedProduct.imagesBySize && selectedProduct.imagesBySize.length > 0;
+                    const hasByColor = !!selectedProduct.imagesByColor && selectedProduct.imagesByColor.length > 0;
+                    if (hasBySize) {
+                      const flattened: { url: string; group: number; idx: number }[] = [];
+                      selectedProduct.imagesBySize.forEach((group: string[], gIndex: number) => {
+                        group.forEach((url: string, i: number) => flattened.push({ url, group: gIndex, idx: i }));
+                      });
+                      const thumbList = flattened.slice(0, 10);
+                      return (
+                        <div className="grid grid-cols-5 sm:grid-cols-6 gap-2">
+                          {thumbList.map((t, i) => (
+                            <button
+                              key={`${t.group}-${t.idx}-${i}`}
+                              onClick={() => { setSelectedSize(t.group); setSelectedImageIndex(t.idx); }}
+                              className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden border-2 bg-gray-50 touch-manipulation ${
+                                (selectedSize === t.group && selectedImageIndex === t.idx) ? 'border-red-500 ring-2 ring-red-300' : 'border-gray-300'
+                              }`}
+                              title={`Variantas ${t.group + 1}-${t.idx + 1}`}
+                            >
+                              <img
+                                src={resolveImagePath(t.url)}
+                                alt={`${selectedProduct.name} - Nuotrauka`}
+                                className="w-full h-full object-contain p-1"
+                                loading="lazy"
+                                decoding="async"
+                              />
+                            </button>
+                          ))}
+                        </div>
+                      );
+                    }
+                    if (hasByColor) {
+                      const flattened: { url: string; group: number; idx: number }[] = [];
+                      selectedProduct.imagesByColor.forEach((group: string[], gIndex: number) => {
+                        group.forEach((url: string, i: number) => flattened.push({ url, group: gIndex, idx: i }));
+                      });
+                      const thumbList = flattened.slice(0, 10);
+                      return (
+                        <div className="grid grid-cols-5 sm:grid-cols-6 gap-2">
+                          {thumbList.map((t, i) => (
+                            <button
+                              key={`${t.group}-${t.idx}-${i}`}
+                              onClick={() => { setSelectedColor(t.group); setSelectedImageIndex(t.idx); }}
+                              className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden border-2 bg-gray-50 touch-manipulation ${
+                                (selectedColor === t.group && selectedImageIndex === t.idx) ? 'border-red-500 ring-2 ring-red-300' : 'border-gray-300'
+                              }`}
+                              title={`Variantas ${t.group + 1}-${t.idx + 1}`}
+                            >
+                              <img
+                                src={resolveImagePath(t.url)}
+                                alt={`${selectedProduct.name} - Nuotrauka`}
+                                className="w-full h-full object-contain p-1"
+                                loading="lazy"
+                                decoding="async"
+                              />
+                            </button>
+                          ))}
+                        </div>
+                      );
+                    }
+                    // Fallback: no imagesBySize, show simple list
+                    const imagesList = selectedProduct.images || [];
+                    if (!imagesList.length) return null;
+                    return (
+                      <div className="grid grid-cols-5 sm:grid-cols-6 gap-2">
+                        {imagesList.slice(0, 6).map((img: string, index: number) => (
+                          <button
+                            key={index}
+                            onClick={() => setSelectedImageIndex(index)}
+                            className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden border-2 bg-gray-50 touch-manipulation ${
+                              selectedImageIndex === index ? 'border-red-500 ring-2 ring-red-300' : 'border-gray-300'
+                            }`}
+                            title={`Variantas ${index + 1}`}
+                          >
+                            <img
+                              src={resolveImagePath(img)}
+                              alt={`${selectedProduct.name} - Nuotrauka ${index + 1}`}
+                              className="w-full h-full object-contain p-1"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {/* Right Column - Product Info */}
@@ -1543,8 +1626,24 @@ function HomePage() {
                   {/* Price */}
                   <div className="mb-4">
                     <div className="flex items-center space-x-3">
-                      <span className="text-2xl font-bold text-red-600">€{(selectedProduct.pricesByColor && selectedProduct.pricesByColor[selectedColor] !== undefined) ? selectedProduct.pricesByColor[selectedColor].toFixed(2) : selectedProduct.price}</span>
-                      <span className="text-lg text-gray-400 line-through">€{(selectedProduct.originalPricesByColor && selectedProduct.originalPricesByColor[selectedColor] !== undefined) ? selectedProduct.originalPricesByColor[selectedColor].toFixed(2) : selectedProduct.originalPrice}</span>
+                      {(() => {
+                        const variantPrice = (selectedProduct.pricesByColor && selectedProduct.pricesByColor[selectedColor] !== undefined)
+                          ? selectedProduct.pricesByColor[selectedColor]
+                          : (selectedProduct.pricesBySize && selectedProduct.pricesBySize[selectedSize] !== undefined)
+                            ? selectedProduct.pricesBySize[selectedSize]
+                            : selectedProduct.price;
+                        const variantOriginal = (selectedProduct.originalPricesByColor && selectedProduct.originalPricesByColor[selectedColor] !== undefined)
+                          ? selectedProduct.originalPricesByColor[selectedColor]
+                          : (selectedProduct.originalPricesBySize && selectedProduct.originalPricesBySize[selectedSize] !== undefined)
+                            ? selectedProduct.originalPricesBySize[selectedSize]
+                            : selectedProduct.originalPrice;
+                        return (
+                          <>
+                            <span className="text-2xl font-bold text-red-600">€{Number(variantPrice).toFixed(2)}</span>
+                            <span className="text-lg text-gray-400 line-through">€{Number(variantOriginal).toFixed(2)}</span>
+                          </>
+                        );
+                      })()}
                       <span className="bg-red-600 text-white px-2 py-1 rounded text-sm font-bold">
                         SUTAUPYKITE {selectedProduct.discount}
                       </span>
@@ -1571,7 +1670,7 @@ function HomePage() {
                       {selectedProduct.colors.map((color: any, index: number) => (
                         <button
                           key={index}
-                          onClick={() => setSelectedColor(index)}
+                          onClick={() => { setSelectedColor(index); if (selectedProduct.imagesByColor) setSelectedImageIndex(0); }}
                           className={`px-3 py-2 border-2 rounded-lg text-sm font-semibold touch-manipulation min-h-[44px] transition-all ${
                             selectedColor === index
                               ? 'border-red-500 bg-red-50 text-red-700 shadow-md'
@@ -1586,12 +1685,12 @@ function HomePage() {
 
                   {/* Size Selection */}
                   <div className="mb-4">
-                    <h3 className="font-bold mb-3 text-base text-gray-900">Dydis</h3>
+                    <h3 className="font-bold mb-3 text-base text-gray-900">{selectedProduct.sizeLabel || 'Dydis'}</h3>
                     <div className="flex flex-wrap gap-3">
                       {selectedProduct.sizes.map((size: any, index: number) => (
                         <button
                           key={index}
-                          onClick={() => setSelectedSize(index)}
+                          onClick={() => { setSelectedSize(index); setSelectedImageIndex(0); }}
                           className={`px-5 py-4 border-2 rounded-lg text-base font-bold touch-manipulation min-h-[52px] min-w-[60px] transition-all ${
                             selectedSize === index
                               ? 'border-red-500 bg-red-50 text-red-700 shadow-md'
@@ -1672,8 +1771,11 @@ function HomePage() {
                       await new Promise(resolve => setTimeout(resolve, 500)); // Simulate loading
                       const effectivePrice = (selectedProduct.pricesByColor && selectedProduct.pricesByColor[selectedColor] !== undefined)
                         ? selectedProduct.pricesByColor[selectedColor]
-                        : (typeof selectedProduct.price === 'number' ? selectedProduct.price : parseFloat(selectedProduct.price));
-                      const imageUrl = selectedProduct.images?.[selectedColor] || selectedProduct.image;
+                        : (selectedProduct.pricesBySize && selectedProduct.pricesBySize[selectedSize] !== undefined)
+                          ? selectedProduct.pricesBySize[selectedSize]
+                          : (typeof selectedProduct.price === 'number' ? selectedProduct.price : parseFloat(selectedProduct.price));
+                      const imagesListForCart = selectedProduct.imagesBySize ? (selectedProduct.imagesBySize[selectedSize] || selectedProduct.images) : selectedProduct.images;
+                      const imageUrl = imagesListForCart?.[selectedImageIndex] || selectedProduct.image;
                       addItem({
                         productId: selectedProduct.id,
                         name: selectedProduct.name,
@@ -1681,7 +1783,8 @@ function HomePage() {
                         image: imageUrl,
                         quantity: quantity,
                         selectedColor: selectedProduct.colors[selectedColor]?.name || '',
-                        selectedSize: selectedProduct.sizes[selectedSize]?.name || ''
+                        selectedSize: selectedProduct.sizes[selectedSize]?.name || '',
+                        sizeLabel: (selectedProduct as any).sizeLabel || 'Dydis'
                       });
                       setSuccessMessage(t.addedToCart);
                       setProductModalOpen(false);
@@ -1883,7 +1986,7 @@ function HomePage() {
                       <h3 className="text-base font-semibold">Mokėjimo Informacija</h3>
                     </div>
                     <StripeCardSection />
-                  </div>
+                      </div>
                   {/* Expose Stripe pay function to parent */}
                   <StripePayBridge
                     payRef={stripePayRef}
@@ -2035,7 +2138,7 @@ function HomePage() {
 
                         // Webhook will send the Discord embed; no direct client notification to avoid duplicates
                         order.status = 'Apmokėta';
-
+                        
                         setOrderHistory([order, ...orderHistory]);
                         setCompletedOrderNumber(orderNumber);
                         setCompletedOrderEmail(checkoutFormData.email);
@@ -2154,7 +2257,8 @@ function HomePage() {
       />
 
       {/* Footer */}
-      <footer className="bg-slate-900 text-white">
+      <footer className="relative bg-slate-900 text-white overflow-hidden">
+        <Snowfall position="absolute" zIndex={0} />
         <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-10">
           <div>
             <h4 className="font-bold text-lg mb-3">{t.shopName}</h4>

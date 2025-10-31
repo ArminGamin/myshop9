@@ -33,6 +33,32 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+/* Snowfall animation (respects reduced motion) */
+@keyframes kk-snow-fall {
+  0% { transform: translate3d(0, -10vh, 0) rotate(0deg); }
+  100% { transform: translate3d(var(--drift, 0px), 110vh, 0) rotate(360deg); }
+}
+
+.snowflake {
+  position: absolute;
+  top: -10vh;
+  color: #ffffff;
+  text-shadow: 0 0 5px rgba(255,255,255,0.75);
+  animation-name: kk-snow-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+  transform: translateZ(0);
+  contain: layout paint style;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snowflake { animation: none; display: none; }
+}
+
+/* Pause all flakes when not visible */
+.snow-paused .snowflake { animation-play-state: paused !important; }
+
 /* Optimize images */
 img {
   max-width: 100%;

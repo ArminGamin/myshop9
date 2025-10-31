@@ -32,8 +32,22 @@ export const CartSidebar = React.memo(({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
-      <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-xl overflow-y-auto">
-        <div className="p-6">
+radial-gradient(10px 10px at 78% 64%, rgba(16,185,129,0.10) 20%, transparent 21%),\
+radial-gradient(8px 8px at 55% 85%, rgba(37,99,235,0.08) 20%, transparent 21%),\
+linear-gradient(to top, rgba(254,242,242,1) 0%, rgba(255,255,255,0) 65%)',
+      <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-xl overflow-y-auto relative">
+        {/* Decorative background only for empty cart */}
+        {totalItems === 0 && (
+          <div
+            className="pointer-events-none absolute inset-0 z-0"
+            style={{
+              backgroundColor: '#f8fafc',
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cg stroke='%23e2e8f0' stroke-width='1.2' opacity='0.55' stroke-linecap='round'%3E%3Cpath d='M24 3v42M3 24h42M9 9l30 30M39 9L9 39'/%3E%3C/g%3E%3C/svg%3E"), linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(254,242,242,0.85) 55%, rgba(255,255,255,0) 100%)`,
+              backgroundRepeat: 'repeat, no-repeat',
+            }}
+          />
+        )}
+        <div className="p-6 relative z-10">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold">Krepšelis • {totalItems}</h2>
             <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">
@@ -97,7 +111,7 @@ export const CartSidebar = React.memo(({
                     <div className="flex-1">
                       <h3 className="font-medium text-sm">{item.name}</h3>
                       {item.selectedColor && <p className="text-xs text-gray-500">Spalva: {item.selectedColor}</p>}
-                      {item.selectedSize && <p className="text-xs text-gray-500">Dydis: {item.selectedSize}</p>}
+                      {item.selectedSize && <p className="text-xs text-gray-500">{item.sizeLabel || 'Dydis'}: {item.selectedSize}</p>}
                       <span className="text-lg font-bold text-red-600">€{item.price}</span>
                       <div className="flex items-center justify-between mt-2">
                         <div className="flex items-center space-x-2">
