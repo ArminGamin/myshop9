@@ -1791,7 +1791,6 @@ function HomePage() {
                       setLoading(false);
                       setTimeout(() => setSuccessMessage(''), 3000);
                     }}
-                    disabled={loading}
                     className="w-full bg-gradient-to-r from-red-600 to-green-600 text-white py-3 rounded-lg font-bold hover:from-red-700 hover:to-green-700 transition mb-3 disabled:opacity-50"
                   >
                     {loading ? (language === 'lt' ? 'Pridedama...' : 'Adding...') : t.addToCart}
