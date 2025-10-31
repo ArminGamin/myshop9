@@ -4,6 +4,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import "./index.css";
+import { Analytics } from "@vercel/analytics/react";
 
 // Performance monitoring and analytics
 if (import.meta.env.PROD) {
@@ -67,26 +68,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <BrowserRouter>
       <App />
     </BrowserRouter>
-    {/* Vercel Analytics (safe dynamic import for Vite/React) */}
-    {(() => {
-      const AnalyticsLazy = React.lazy(async () => {
-        try {
-          const mod = await import("@vercel/analytics/next");
-          return { default: mod.Analytics } as any;
-        } catch {
-          try {
-            const mod2 = await import("@vercel/analytics/react");
-            return { default: mod2.Analytics } as any;
-          } catch {
-            return { default: () => null } as any;
-          }
-        }
-      });
-      return (
-        <React.Suspense fallback={null}>
-          <AnalyticsLazy />
-        </React.Suspense>
-      );
-    })()}
+    <Analytics />
   </React.StrictMode>
 );
