@@ -1,10 +1,10 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+// Using loose types to avoid requiring '@vercel/node' in this Vite app
 
 // Sends an order notification to Discord via webhook.
 // Set DISCORD_WEBHOOK_URL in your environment. Falls back to a hardcoded URL if provided.
 const FALLBACK_WEBHOOK = 'https://discord.com/api/webhooks/1433188852193038496/67gjMdvWLEMqpEK5_U1e_pI2T9HV30mGhvQi0hJgENpueSikdfUzwtKqvu29BSU1wydW';
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {

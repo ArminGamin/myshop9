@@ -1,4 +1,4 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+// Using loose types to avoid requiring '@vercel/node' in this Vite app
 
 // Optional Redis (Upstash) for global dedup
 const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
@@ -26,7 +26,7 @@ async function redisSetNX(key: string, value: string, ttlSeconds: number) {
   return data?.result === 'OK';
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {

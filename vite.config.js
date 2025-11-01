@@ -13,7 +13,7 @@ export default defineConfig({
     }
   },
   build: {
-    target: 'es2015',
+    target: 'es2020',
     minify: 'terser',
     // Let Vite handle chunking to preserve correct load order in production
     terserOptions: {

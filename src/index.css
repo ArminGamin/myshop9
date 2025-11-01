@@ -168,6 +168,12 @@ button:active {
   -webkit-overflow-scrolling: touch;
 }
 
+/* Content-visibility helper for offscreen items */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 600px 800px; /* fallback size to avoid layout shift */
+}
+
 /* Better mobile typography */
 @media (max-width: 640px) {
   h1 {
@@ -354,4 +360,97 @@ button, a, .transition {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* Countdown visual accents */
+@keyframes kk-glow-pulse {
+  0% { box-shadow: 0 0 0 rgba(255,255,255,0.0); }
+  100% { box-shadow: 0 0 12px rgba(255,255,255,0.2); }
+}
+
+@keyframes kk-pop-in {
+  0% { opacity: 0; transform: translateY(8px) scale(0.98); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.countdown-pulse {
+  animation: kk-glow-pulse 1s ease-in-out infinite alternate;
+}
+
+.countdown-pop {
+  animation: kk-pop-in 500ms ease-out both;
+}
+
+/* Gold festive heading */
+.gold-text {
+  background: linear-gradient(180deg, #fff7bf 0%, #ffd54a 50%, #f5b400 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4), 0 0 8px rgba(255, 215, 0, 0.25);
+}
+
+/* Fairy light particles */
+@keyframes kk-twinkle {
+  0% { opacity: 0.6; transform: translateY(0) scale(0.95); filter: drop-shadow(0 0 2px rgba(255, 230, 140, 0.6)); }
+  100% { opacity: 1; transform: translateY(-1px) scale(1.05); filter: drop-shadow(0 0 6px rgba(255, 230, 140, 0.9)); }
+}
+
+.fairy-light {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(255,250,210,1) 0%, rgba(255,220,120,0.95) 40%, rgba(255,200,80,0.0) 70%);
+  box-shadow: 0 0 10px 4px rgba(255, 215, 120, 0.45);
+  animation: kk-twinkle 1.6s ease-in-out infinite alternate;
+}
+
+.fairy-light.slow { animation-duration: 2.2s; }
+.fairy-light.fast { animation-duration: 1.2s; }
+
+/* Premium glass card for countdown */
+.glass-card {
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  background: linear-gradient(135deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.08) 100%);
+  border: 1px solid rgba(255,255,255,0.35);
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255,255,255,0.45),
+    inset 0 -1px 0 rgba(255,255,255,0.15),
+    inset 0 0 12px rgba(255,255,255,0.08);
+}
+
+/* Sparkling divider line */
+@keyframes kk-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.sparkle-line {
+  height: 2px;
+  background: linear-gradient(90deg,
+    rgba(250,204,21,0.15) 0%,
+    rgba(250,204,21,0.85) 10%,
+    rgba(250,204,21,0.15) 20%,
+    rgba(250,204,21,0.15) 80%,
+    rgba(250,204,21,0.85) 90%,
+    rgba(250,204,21,0.15) 100%);
+  background-size: 200% 100%;
+  animation: kk-shimmer 2.8s linear infinite;
+  border-radius: 9999px;
+  box-shadow: 0 0 12px rgba(250,204,21,0.45);
+}
+
+/* Soft vignette helper */
+.vignette-soft {
+  position: relative;
+}
+.vignette-soft::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0) 60%, rgba(0,0,0,0.10) 100%);
 }
