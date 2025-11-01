@@ -7,7 +7,7 @@ export const initialProducts: Product[] = [
     name: "Kalėdinis Durų Kilimėlis",
     price: 9.99,
     originalPrice: 18.99,
-    image: "https://ae-pic-a1.aliexpress-media.com/kf/Sd0b1d77d28a24d1d9ef4bbba51142f1ac.jpg",
+    image: "https://ae-pic-a1.aliexpress-media.com/kf/S612c6eb10fa5471ab8f81a12a5a305b42.jpg",
     images: [
       "https://ae-pic-a1.aliexpress-media.com/kf/Sd0b1d77d28a24d1d9ef4bbba51142f1ac.jpg",
       "https://ae-pic-a1.aliexpress-media.com/kf/S054f234dc939406491db00974008b82ew.jpg",

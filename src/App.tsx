@@ -320,6 +320,8 @@ function HomePage() {
   const [isMobile, setIsMobile] = useState(false);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [touchStartY, setTouchStartY] = useState<number | null>(null);
+  const [touchEndY, setTouchEndY] = useState<number | null>(null);
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -351,7 +353,7 @@ function HomePage() {
       easyReturns: 'Lengvas Grąžinimas',
       support: '24/7 Pagalba',
       christmasCountdown: 'Laikas Iki Kalėdų',
-      countdownSubtitle: 'Nepraleiskite mūsų švenčių pasiūlymų!',
+      countdownSubtitle: 'Nepraleiskite mūsų šventinių pasiūlymų!',
       days: 'Dienos',
       hours: 'Valandos',
       minutes: 'Minutės',
@@ -608,22 +610,35 @@ function HomePage() {
   // Touch gesture handlers
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchEnd(null);
+    setTouchEndY(null);
     setTouchStart(e.targetTouches[0].clientX);
+    setTouchStartY(e.targetTouches[0].clientY);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     setTouchEnd(e.targetTouches[0].clientX);
+    setTouchEndY(e.targetTouches[0].clientY);
   };
 
   const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > 50;
-    const isRightSwipe = distance < -50;
+    if (!isMobile || touchStart === null || touchEnd === null || touchStartY === null || touchEndY === null) return;
 
-    if (isLeftSwipe && cartOpen) setCartOpen(false);
-    if (isRightSwipe && !cartOpen) setCartOpen(true);
+    const dx = touchStart - touchEnd; // positive = left swipe
+    const dy = touchStartY - touchEndY;
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+
+    // Require a strong horizontal intent to avoid triggering on vertical scroll
+    const strongHorizontal = absDx > 80 && absDx > absDy * 1.5;
+    if (!strongHorizontal) return;
+
+    const isLeftSwipe = dx > 0;
+    const isRightSwipe = dx < 0;
+    const nearLeftEdge = touchStart < 40;
+    const nearRightEdge = touchStart > (window.innerWidth - 40);
+
+    if (isLeftSwipe && cartOpen && nearRightEdge) setCartOpen(false);
+    if (isRightSwipe && !cartOpen && nearLeftEdge) setCartOpen(true);
   };
 
   // Prevent scroll when modal is open on mobile
