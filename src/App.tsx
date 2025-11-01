@@ -1138,7 +1138,8 @@ function HomePage() {
                 
                 // Proceed to submit
               try {
-                const response = await fetch('/api/newsletter-subscribe', {
+                const apiBase = ((import.meta as any).env?.VITE_API_BASE as string) || '';
+                const response = await fetch(`${apiBase}/api/newsletter-subscribe`, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
