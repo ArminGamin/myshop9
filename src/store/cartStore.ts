@@ -21,9 +21,9 @@ export const useCartStore = create<CartState>()(
       totalPrice: 0,
 
       addItem: (item: Omit<CartItem, 'id'>) => {
-        // Do not round up fractional cents when normalizing UI price values.
-        // Truncate to 2 decimals to avoid inflating totals toward free-shipping thresholds.
-        const normalizePrice = (p: number) => Math.floor(Number(p) * 100) / 100;
+        // Preserve intended item price to 2 decimals (fixes 17.99 -> 17.98 float artifacts)
+        // This does not affect free-shipping logic, which uses FLOOR cents separately in App.tsx
+        const normalizePrice = (p: number) => Number(Number(p).toFixed(2));
         // normalize incoming price to 2 decimals to avoid float drift
         item.price = normalizePrice(item.price);
         const { items } = get();

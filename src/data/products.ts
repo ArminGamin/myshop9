@@ -134,7 +134,7 @@ export const initialProducts: Product[] = [
   },
   {
     id: 1004,
-    name: "Šviečiančios dekoratyvinės šakelės",
+    name: "Šviečiančios Dekoratyvinės Šakelės",
     price: 11.99,
     originalPrice: 19.99,
     image: "https://ae-pic-a1.aliexpress-media.com/kf/S255daedfa95e4aab86e8670962d5f04dD.jpg",
@@ -221,7 +221,7 @@ export const initialProducts: Product[] = [
   ,
   {
     id: 1006,
-    name: "Pliušinis žaislas",
+    name: "Pliušinis Žaislas",
     price: 7.99,
     originalPrice: 14.99,
     image: "https://ae-pic-a1.aliexpress-media.com/kf/Sd0a54cae9f1d4760b4a22385c822a709u.jpg",
@@ -267,7 +267,7 @@ export const initialProducts: Product[] = [
   },
   {
     id: 1007,
-    name: "Kalėdiniai raktų pakabukai",
+    name: "Kalėdiniai Raktų Pakabukai",
     price: 5.99,
     originalPrice: 11.99,
     image: "https://ae-pic-a1.aliexpress-media.com/kf/S071cb82cce914403989faee9341768c2T.jpg",

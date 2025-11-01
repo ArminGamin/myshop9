@@ -304,6 +304,18 @@ function HomePage() {
     { name: 'Ieva N.', location: 'Mažeikiai', time: '35 min', product: 'Puokštės' },
   ]);
 
+  // Ensure product cards show varied recent-order info without repeating the same entry
+  const orderInfos = useMemo(() => {
+    const arr = [...recentOrders];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = tmp;
+    }
+    return arr;
+  }, [recentOrders]);
+
   // Mobile-specific state
   const [isMobile, setIsMobile] = useState(false);
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -1073,7 +1085,7 @@ function HomePage() {
                 <div className="mt-2 text-sm text-gray-800">
                   <div className="flex items-center space-x-2">
                     <Users className="w-4 h-4" />
-                    <span className="font-medium">{recentOrders[product.id % recentOrders.length]?.name} iš {recentOrders[product.id % recentOrders.length]?.location} užsisakė prieš {recentOrders[product.id % recentOrders.length]?.time}</span>
+                    <span className="font-medium">{orderInfos[index % orderInfos.length]?.name} iš {orderInfos[index % orderInfos.length]?.location} užsisakė prieš {orderInfos[index % orderInfos.length]?.time}</span>
                   </div>
                 </div>
 
@@ -1305,7 +1317,7 @@ function HomePage() {
                           <p className="text-sm font-semibold text-gray-700">{item.sizeLabel || 'Dydis'}: {item.selectedSize}</p>
                         )}
                         <div className="flex items-center space-x-2 mt-1">
-                          <span className="text-xl font-extrabold text-red-600">€{item.price}</span>
+                          <span className="text-xl font-extrabold text-red-600">€{Number(item.price).toFixed(2)}</span>
                         </div>
                         <div className="flex items-center justify-between mt-2">
                           <div className="flex items-center space-x-2">
