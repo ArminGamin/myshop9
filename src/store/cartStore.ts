@@ -21,6 +21,11 @@ export const useCartStore = create<CartState>()(
       totalPrice: 0,
 
       addItem: (item: Omit<CartItem, 'id'>) => {
+        // Do not round up fractional cents when normalizing UI price values.
+        // Truncate to 2 decimals to avoid inflating totals toward free-shipping thresholds.
+        const normalizePrice = (p: number) => Math.floor(Number(p) * 100) / 100;
+        // normalize incoming price to 2 decimals to avoid float drift
+        item.price = normalizePrice(item.price);
         const { items } = get();
         const existingItem = items.find(
           i => i.productId === item.productId && 
@@ -43,22 +48,20 @@ export const useCartStore = create<CartState>()(
           };
           set(state => ({ items: [...state.items, newItem] }));
         }
-
-        // Update totals
-        set(state => ({
-          totalItems: state.items.reduce((sum, item) => sum + item.quantity, 0),
-          totalPrice: state.items.reduce((sum, item) => sum + (item.price * item.quantity), 0),
-        }));
+        // Update totals using integer cents to ensure exact sums
+        set(state => {
+          const totalItems = state.items.reduce((sum, it) => sum + it.quantity, 0);
+          const totalCents = state.items.reduce((sum, it) => sum + Math.round(Number(it.price) * 100) * it.quantity, 0);
+          return { totalItems, totalPrice: totalCents / 100 };
+        });
       },
 
       removeItem: (itemId: string) => {
         set(state => {
           const newItems = state.items.filter(item => item.id !== itemId);
-          return {
-            items: newItems,
-            totalItems: newItems.reduce((sum, item) => sum + item.quantity, 0),
-            totalPrice: newItems.reduce((sum, item) => sum + (item.price * item.quantity), 0),
-          };
+          const totalItems = newItems.reduce((sum, it) => sum + it.quantity, 0);
+          const totalCents = newItems.reduce((sum, it) => sum + Math.round(Number(it.price) * 100) * it.quantity, 0);
+          return { items: newItems, totalItems, totalPrice: totalCents / 100 };
         });
       },
 
@@ -72,11 +75,9 @@ export const useCartStore = create<CartState>()(
           const newItems = state.items.map(item =>
             item.id === itemId ? { ...item, quantity } : item
           );
-          return {
-            items: newItems,
-            totalItems: newItems.reduce((sum, item) => sum + item.quantity, 0),
-            totalPrice: newItems.reduce((sum, item) => sum + (item.price * item.quantity), 0),
-          };
+          const totalItems = newItems.reduce((sum, it) => sum + it.quantity, 0);
+          const totalCents = newItems.reduce((sum, it) => sum + Math.round(Number(it.price) * 100) * it.quantity, 0);
+          return { items: newItems, totalItems, totalPrice: totalCents / 100 };
         });
       },
 

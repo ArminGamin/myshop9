@@ -228,8 +228,15 @@ function HomePage() {
   const [thankYouModalOpen, setThankYouModalOpen] = useState(false);
   const [completedOrderNumber, setCompletedOrderNumber] = useState('');
   const [completedOrderEmail, setCompletedOrderEmail] = useState('');
-  // Free shipping override for test product (€0.01)
-  const isFreeShipping = totalPrice >= 30;
+  // Free shipping threshold uses FLOOR of subtotal cents (no rounding up to qualify)
+  const freeShippingCents = 3000; // €30.00
+  const subtotalCentsFloor = useMemo(() => (
+    cartItems.reduce((sum: number, it: any) => {
+      const priceCentsFloor = Math.floor(Number(it.price) * 100);
+      return sum + priceCentsFloor * Number(it.quantity || 1);
+    }, 0)
+  ), [cartItems]);
+  const isFreeShipping = subtotalCentsFloor >= freeShippingCents;
   const orderCents = useMemo(() => {
     const subtotalCents = cartItems.reduce((sum: number, it: any) => {
       const priceCents = Math.round(Number(it.price) * 100);
@@ -261,6 +268,11 @@ function HomePage() {
     seconds: 0,
   });
   const [viewersCount, setViewersCount] = useState(12);
+
+  // Sort products by lowest price first for listing grid
+  const productsSorted = useMemo(() => {
+    return [...products].sort((a: any, b: any) => Number(a.price) - Number(b.price));
+  }, [products]);
   
   // Weighted random stock counter (3-15, lower numbers prioritized)
   const getWeightedStockCount = () => {
@@ -678,8 +690,8 @@ function HomePage() {
       {/* Global snowfall overlay for continuous flakes */}
       <Snowfall position="fixed" zIndex={5} />
       {/* Sale Banner */}
-      <div className="relative bg-gradient-to-r from-red-600 to-green-600 text-white py-2 text-center text-sm font-medium overflow-hidden">
-        <div className="relative">{t.saleBanner}</div>
+      <div className="relative bg-gradient-to-r from-red-600 to-green-600 text-white py-2 text-center text-sm sm:text-base font-semibold overflow-hidden">
+        <div className="relative tracking-wide">🎁 {t.saleBanner} 🎁</div>
       </div>
 
       {/* Header */}
@@ -777,21 +789,16 @@ function HomePage() {
             </p>
             
             {/* Call-to-Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+            <div className="flex justify-center mb-12">
               <button
                 onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
-                className="bg-white text-red-600 px-8 py-4 rounded-lg font-semibold border-2 border-red-600 hover:bg-red-50 transition-all duration-300 transform hover:scale-105 touch-manipulation min-h-[48px] flex items-center justify-center gap-2"
+                className="bg-white text-red-600 px-10 py-5 rounded-full font-bold border-2 border-red-600 hover:bg-red-50 transition-all duration-300 transform hover:scale-105 touch-manipulation min-h-[52px] text-lg flex items-center gap-3 cta-glow cta-sheen cta-pulse"
               >
-                <ShoppingCart className="w-5 h-5" />
-                Pirkinių pradžia
-                </button>
-              <button
-                onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
-                className="bg-red-600 text-white px-8 py-4 rounded-lg font-semibold border-2 border-white hover:bg-red-700 transition-all duration-300 transform hover:scale-105 touch-manipulation min-h-[48px]"
-              >
+                <Gift className="w-6 h-6" />
                 Peržiūrėti rinkinius
-                </button>
-              </div>
+              </button>
+            </div>
+            <p className="text-center text-white/90 font-semibold mb-10">Iki -55% nuolaidos rinkiniams – pasiūlymai ribotam laikui</p>
             
             {/* Informational Sections */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -837,6 +844,14 @@ function HomePage() {
           <span className="fairy-light slow" style={{ top: '42%', left: '86%' }}></span>
           <span className="fairy-light" style={{ top: '38%', left: '6%' }}></span>
         </div>
+        {/* Soft gradient seam into the next section */}
+        <div
+          className="pointer-events-none absolute bottom-0 left-0 right-0 h-8 z-10"
+          style={{
+            background:
+              'linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(22,101,52,0.35) 60%, #166534 100%)',
+          }}
+        />
       </div>
 
       
@@ -992,23 +1007,23 @@ function HomePage() {
       )}
 
       {/* Products */}
-      <main id="products" className="relative z-20 max-w-7xl mx-auto px-1 md:px-2 py-8 flex-1">
+      <main id="products" className="relative z-20 max-w-7xl mx-auto px-6 py-8 flex-1">
         <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
           {t.products}
         </h2>
-        {products.length === 0 ? (
+        {productsSorted.length === 0 ? (
           <div className="text-center text-gray-600 py-12">
             Šiuo metu nėra prekių. Pridėkite naujų įrašų – aš paruošiau vietą nuotraukoms ir aprašymams.
           </div>
         ) : (
-        <div className={`grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3`}>
-          {products.map((product, index) => (
+        <div className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3`}>
+          {productsSorted.map((product, index) => (
             <div
               key={product.id}
-              className={`cv-auto bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 group h-full flex flex-col ${products.length === 1 ? 'lg:col-span-2' : ''}`}
+              className={`cv-auto bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 group h-full flex flex-col ${productsSorted.length === 1 ? 'lg:col-span-2' : ''}`}
               style={{ contain: 'content', contentVisibility: 'auto' }}
             >
-              <div className={`w-full h-40 sm:h-48 md:h-72 lg:h-80 bg-gray-50 flex items-center justify-center overflow-hidden`}>
+              <div className={`w-full h-40 sm:h-48 md:h-72 lg:h-80 bg-gray-50 flex items-center justify-center overflow-hidden rounded-2xl`}>
                   <OptimizedImage
                   src={product.image}
                   alt={`${product.name} - Premium Kalėdų dekoracija | Kalėdų Kampelis`}
@@ -1027,14 +1042,12 @@ function HomePage() {
                     {product.rating} ({product.reviews})
                   </span>
                 </div>
-                <h3 className="text-lg font-bold mb-2 text-gray-900 line-clamp-2 group-hover:text-red-600 transition-colors duration-300 min-h-[3.5rem] leading-tight">
-                  {product.name === 'Pliušinis žaislas' ? (
-                    <>
-                      Pliušinis<br /> žaislas
-                    </>
-                  ) : (
-                    product.name
-                  )}
+                <h3
+                  className={`text-lg font-bold mb-2 text-gray-900 group-hover:text-red-600 transition-colors duration-300 min-h-[3.5rem] leading-tight ${
+                    product.name === 'Pliušinis žaislas' ? 'whitespace-nowrap truncate' : 'line-clamp-2'
+                  }`}
+                >
+                  {product.name}
                 </h3>
                 <div className="flex items-center justify-between mb-2 pr-1">
                   <div>
@@ -1087,7 +1100,7 @@ function HomePage() {
 
       {/* Newsletter */}
       <section className="relative bg-gradient-to-r from-green-600 to-red-600 text-white py-16 px-6 text-center overflow-hidden cv-auto" style={{ contentVisibility: 'auto', containIntrinsicSize: '800px' }}>
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-4xl mx-auto transform translate-x-1 md:translate-x-2">
           <Mail className="mx-auto mb-4 w-10 h-10" />
           <h3 className="text-2xl font-bold mb-3">
             Gaukite Išskirtinius Švenčių Pasiūlymus
@@ -1174,11 +1187,11 @@ function HomePage() {
               }
               setTimeout(() => setNewsletterMsg(null), 4000);
             }}
-            className="flex flex-col sm:flex-row gap-3 justify-center"
+            className="flex flex-col sm:flex-row gap-3 justify-center mx-auto max-w-2xl"
           >
             <input
               placeholder="Įveskite savo el. paštą"
-              className="flex-1 px-4 py-3 rounded-md text-black"
+              className="w-full sm:flex-1 px-4 py-3 rounded-md text-black"
               type="email"
               name="email"
               value={email}
@@ -1483,7 +1496,7 @@ function HomePage() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Left Column - Images */}
                 <div>
-                  <div className="mb-3 bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden" style={{ minHeight: '400px' }}>
+                  <div className="mb-3 bg-gray-50 rounded-2xl kk-red-contour kk-contour-inset-lg flex items-center justify-center overflow-hidden" style={{ minHeight: '400px' }}>
                     {(() => {
                       const imagesList = selectedProduct.imagesBySize
                         ? (selectedProduct.imagesBySize[selectedSize] || selectedProduct.images)
@@ -1517,7 +1530,7 @@ function HomePage() {
                             <button
                               key={`${t.group}-${t.idx}-${i}`}
                               onClick={() => { setSelectedSize(t.group); setSelectedImageIndex(t.idx); }}
-                              className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden border-2 bg-gray-50 touch-manipulation ${
+                              className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg kk-red-contour kk-contour-inset-sm overflow-hidden border-2 bg-gray-50 touch-manipulation ${
                                 (selectedSize === t.group && selectedImageIndex === t.idx) ? 'border-red-500 ring-2 ring-red-300' : 'border-gray-300'
                               }`}
                               title={`Variantas ${t.group + 1}-${t.idx + 1}`}
@@ -1546,7 +1559,7 @@ function HomePage() {
                             <button
                               key={`${t.group}-${t.idx}-${i}`}
                               onClick={() => { setSelectedColor(t.group); setSelectedImageIndex(t.idx); }}
-                              className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden border-2 bg-gray-50 touch-manipulation ${
+                              className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg kk-red-contour kk-contour-inset-sm overflow-hidden border-2 bg-gray-50 touch-manipulation ${
                                 (selectedColor === t.group && selectedImageIndex === t.idx) ? 'border-red-500 ring-2 ring-red-300' : 'border-gray-300'
                               }`}
                               title={`Variantas ${t.group + 1}-${t.idx + 1}`}
@@ -1572,7 +1585,7 @@ function HomePage() {
                         <button
                           key={index}
                             onClick={() => setSelectedImageIndex(index)}
-                          className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden border-2 bg-gray-50 touch-manipulation ${
+                          className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg kk-red-contour kk-contour-inset-sm overflow-hidden border-2 bg-gray-50 touch-manipulation ${
                               selectedImageIndex === index ? 'border-red-500 ring-2 ring-red-300' : 'border-gray-300'
                           }`}
                           title={`Variantas ${index + 1}`}
@@ -2235,7 +2248,7 @@ function HomePage() {
       {/* Footer */}
       <footer className="relative bg-slate-900 text-white overflow-hidden">
         <Snowfall position="absolute" zIndex={0} />
-        <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-10 justify-items-center md:justify-items-start text-center md:text-left transform translate-x-1 md:translate-x-2">
           <div>
             <h4 className="font-bold text-lg mb-3">{t.shopName}</h4>
             <p className="text-sm text-gray-300 mb-3">

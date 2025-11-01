@@ -443,6 +443,60 @@ button, a, .transition {
   box-shadow: 0 0 12px rgba(250,204,21,0.45);
 }
 
+/* Hero CTA enhancements */
+@keyframes kk-cta-glow {
+  0%   { box-shadow: 0 8px 24px rgba(220, 38, 38, 0.25), 0 0 0 rgba(220,38,38,0); }
+  50%  { box-shadow: 0 12px 36px rgba(220, 38, 38, 0.35), 0 0 12px rgba(220,38,38,0.25); }
+  100% { box-shadow: 0 8px 24px rgba(220, 38, 38, 0.25), 0 0 0 rgba(220,38,38,0); }
+}
+
+.cta-glow {
+  animation: kk-cta-glow 2.6s ease-in-out infinite;
+}
+
+.cta-sheen { position: relative; overflow: hidden; }
+.cta-sheen::after {
+  content: "";
+  position: absolute;
+  top: -150%;
+  left: -50%;
+  width: 60%;
+  height: 400%;
+  transform: rotate(25deg);
+  background: linear-gradient(
+    to right,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.55) 50%,
+    rgba(255,255,255,0) 100%
+  );
+  opacity: 0.35;
+  filter: blur(1px);
+  animation: kk-sheen-move 4.5s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes kk-sheen-move {
+  0% { left: -60%; }
+  100% { left: 130%; }
+}
+
+/* Subtle outward pulse ring */
+.cta-pulse { position: relative; }
+.cta-pulse::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.35);
+  animation: kk-pulse-ring 2s ease-out infinite;
+}
+
+@keyframes kk-pulse-ring {
+  0% { transform: scale(0.96); opacity: 0.6; }
+  70% { transform: scale(1.12); opacity: 0.0; }
+  100% { transform: scale(1.12); opacity: 0.0; }
+}
+
 /* Soft vignette helper */
 .vignette-soft {
   position: relative;
@@ -454,3 +508,38 @@ button, a, .transition {
   pointer-events: none;
   background: radial-gradient(ellipse at center, rgba(0,0,0,0) 60%, rgba(0,0,0,0.10) 100%);
 }
+
+/* Subtle red animated contour around product images */
+.kk-red-contour { position: relative; --kk-contour-radius: inherit; --kk-contour-width: 2px; --kk-contour-inset: 0px; }
+.kk-red-contour::after {
+  content: "";
+  position: absolute;
+  inset: var(--kk-contour-inset);
+  pointer-events: none;
+  border-radius: var(--kk-contour-radius);
+  border: var(--kk-contour-width) solid rgba(220, 38, 38, 0.35);
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.15), 0 0 0 1px rgba(220, 38, 38, 0.18) inset;
+  animation: kk-red-contour 3s ease-in-out infinite;
+}
+
+@keyframes kk-red-contour {
+  0%, 100% {
+    border-color: rgba(220, 38, 38, 0.32);
+    box-shadow: 0 0 8px rgba(220, 38, 38, 0.12), 0 0 0 1px rgba(220, 38, 38, 0.16) inset;
+  }
+  50% {
+    border-color: rgba(220, 38, 38, 0.55);
+    box-shadow: 0 0 16px rgba(220, 38, 38, 0.22), 0 0 0 2px rgba(220, 38, 38, 0.22) inset;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kk-red-contour::after { animation: none; }
+}
+
+/* Helpers to tune inset per container */
+.kk-contour-inset-sm { --kk-contour-inset: 4px; }
+.kk-contour-inset-md { --kk-contour-inset: 8px; }
+.kk-contour-inset-lg { --kk-contour-inset: 12px; }
+
+/* (animated contour styles removed on request) */

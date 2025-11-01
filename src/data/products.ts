@@ -264,5 +264,134 @@ export const initialProducts: Product[] = [
     isNew: true,
     isPopular: true,
     createdAt: new Date()
+  },
+  {
+    id: 1007,
+    name: "Kalėdiniai raktų pakabukai",
+    price: 5.99,
+    originalPrice: 11.99,
+    image: "https://ae-pic-a1.aliexpress-media.com/kf/S071cb82cce914403989faee9341768c2T.jpg",
+    images: [
+      "https://ae-pic-a1.aliexpress-media.com/kf/S071cb82cce914403989faee9341768c2T.jpg",
+      "https://ae-pic-a1.aliexpress-media.com/kf/Sd8923f6c484c4622ab026da2090109dcr.jpg",
+      "https://ae-pic-a1.aliexpress-media.com/kf/Sb9a5d21008f64cdfa947cdd92b8ad62bC.jpg",
+      "https://ae-pic-a1.aliexpress-media.com/kf/S1c5a239762a4418bb61ec7d015846ac5B.jpg",
+      "https://ae-pic-a1.aliexpress-media.com/kf/S1b4b8132e3d349c395a09a277bd5f9be9.jpg"
+    ],
+    imagesByColor: [
+      ["https://ae-pic-a1.aliexpress-media.com/kf/S071cb82cce914403989faee9341768c2T.jpg"],
+      ["https://ae-pic-a1.aliexpress-media.com/kf/Sd8923f6c484c4622ab026da2090109dcr.jpg"],
+      ["https://ae-pic-a1.aliexpress-media.com/kf/Sb9a5d21008f64cdfa947cdd92b8ad62bC.jpg"],
+      ["https://ae-pic-a1.aliexpress-media.com/kf/S1c5a239762a4418bb61ec7d015846ac5B.jpg"],
+      ["https://ae-pic-a1.aliexpress-media.com/kf/S1b4b8132e3d349c395a09a277bd5f9be9.jpg"]
+    ],
+    rating: 4.8,
+    reviews: 63,
+    discount: "-50%",
+    description:
+      "Kalėdiniai raktų pakabukai – žaismingi šventiniai akcentai kasdienai. Pasirinkite iš variantų: Senelis Kalėda, Kalėdinės kojinės, Kalėdinis elnias, Sniego senis arba Kalėdinė eglutė. Lengvi ir tvirti, puikiai tinka kaip dovana, puošia raktus, kuprinę ar automobilio raktelį.",
+    features: [
+      "Lengvi ir tvirti – kasdieniam naudojimui",
+      "Ryškūs šventiniai dizainai (5 dizainai)",
+      "Puiki dovanos idėja Kalėdoms",
+      "Universalus dydis – tinka prie bet kurių raktų"
+    ],
+    colors: [
+      { name: "Senelis Kalėda", value: "santa_claus" },
+      { name: "Kalėdinės kojinės", value: "christmas_socks" },
+      { name: "Kalėdinis elnias", value: "christmas_elk" },
+      { name: "Sniego senis", value: "christmas_snowman" },
+      { name: "Kalėdinė eglutė", value: "christmas_tree" }
+    ],
+    pricesByColor: [5.99, 5.99, 5.99, 5.99, 5.99],
+    originalPricesByColor: [11.99, 11.99, 11.99, 11.99, 11.99],
+    sizes: [
+      { name: "Universalus", value: "universal" }
+    ],
+    category: "Aksesuarai",
+    tags: [
+      "kalėdiniai raktų pakabukai",
+      "raktų pakabukas",
+      "šventiniai aksesuarai",
+      "senelis kalėda",
+      "sniego senis",
+      "kalėdinė eglutė",
+      "kalėdinės kojinės",
+      "kalėdinis elnias",
+      "dovana",
+      "kalėdos",
+      "raktai",
+      "automobilio rakteliai"
+    ],
+    stock: 9999,
+    isNew: true,
+    isPopular: true,
+    createdAt: new Date()
+  }
+  ,
+  {
+    id: 1008,
+    name: "Kalėdinis Megztinis",
+    price: 19.99,
+    originalPrice: 29.99,
+    image: "https://ae-pic-a1.aliexpress-media.com/kf/Sc5decea530e24a48942d4fcd70582ad37.jpg",
+    images: [
+      "https://ae-pic-a1.aliexpress-media.com/kf/Sc5decea530e24a48942d4fcd70582ad37.jpg",
+      "https://ae-pic-a1.aliexpress-media.com/kf/Sc39853661e8d4b09b330f44339610bd4I.jpg",
+      "https://ae-pic-a1.aliexpress-media.com/kf/S66dcceb97a8847bf91ef9d4d5dd492b6f.jpg"
+    ],
+    imagesByColor: [
+      ["https://ae-pic-a1.aliexpress-media.com/kf/Sc5decea530e24a48942d4fcd70582ad37.jpg"],
+      ["https://ae-pic-a1.aliexpress-media.com/kf/Sc39853661e8d4b09b330f44339610bd4I.jpg"],
+      ["https://ae-pic-a1.aliexpress-media.com/kf/S66dcceb97a8847bf91ef9d4d5dd492b6f.jpg"]
+    ],
+    rating: 4.8,
+    reviews: 42,
+    discount: "-33%",
+    description:
+      "Kalėdinis megztinis – šiltas, minkštas ir patogus žiemos šventėms. Pasirinkite iš trijų klasikinių spalvų: žalia, raudona ir tamsiai mėlyna. Puikiai tinka šeimos fotosesijoms, darbo vakarėliams, kasdieniam nešiojimui ar kaip dovana. Kvėpuojantis audinys, lengva priežiūra, universalus dizainas moterims ir vyrams.",
+    features: [
+      "Aukštos kokybės, minkštas audinys – malonus odai",
+      "Ryškios šventinės spalvos (žalia / raudona / tamsiai mėlyna)",
+      "M, L, XL, XXL, XXXL dydžiai",
+      "Lengva priežiūra",
+      "Puiki dovana Kalėdoms, poroms ir šeimai"
+    ],
+    colors: [
+      { name: "Žalia", value: "green" },
+      { name: "Raudona", value: "red" },
+      { name: "Tamsiai mėlyna", value: "navy_blue" }
+    ],
+    pricesByColor: [19.99, 19.99, 19.99],
+    originalPricesByColor: [29.99, 29.99, 29.99],
+    sizes: [
+      { name: "M", value: "size_m" },
+      { name: "L", value: "size_l" },
+      { name: "XL", value: "size_xl" },
+      { name: "XXL", value: "size_xxl" },
+      { name: "XXXL", value: "size_xxxl" }
+    ],
+    sizeLabel: "Dydis",
+    category: "Drabužiai",
+    tags: [
+      "kalėdinis megztinis",
+      "megztinis",
+      "šiltas megztinis",
+      "žalias megztinis",
+      "raudonas megztinis",
+      "tamsiai mėlynas megztinis",
+      "moteriškas megztinis",
+      "vyriškas megztinis",
+      "poroms",
+      "šeimai",
+      "dovana",
+      "kalėdos",
+      "žiema",
+      "šventinis drabužis"
+    ],
+    stock: 9999,
+    isNew: true,
+    isPopular: true,
+    createdAt: new Date()
   }
 ];
