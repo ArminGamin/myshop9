@@ -108,9 +108,8 @@ export const initialProducts: Product[] = [
     discount: "-57%",
     description: "Šeimos kalėdinės pižamos – suderintas komplektas su šventiniais motyvais. Minkštas, elastingas ir malonus liesti audinys, patogus vaikams ir suaugusiems. Idealiai tinka kalėdinei fotosesijai, jaukiems šeimos vakarams ir dovanai. Lengvai prižiūrimos, greitai džiūsta, galimi dydžiai XS–XXL.",
     features: [
-      "Komplektas visai šeimai (vadovas, mama, vaikai)",
-      "Šventiniai motyvai: Senelis Kalėda, eglutės, elniukai, ledo kristalai",
-      "Minkšti ir patogūs medžiagos",
+      "Komplektas visai šeimai (tėčiui, mamai, vaikam)",
+      "Minkštos ir patogios medžiagos",
       "Tinka skirtingų dydžių (moterims, vyrams, vaikams)",
       "Puiki dovana šeimai prieš Kalėdas"
     ],
@@ -244,7 +243,7 @@ export const initialProducts: Product[] = [
       "Minkštas ir jaukus pliušinis žaislas – puiki dovana šventėms. Aukštos kokybės, malonus liesti, idealiai tinka kaip kalėdinė dovana vaikams ir suaugusiems, namų dekorui ar jaukiam interjerui.",
     features: [
       "Minkšta, maloni liesti medžiaga",
-      "Tinka vaikams ir kaip dekoracija",
+      "Tinka kaip dovana ir kaip dekoracija",
       "Puiki dovanos idėja Kalėdoms"
     ],
     colors: [
