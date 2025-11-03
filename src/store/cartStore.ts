@@ -54,6 +54,22 @@ export const useCartStore = create<CartState>()(
           const totalCents = state.items.reduce((sum, it) => sum + Math.round(Number(it.price) * 100) * it.quantity, 0);
           return { totalItems, totalPrice: totalCents / 100 };
         });
+
+        // Meta Pixel: AddToCart event (guarded)
+        try {
+          const value = Number(Number(item.price * item.quantity).toFixed(2));
+          const w: any = (typeof window !== 'undefined') ? window : null;
+          if (w && typeof w.fbq === 'function') {
+            w.fbq('track', 'AddToCart', {
+              currency: 'EUR',
+              value,
+              content_ids: [item.productId],
+              content_name: item.name,
+              content_type: 'product',
+              quantity: item.quantity,
+            });
+          }
+        } catch {}
       },
 
       removeItem: (itemId: string) => {

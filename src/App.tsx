@@ -1372,7 +1372,19 @@ function HomePage() {
                       <span className="text-xl font-bold text-red-600">€{totalPrice.toFixed(2)}</span>
                     </div>
                     <button 
-                      onClick={() => setCheckoutOpen(true)}
+                      onClick={() => {
+                        try {
+                          const w: any = (typeof window !== 'undefined') ? window : null;
+                          if (w && typeof w.fbq === 'function') {
+                            w.fbq('track', 'InitiateCheckout', {
+                              value: Number(totalPrice.toFixed(2)),
+                              currency: 'EUR',
+                              num_items: totalItems,
+                            });
+                          }
+                        } catch {}
+                        setCheckoutOpen(true);
+                      }}
                       className="w-full bg-gradient-to-r from-red-600 to-green-600 text-white py-3 rounded-lg font-semibold hover:from-red-700 hover:to-green-700 transition"
                     >
                       {t.checkout} • €{totalPrice.toFixed(2)}
@@ -2160,6 +2172,21 @@ function HomePage() {
                         setCompletedOrderEmail(checkoutFormData.email);
                         setCheckoutOpen(false);
                         setThankYouModalOpen(true);
+                        // Meta Pixel: Purchase event
+                        try {
+                          const w: any = (typeof window !== 'undefined') ? window : null;
+                          if (w && typeof w.fbq === 'function') {
+                            w.fbq('track', 'Purchase', {
+                              value: Number((orderCents / 100).toFixed(2)),
+                              currency: 'EUR',
+                              contents: cartItems.map((it: any) => ({
+                                id: it.productId,
+                                quantity: it.quantity,
+                              })),
+                              content_type: 'product',
+                            });
+                          }
+                        } catch {}
                         clearCart();
                         setGiftWrapping(false);
                         
