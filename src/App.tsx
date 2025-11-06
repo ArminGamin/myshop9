@@ -111,20 +111,8 @@ const PristatymoInfo = () => (
 
 const Grazinimai = () => (
   <PageWrapper title="Grąžinimai">
-    <p className="text-gray-700 whitespace-pre-line">
-      Kokybiškų prekių grąžinimas, remiantis Lietuvos Respublikos civiliniu
-      kodeksu bei Lietuvos Respublikos Vyriausybės nutarimu (2014-07-22) dėl
-      mažmeninės prekybos taisyklių patvirtinimo ir pačiomis Mažmeninės prekybos
-      taisyklėmis.
-    </p>
-    <br />
-    <p className="text-gray-700 whitespace-pre-line">
-      Tuo atveju, jei Vartotojas sudaro pirkimo-pardavimo sutartį (toliau
-      Sutartis) naudojantis tik ryšio priemonėmis (nuotolinė sutartis) ir dėl to
-      negali prieš sudarant sutartį pasinaudoti įstatymais įtvirtinta teise
-      apžiūrėti prekes ir įvertinti teikiamų paslaugų pobūdį, jis turi teisę
-      atsisakyti pirkimo-pardavimo sutarties, raštu pranešdamas apie tai
-      Pardavėjui per 14 (keturiolika) dienų nuo prekių pristatymo dienos...
+    <p className="text-gray-700">
+      Norime, kad būtumėte visiškai patenkinti savo pirkiniu! Atkreipkite dėmesį, kad visi pardavimai yra galutiniai, todėl grąžinti ar pakeisti prekių negalime. Raginame atidžiai peržiūrėti prekės aprašymą, dydžius ir nuotraukas prieš pateikiant užsakymą. Jei turite klausimų arba reikia pagalbos renkantis tinkamą prekę, mūsų komanda mielai jums padės – susisiekite dar prieš pirkdami!
     </p>
   </PageWrapper>
 );
@@ -759,7 +747,28 @@ function HomePage() {
             <div className="text-2xl sm:text-3xl animate-bounce group-hover:animate-spin">🎄</div>
             <h1 className="text-lg sm:text-2xl font-bold text-red-600 group-hover:text-green-600 transition-colors duration-300">{t.shopName}</h1>
           </div>
-          <div className="flex items-center space-x-2 sm:space-x-4">
+      <div className="flex items-center space-x-2 sm:space-x-4">
+        {/* Language Switcher */}
+        <div className="flex items-center gap-1 mr-1">
+          <button
+            onClick={() => {
+              document.cookie = `googtrans=/auto/en; path=/`;
+              document.cookie = `googtrans=/auto/en; domain=${window.location.hostname}; path=/`;
+              window.location.reload();
+            }}
+            className="px-2 py-1 border rounded text-xs hover:bg-gray-50"
+            title="English"
+          >🇬🇧 EN</button>
+          <button
+            onClick={() => {
+              document.cookie = `googtrans=/auto/lt; path=/`;
+              document.cookie = `googtrans=/auto/lt; domain=${window.location.hostname}; path=/`;
+              window.location.reload();
+            }}
+            className="px-2 py-1 border rounded text-xs hover:bg-gray-50"
+            title="Lietuvių"
+          >🇱🇹 LT</button>
+        </div>
             <button
               className="relative text-gray-700 hover:text-red-600 p-3 sm:p-2 rounded-lg hover:bg-red-50 touch-manipulation"
               onClick={() => setWishlistOpen((s) => !s)}
