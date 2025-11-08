@@ -2490,18 +2490,18 @@ function HomePage() {
             <h5 className="font-semibold mb-3">Kontaktai</h5>
             <ul className="text-sm space-y-2 text-gray-300">
               <li className="flex items-center gap-3 py-1">
-                <Mail className="w-5 h-5 block" />
-                <span className="leading-none">kaleddovanos@gmail.com</span>
+                <Mail className="w-5 h-5 block shrink-0" />
+                <span className="inline-flex items-center h-5">kaleddovanos@gmail.com</span>
               </li>
               <li className="flex items-center gap-3 py-1">
-                <img src="https://cdn.simpleicons.org/instagram/FFFFFF" alt="Instagram" className="w-5 h-5 block" />
-                <a href="https://www.instagram.com/kaledukampelis" target="_blank" rel="noopener noreferrer" className="hover:text-white leading-none">
+                <img src="https://cdn.simpleicons.org/instagram/FFFFFF" alt="Instagram" className="w-5 h-5 block shrink-0" />
+                <a href="https://www.instagram.com/kaledukampelis" target="_blank" rel="noopener noreferrer" className="hover:text-white inline-flex items-center h-5">
                   kaledukampelis
                 </a>
               </li>
               <li className="flex items-center gap-3 py-1">
-                <img src="https://cdn.simpleicons.org/tiktok/FFFFFF" alt="TikTok" className="w-5 h-5 block" />
-                <a href="https://www.tiktok.com/@kaledukampelis" target="_blank" rel="noopener noreferrer" className="hover:text-white leading-none">
+                <img src="https://cdn.simpleicons.org/tiktok/FFFFFF" alt="TikTok" className="w-5 h-5 block shrink-0" />
+                <a href="https://www.tiktok.com/@kaledukampelis" target="_blank" rel="noopener noreferrer" className="hover:text-white inline-flex items-center h-5">
                   kaledukampelis
                 </a>
               </li>
