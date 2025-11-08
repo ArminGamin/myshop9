@@ -34,6 +34,7 @@ export default function PayPalButton({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const renderedRef = useRef(false);
   const amountRef = useRef<string>((Math.round(amountCents) / 100).toFixed(2));
+  const orderRef = useRef<string | undefined>(orderNumber);
 
   // Keep the latest amount without re-rendering PayPal
   useEffect(() => {
@@ -62,7 +63,7 @@ export default function PayPalButton({
               },
               purchase_units: [
                 {
-                  description: orderNumber ? `Užsakymas ${orderNumber}` : "Užsakymas",
+                  description: orderRef.current ? `Užsakymas ${orderRef.current}` : "Užsakymas",
                   amount: { value: amountRef.current, currency_code: "EUR" },
                 },
               ],
@@ -82,7 +83,7 @@ export default function PayPalButton({
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
                     provider: "paypal",
-                    orderNumber,
+                    orderNumber: orderRef.current,
                     total: amountRef.current,
                     customer: customer || {},
                     items: (items || []).map(it => ({
@@ -130,7 +131,7 @@ export default function PayPalButton({
       // Do not clear the container here to avoid PayPal render race.
       renderedRef.current = false;
     };
-  }, [orderNumber]);
+  }, []); 
 
   return (
     <div className="mt-4">
