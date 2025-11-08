@@ -2489,8 +2489,9 @@ function HomePage() {
           <div>
             <h5 className="font-semibold mb-3">Kontaktai</h5>
             <ul className="text-sm space-y-2 text-gray-300">
-              <li className="flex items-center gap-2">
-                <Mail className="w-4 h-4" /> kaleddovanos@gmail.com
+              <li className="flex items-center gap-3 py-1">
+                <Mail className="w-5 h-5 block" />
+                <span className="leading-none">kaleddovanos@gmail.com</span>
               </li>
               <li className="flex items-center gap-3 py-1">
                 <img src="https://cdn.simpleicons.org/instagram/FFFFFF" alt="Instagram" className="w-5 h-5 block" />
