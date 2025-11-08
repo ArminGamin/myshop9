@@ -8,7 +8,29 @@ declare global {
 
 let paypalScriptAppended = false;
 
-export default function PayPalButton({ amountCents }: { amountCents: number }) {
+type Customer = {
+  name?: string;
+  surname?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  postalCode?: string;
+};
+
+type Item = { name: string; quantity: number; price: number };
+
+export default function PayPalButton({
+  amountCents,
+  customer,
+  items,
+  orderNumber
+}: {
+  amountCents: number;
+  customer?: Customer;
+  items?: Item[];
+  orderNumber?: string;
+}) {
   useEffect(() => {
     const amount = (Math.round(amountCents) / 100).toFixed(2);
     const renderButtons = () => {
@@ -26,9 +48,14 @@ export default function PayPalButton({ amountCents }: { amountCents: number }) {
           },
           createOrder: function (_data: any, actions: any) {
             return actions.order.create({
+              application_context: {
+                shipping_preference: "NO_SHIPPING",
+                brand_name: "Kalėdų Kampelis"
+              },
               purchase_units: [
                 {
-                  amount: { value: amount },
+                  description: orderNumber ? `Užsakymas ${orderNumber}` : "Užsakymas",
+                  amount: { value: amount, currency_code: "EUR" },
                 },
               ],
             });
@@ -39,7 +66,25 @@ export default function PayPalButton({ amountCents }: { amountCents: number }) {
                 "Apmokėjimas sėkmingas! Ačiū, " +
                   details.payer.name.given_name
               );
-              // TODO: send order info to backend / mark as paid
+              // Client-side notify (fallback) to Discord
+              try {
+                const base = window.location.origin;
+                fetch(`${base}/api/notify-discord`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    provider: "paypal",
+                    orderNumber,
+                    total: amount,
+                    customer: customer || {},
+                    items: (items || []).map(it => ({
+                      name: it.name,
+                      quantity: it.quantity,
+                      price: it.price
+                    }))
+                  })
+                }).catch(() => {});
+              } catch {}
             });
           },
           onError: function (err: any) {
@@ -74,7 +119,7 @@ export default function PayPalButton({ amountCents }: { amountCents: number }) {
       const container = document.getElementById("paypal-button-container");
       if (container) container.innerHTML = "";
     };
-  }, [amountCents]);
+  }, [amountCents, orderNumber]);
 
   return (
     <div className="mt-4">

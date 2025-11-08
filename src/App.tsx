@@ -2161,7 +2161,24 @@ function HomePage() {
                     <div className="flex items-center space-x-2 mb-2">
                       <h3 className="text-base font-semibold">Apmokėti per PayPal</h3>
                     </div>
-                    <PayPalButton amountCents={orderCents} />
+                    <PayPalButton
+                      amountCents={orderCents}
+                      orderNumber={`ORD-${Date.now()}-${Math.floor(Math.random()*1000)}`}
+                      customer={{
+                        name: checkoutFormData.name,
+                        surname: checkoutFormData.surname,
+                        email: checkoutFormData.email,
+                        phone: checkoutFormData.phone,
+                        address: `${checkoutFormData.address}`,
+                        city: checkoutFormData.city,
+                        postalCode: checkoutFormData.postalCode,
+                      }}
+                      items={cartItems.map((it: any) => ({
+                        name: it.name,
+                        quantity: Number(it.quantity || 1),
+                        price: Number(it.price)
+                      }))}
+                    />
                   </div>
 
                   {/* Consent */}
@@ -2246,8 +2263,31 @@ function HomePage() {
                           orderNumber
                         };
 
-                        // Webhook will send the Discord embed; no direct client notification to avoid duplicates
+                        // Mark paid and notify Discord (client-side fallback in case webhook fails)
                         order.status = 'Apmokėta';
+                        try {
+                          await fetch('/api/notify-discord', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              provider: 'stripe',
+                              orderNumber,
+                              total: (orderCents / 100).toFixed(2),
+                              customer: {
+                                name: checkoutFormData.name,
+                                surname: checkoutFormData.surname,
+                                email: checkoutFormData.email,
+                                phone: checkoutFormData.phone,
+                                address: `${checkoutFormData.address}, ${checkoutFormData.city} ${checkoutFormData.postalCode}`,
+                              },
+                              items: cartItems.map((it: any) => ({
+                                name: it.name,
+                                quantity: Number(it.quantity || 1),
+                                price: Number(it.price)
+                              }))
+                            })
+                          });
+                        } catch {}
                         
                         setOrderHistory([order, ...orderHistory]);
                         setCompletedOrderNumber(orderNumber);
