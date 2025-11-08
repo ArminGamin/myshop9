@@ -22,30 +22,47 @@ type Item = { name: string; quantity: number; price: number };
 
 export default function PayPalButton({
   amountCents,
+  total,
   customer,
   items,
   orderNumber
 }: {
-  amountCents: number;
+  amountCents?: number;
+  total?: number | string;
   customer?: Customer;
   items?: Item[];
   orderNumber?: string;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const renderedRef = useRef(false);
-  const amountRef = useRef<string>((Math.round(amountCents) / 100).toFixed(2));
+  const amountRef = useRef<string>('0.00');
   const orderRef = useRef<string | undefined>(orderNumber);
+  const renderingRef = useRef(false);
 
-  // Keep the latest amount without re-rendering PayPal
+  // Keep the latest adjusted total without re-rendering PayPal
   useEffect(() => {
-    amountRef.current = (Math.round(amountCents) / 100).toFixed(2);
-  }, [amountCents]);
+    // Base total in EUR: prefer explicit 'total', otherwise derive from amountCents
+    const baseTotal = (() => {
+      if (total !== undefined && total !== null) {
+        const n = parseFloat(String(total));
+        return Number.isFinite(n) ? n : 0;
+      }
+      if (typeof amountCents === 'number') {
+        return Math.round(amountCents) / 100;
+      }
+      return 0;
+    })();
+    // Adjust for PayPal fees: (total + 0.35) / (1 - 0.029)
+    const adjusted = (baseTotal + 0.35) / (1 - 0.029);
+    amountRef.current = adjusted.toFixed(2);
+  }, [amountCents, total]);
 
   // Render PayPal buttons ONCE to avoid flicker; use refs for dynamic values
   useEffect(() => {
     const renderButtons = () => {
       const container = containerRef.current;
-      if (!container || !window.paypal || renderedRef.current) return;
+      if (!container || !window.paypal || renderedRef.current || renderingRef.current) return;
+      renderingRef.current = true;
       window.paypal
         .Buttons({
           fundingSource: window.paypal.FUNDING.PAYPAL,
@@ -101,8 +118,8 @@ export default function PayPalButton({
           },
         })
         .render(container)
-        .then(() => { renderedRef.current = true; })
-        .catch(() => {});
+        .then(() => { renderedRef.current = true; renderingRef.current = false; })
+        .catch(() => { renderingRef.current = false; });
     };
 
     if (window.paypal) {

@@ -2161,6 +2161,17 @@ function HomePage() {
                     <div className="flex items-center space-x-2 mb-2">
                       <h3 className="text-base font-semibold">Apmokėti per PayPal</h3>
                     </div>
+                    <div className="space-y-1 mb-2">
+                      <p className="text-xs text-gray-700 font-semibold">
+                        📨 Mokėdami per PayPal, įrašykite savo kontaktinę informaciją čia, kad galėtume susisiekti dėl užsakymo!
+                      </p>
+                      <p className="text-xs text-gray-500 font-semibold">
+                        (PayPal kartais neperduoda visų duomenų, todėl jūsų pagalba padeda mums greičiau išsiųsti prekę 🎁)
+                      </p>
+                      <p className="text-xs text-gray-700 font-semibold">
+                        💛 Atsiskaitydami per PayPal, taikomas nedidelis apdorojimo mokestis (apie 2.5 %). Jis padeda padengti PayPal mokesčius ir užtikrina, kad galėtume išlaikyti mažas kainas visiems 🎄
+                      </p>
+                    </div>
                     <PayPalButton
                       amountCents={orderCents}
                       orderNumber={`ORD-${Date.now()}-${Math.floor(Math.random()*1000)}`}
