@@ -33,8 +33,15 @@ export default function PayPalButton({
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const renderedRef = useRef(false);
+  const amountRef = useRef<string>((Math.round(amountCents) / 100).toFixed(2));
+
+  // Keep the latest amount without re-rendering PayPal
   useEffect(() => {
-    const amount = (Math.round(amountCents) / 100).toFixed(2);
+    amountRef.current = (Math.round(amountCents) / 100).toFixed(2);
+  }, [amountCents]);
+
+  // Render PayPal buttons ONCE to avoid flicker; use refs for dynamic values
+  useEffect(() => {
     const renderButtons = () => {
       const container = containerRef.current;
       if (!container || !window.paypal || renderedRef.current) return;
@@ -56,7 +63,7 @@ export default function PayPalButton({
               purchase_units: [
                 {
                   description: orderNumber ? `Užsakymas ${orderNumber}` : "Užsakymas",
-                  amount: { value: amount, currency_code: "EUR" },
+                  amount: { value: amountRef.current, currency_code: "EUR" },
                 },
               ],
             });
@@ -76,7 +83,7 @@ export default function PayPalButton({
                   body: JSON.stringify({
                     provider: "paypal",
                     orderNumber,
-                    total: amount,
+                    total: amountRef.current,
                     customer: customer || {},
                     items: (items || []).map(it => ({
                       name: it.name,
@@ -120,10 +127,10 @@ export default function PayPalButton({
     }
 
     return () => {
+      // Do not clear the container here to avoid PayPal render race.
       renderedRef.current = false;
-      if (containerRef.current) containerRef.current.innerHTML = "";
     };
-  }, [amountCents, orderNumber]);
+  }, [orderNumber]);
 
   return (
     <div className="mt-4">
