@@ -219,7 +219,6 @@ function HomePage() {
   const [completedOrderEmail, setCompletedOrderEmail] = useState('');
   // Free shipping threshold uses FLOOR of subtotal cents (no rounding up to qualify)
   const freeShippingCents = 3000; // €30.00
-  const TEST_PRODUCT_ID = 999001;
   const subtotalCentsFloor = useMemo(() => (
     cartItems.reduce((sum: number, it: any) => {
       const priceCentsFloor = Math.floor(Number(it.price) * 100);
@@ -228,13 +227,12 @@ function HomePage() {
   ), [cartItems]);
   const isFreeShipping = subtotalCentsFloor >= freeShippingCents;
   const orderCents = useMemo(() => {
-    const isTestOrder = cartItems.length === 1 && Number(cartItems[0]?.productId) === TEST_PRODUCT_ID && Number(cartItems[0]?.quantity || 1) === 1;
     const subtotalCents = cartItems.reduce((sum: number, it: any) => {
       const priceCents = Math.round(Number(it.price) * 100);
       return sum + priceCents * Number(it.quantity || 1);
     }, 0);
-    const shippingCents = isFreeShipping || isTestOrder ? 0 : 299; // waive shipping for test order
-    const giftWrapCents = isTestOrder ? 0 : (giftWrapping ? 299 : 0);   // no gift wrap charge for test order
+    const shippingCents = isFreeShipping ? 0 : 299; // €2.99 shipping
+    const giftWrapCents = giftWrapping ? 299 : 0;   // €2.99 gift wrap (if enabled)
     return subtotalCents + shippingCents + giftWrapCents;
   }, [cartItems, isFreeShipping, giftWrapping]);
   const [checkoutFormData, setCheckoutFormData] = useState({
