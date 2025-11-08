@@ -114,8 +114,9 @@ export default function PayPalButton({
         if (!existing) {
           const script = document.createElement("script");
           script.id = "paypal-sdk";
+          const clientId = (import.meta as any).env?.VITE_PAYPAL_CLIENT_ID || "ATGx56eqxqaz4iE4LhwoW_M1t-KszuyGy_dKPIeuT7yzsYbpeQL5xXNXlI7IgNit0KllFbQV6QgJGHnb";
           script.src =
-            "https://www.paypal.com/sdk/js?client-id=ATGx56eqxqaz4iE4LhwoW_M1t-KszuyGy_dKPIeuT7yzsYbpeQL5xXNXlI7IgNit0KllFbQV6QgJGHnb&currency=EUR&components=buttons&intent=capture&disable-funding=card,credit";
+            `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=EUR&components=buttons&intent=capture&disable-funding=card,credit`;
           script.async = true;
           script.onload = renderButtons;
           document.body.appendChild(script);
