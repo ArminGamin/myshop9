@@ -170,7 +170,7 @@ const ApieMus = () => (
         „Kalėdų Kampelis“ prasidėjo nuo paprasto tikslo – padaryti Kalėdas gražesnes ir
         lengvai prieinamas visiems. Kiekvieną sezoną atrenkame <strong>premium kalėdų dekoracijas</strong>,
         idėjas ir dovanas, kad jūsų namai spindėtų šventiniu džiaugsmu. Tikime, kad jaukumas slypi
-        smulkmenose – todėl kiekvienas užsakymas supakuojamas su šypsena ir rūpesčiu.
+        smulkmenose – todėl kiekvienas užsakymas supakuojamas su šypsena ir rūpesčiu! :)
       </p>
       <p>
         Rūpinamės greitu aptarnavimu, aiškiomis sąlygomis ir saugiu atsiskaitymu. Jei reikalinga pagalba
@@ -2491,6 +2491,18 @@ function HomePage() {
             <ul className="text-sm space-y-2 text-gray-300">
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4" /> kaleddovanos@gmail.com
+              </li>
+              <li className="flex items-center gap-2">
+                <img src="https://cdn.simpleicons.org/instagram/FFFFFF" alt="Instagram" className="w-4 h-4" />
+                <a href="https://www.instagram.com/kaledukampelis" target="_blank" rel="noopener noreferrer" className="hover:text-white">
+                  kaledukampelis
+                </a>
+              </li>
+              <li className="flex items-center gap-2">
+                <img src="https://cdn.simpleicons.org/tiktok/FFFFFF" alt="TikTok" className="w-4 h-4" />
+                <a href="https://www.tiktok.com/@kaledukampelis" target="_blank" rel="noopener noreferrer" className="hover:text-white">
+                  kaledukampelis
+                </a>
               </li>
             </ul>
           </div>
