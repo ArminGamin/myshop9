@@ -155,8 +155,8 @@ const PrivatumoPolitika = () => (
       
       <h3 className="font-semibold text-lg">Kontaktai</h3>
       <p>
-        Jei turite klausimų ar pastebėjimų dėl šios privatumo politikos, galite susisiekti per svetainėje pateiktą 
-        kontaktų formą arba el. paštą, nurodytą kontaktų skiltyje.
+        Kilus klausimams ar pastebėjimams dėl šios privatumo politikos, susisiekite su mumis el. paštu ar per socialinius tinklus – 
+        kontaktus rasite kontaktų skiltyje.
       </p>
     </div>
   </PageWrapper>
