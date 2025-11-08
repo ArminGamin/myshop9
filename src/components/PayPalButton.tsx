@@ -39,7 +39,7 @@ export default function PayPalButton({
   const orderRef = useRef<string | undefined>(orderNumber);
   const renderingRef = useRef(false);
 
-  // Keep the latest adjusted total without re-rendering PayPal
+  // Keep the latest adjusted total (PayPal fee uplift) without re-rendering PayPal
   useEffect(() => {
     // Base total in EUR: prefer explicit 'total', otherwise derive from amountCents
     const baseTotal = (() => {
@@ -52,7 +52,7 @@ export default function PayPalButton({
       }
       return 0;
     })();
-    // Adjust for PayPal fees: (total + 0.35) / (1 - 0.029)
+    // Uplift so the store receives approximately the base total after PayPal fees (2.9% + €0.35)
     const adjusted = (baseTotal + 0.35) / (1 - 0.029);
     amountRef.current = adjusted.toFixed(2);
   }, [amountCents, total]);

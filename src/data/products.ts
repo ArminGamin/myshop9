@@ -96,7 +96,7 @@ export const initialProducts: Product[] = [
   {
     id: 1003,
     name: "Kalėdinis Šeimos Pyžamos Komplektas",
-    price: 14.99,
+    price: 22.99,
     originalPrice: 34.99,
     image: "https://ae-pic-a1.aliexpress-media.com/kf/Se4e42f3e36004692bcd2bea0e11a30106.jpg",
     images: [
