@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 declare global {
   interface Window {
@@ -31,12 +31,13 @@ export default function PayPalButton({
   items?: Item[];
   orderNumber?: string;
 }) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const renderedRef = useRef(false);
   useEffect(() => {
     const amount = (Math.round(amountCents) / 100).toFixed(2);
     const renderButtons = () => {
-      const container = document.getElementById("paypal-button-container");
-      if (!container || !window.paypal) return;
-      container.innerHTML = "";
+      const container = containerRef.current;
+      if (!container || !window.paypal || renderedRef.current) return;
       window.paypal
         .Buttons({
           fundingSource: window.paypal.FUNDING.PAYPAL,
@@ -91,11 +92,14 @@ export default function PayPalButton({
             console.error("PayPal error:", err);
           },
         })
-        .render("#paypal-button-container");
+        .render(container)
+        .then(() => { renderedRef.current = true; })
+        .catch(() => {});
     };
 
     if (window.paypal) {
-      renderButtons();
+      // render after microtask so React commits the node
+      setTimeout(renderButtons, 0);
     } else {
       if (!paypalScriptAppended) {
         const existing = document.getElementById("paypal-sdk");
@@ -116,14 +120,14 @@ export default function PayPalButton({
     }
 
     return () => {
-      const container = document.getElementById("paypal-button-container");
-      if (container) container.innerHTML = "";
+      renderedRef.current = false;
+      if (containerRef.current) containerRef.current.innerHTML = "";
     };
   }, [amountCents, orderNumber]);
 
   return (
     <div className="mt-4">
-      <div id="paypal-button-container" style={{ width: '100%' }}></div>
+      <div ref={containerRef} style={{ width: '100%' }}></div>
     </div>
   );
 }
