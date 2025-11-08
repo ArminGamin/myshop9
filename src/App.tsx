@@ -162,6 +162,27 @@ const PrivatumoPolitika = () => (
   </PageWrapper>
 );
 
+const ApieMus = () => (
+  <PageWrapper title="Apie mus">
+    <div className="text-gray-800 space-y-4 text-lg font-medium">
+      <h2 className="text-2xl font-bold">Kalėdų Kampelis – apie mus:</h2>
+      <p>
+        „Kalėdų Kampelis“ prasidėjo nuo paprasto tikslo – padaryti Kalėdas gražesnes ir
+        lengvai prieinamas visiems. Kiekvieną sezoną atrenkame <strong>premium kalėdų dekoracijas</strong>,
+        idėjas ir dovanas, kad jūsų namai spindėtų šventiniu džiaugsmu. Tikime, kad jaukumas slypi
+        smulkmenose – todėl kiekvienas užsakymas supakuojamas su šypsena ir rūpesčiu.
+      </p>
+      <p>
+        Rūpinamės greitu aptarnavimu, aiškiomis sąlygomis ir saugiu atsiskaitymu. Jei reikalinga pagalba
+        renkantis, parašykite – mūsų komanda visuomet pasiruošusi patarti!
+      </p>
+      <p>
+        Norėdami peržiūrėti visą kolekciją, grįžkite į pagrindinį puslapį ir slinkite žemyn iki skyriaus „Mūsų Produktai“.
+      </p>
+    </div>
+  </PageWrapper>
+);
+
 
 // --- Reusable Page Wrapper ---
 const PageWrapper = ({
@@ -2439,6 +2460,11 @@ function HomePage() {
             <p className="text-sm text-gray-300 mb-3">
               {language === 'lt' ? 'Jūsų patikima Kalėdų dekoracijų parduotuvė.' : 'Your trusted Christmas decorations store.'}
             </p>
+            <p>
+              <Link to="/apie-mus" className="hover:text-white cursor-pointer">
+                Apie mus
+              </Link>
+            </p>
           </div>
           <div>
             <h5 className="font-semibold mb-3">Teisinė informacija</h5>
@@ -2515,6 +2541,7 @@ export default function App() {
     }>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/apie-mus" element={<ApieMus />} />
         <Route path="/pristatymo-info" element={<PristatymoInfo />} />
         <Route path="/grazinimai" element={<Grazinimai />} />
         <Route path="/privatumo-politika" element={<PrivatumoPolitika />} />
