@@ -279,16 +279,9 @@ function HomePage() {
   });
   const [viewersCount, setViewersCount] = useState(12);
 
-  // Sort products with a featured item first, then by lowest price
+  // Sort products by lowest price first for listing grid
   const productsSorted = useMemo(() => {
-    const featuredIds = new Set([1003]); // Pajamas at the top
-    return [...products].sort((a: any, b: any) => {
-      const aFeatured = featuredIds.has(a.id);
-      const bFeatured = featuredIds.has(b.id);
-      if (aFeatured && !bFeatured) return -1;
-      if (!aFeatured && bFeatured) return 1;
-      return Number(a.price) - Number(b.price);
-    });
+    return [...products].sort((a: any, b: any) => Number(a.price) - Number(b.price));
   }, [products]);
   
   // Weighted random stock counter (3-15, lower numbers prioritized)
