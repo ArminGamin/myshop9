@@ -38,30 +38,25 @@ export default async function handler(req, res) {
     const orderNumber = md.order_id || `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     const amount = (payment.amount / 100).toFixed(2);
 
-    const fields = [
-      { name: 'Užsakymo numeris', value: String(orderNumber), inline: true },
-      { name: 'Suma', value: `€${amount}`, inline: true },
-      { name: '\u200B', value: '\u200B', inline: false },
-      { name: 'Vardas', value: md.name || '-', inline: true },
-      { name: 'Pavardė', value: md.surname || '-', inline: true },
-      { name: 'El. paštas', value: md.email || '-', inline: false },
-      { name: 'Telefonas', value: md.phone || '-', inline: false },
-      { name: 'Adresas', value: md.address || '-', inline: false },
-      { name: 'Prekės', value: md.items || '-', inline: false }
-    ];
-
-    const embed = {
-      title: 'Naujas užsakymas (Apmokėta)',
-      color: 0x2ecc71,
-      timestamp: new Date().toISOString(),
-      fields
-    };
-
     try {
-      await fetch(process.env.DISCORD_WEBHOOK_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ embeds: [embed] })
+      const base = process.env.NEXT_PUBLIC_URL || "https://kaledukampelis.com";
+      await fetch(`${base}/api/notify-discord`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          provider: 'stripe',
+          orderNumber,
+          total: amount,
+          customer: {
+            name: md.name || '',
+            surname: md.surname || '',
+            email: md.email || '',
+            phone: md.phone || '',
+            address: md.address || ''
+          },
+          // If you pass a detailed item list in metadata later, send it here
+          items: []
+        })
       });
     } catch (err) {
       console.error("Discord webhook error:", err);

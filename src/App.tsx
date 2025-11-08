@@ -31,6 +31,7 @@ import { initialProducts } from "./data/products";
 import { Elements, useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import StripeCardSection from './components/StripeCardSection';
+import PayPalButton from './components/PayPalButton';
 
 const stripePromise = loadStripe((import.meta as any).env?.VITE_STRIPE_PUBLISHABLE_KEY || '');
 
@@ -218,6 +219,7 @@ function HomePage() {
   const [completedOrderEmail, setCompletedOrderEmail] = useState('');
   // Free shipping threshold uses FLOOR of subtotal cents (no rounding up to qualify)
   const freeShippingCents = 3000; // €30.00
+  const TEST_PRODUCT_ID = 999001;
   const subtotalCentsFloor = useMemo(() => (
     cartItems.reduce((sum: number, it: any) => {
       const priceCentsFloor = Math.floor(Number(it.price) * 100);
@@ -226,12 +228,13 @@ function HomePage() {
   ), [cartItems]);
   const isFreeShipping = subtotalCentsFloor >= freeShippingCents;
   const orderCents = useMemo(() => {
+    const isTestOrder = cartItems.length === 1 && Number(cartItems[0]?.productId) === TEST_PRODUCT_ID && Number(cartItems[0]?.quantity || 1) === 1;
     const subtotalCents = cartItems.reduce((sum: number, it: any) => {
       const priceCents = Math.round(Number(it.price) * 100);
       return sum + priceCents * Number(it.quantity || 1);
     }, 0);
-    const shippingCents = isFreeShipping ? 0 : 299; // €2.99 shipping
-    const giftWrapCents = giftWrapping ? 299 : 0;   // €2.99 gift wrap (if enabled)
+    const shippingCents = isFreeShipping || isTestOrder ? 0 : 299; // waive shipping for test order
+    const giftWrapCents = isTestOrder ? 0 : (giftWrapping ? 299 : 0);   // no gift wrap charge for test order
     return subtotalCents + shippingCents + giftWrapCents;
   }, [cartItems, isFreeShipping, giftWrapping]);
   const [checkoutFormData, setCheckoutFormData] = useState({
@@ -752,18 +755,81 @@ function HomePage() {
         <div className="flex items-center gap-1 mr-1">
           <button
             onClick={() => {
-              document.cookie = `googtrans=/auto/en; path=/`;
-              document.cookie = `googtrans=/auto/en; domain=${window.location.hostname}; path=/`;
-              window.location.reload();
+              // Lazy-load Google Translate only when user switches language
+              const ensureTranslate = () =>
+                new Promise<void>((resolve) => {
+                  if ((window as any).google?.translate) return resolve();
+                  const existing = document.getElementById('google-translate-script');
+                  if (existing) {
+                    // Wait briefly for existing script to finish
+                    setTimeout(() => resolve(), 350);
+                    return;
+                  }
+                  const s = document.createElement('script');
+                  s.id = 'google-translate-script';
+                  (window as any).__gt_cb = function () {
+                    resolve();
+                  };
+                  s.src = 'https://translate.google.com/translate_a/element.js?cb=__gt_cb';
+                  document.body.appendChild(s);
+                });
+              ensureTranslate().then(() => {
+                // Set cookie to EN and initialize translator
+                document.cookie = `googtrans=/auto/en; path=/`;
+                document.cookie = `googtrans=/auto/en; domain=${window.location.hostname}; path=/`;
+                try {
+                  const holder = document.getElementById('google_translate_element') || document.createElement('div');
+                  holder.id = 'google_translate_element';
+                  holder.style.display = 'none';
+                  document.body.appendChild(holder);
+                  if ((window as any).google?.translate) {
+                    new (window as any).google.translate.TranslateElement({
+                      pageLanguage: 'lt',
+                      includedLanguages: 'lt,en',
+                      autoDisplay: false
+                    }, 'google_translate_element');
+                  }
+                } catch {}
+              });
             }}
             className="px-2 py-1 border rounded text-xs hover:bg-gray-50"
             title="English"
           >🇬🇧 EN</button>
           <button
             onClick={() => {
-              document.cookie = `googtrans=/auto/lt; path=/`;
-              document.cookie = `googtrans=/auto/lt; domain=${window.location.hostname}; path=/`;
-              window.location.reload();
+              const ensureTranslate = () =>
+                new Promise<void>((resolve) => {
+                  if ((window as any).google?.translate) return resolve();
+                  const existing = document.getElementById('google-translate-script');
+                  if (existing) {
+                    setTimeout(() => resolve(), 350);
+                    return;
+                  }
+                  const s = document.createElement('script');
+                  s.id = 'google-translate-script';
+                  (window as any).__gt_cb = function () {
+                    resolve();
+                  };
+                  s.src = 'https://translate.google.com/translate_a/element.js?cb=__gt_cb';
+                  document.body.appendChild(s);
+                });
+              ensureTranslate().then(() => {
+                document.cookie = `googtrans=/auto/lt; path=/`;
+                document.cookie = `googtrans=/auto/lt; domain=${window.location.hostname}; path=/`;
+                try {
+                  const holder = document.getElementById('google_translate_element') || document.createElement('div');
+                  holder.id = 'google_translate_element';
+                  holder.style.display = 'none';
+                  document.body.appendChild(holder);
+                  if ((window as any).google?.translate) {
+                    new (window as any).google.translate.TranslateElement({
+                      pageLanguage: 'lt',
+                      includedLanguages: 'lt,en',
+                      autoDisplay: false
+                    }, 'google_translate_element');
+                  }
+                } catch {}
+              });
             }}
             className="px-2 py-1 border rounded text-xs hover:bg-gray-50"
             title="Lietuvių"
@@ -1871,7 +1937,7 @@ function HomePage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg max-w-5xl w-full max-h-[95vh] overflow-y-auto">
             <div className="p-4">
-              <Elements stripe={stripePromise}>
+              <Elements stripe={stripePromise} options={{ appearance: { theme: 'stripe' } }}>
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold">Apmokėjimas</h2>
                 <button
@@ -2089,7 +2155,14 @@ function HomePage() {
                     </div>
                   </div>
 
-                  {/* Gift Wrapping Option removed per request */}
+                  <hr className="my-6 border-gray-300" />
+                  {/* Pay with PayPal */}
+                  <div className="mt-4">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <h3 className="text-base font-semibold">Apmokėti per PayPal</h3>
+                    </div>
+                    <PayPalButton amountCents={orderCents} />
+                  </div>
 
                   {/* Consent */}
                   

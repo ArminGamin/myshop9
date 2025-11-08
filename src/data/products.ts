@@ -392,5 +392,30 @@ export const initialProducts: Product[] = [
     isNew: true,
     isPopular: true,
     createdAt: new Date()
+  },
+  {
+    id: 999001,
+    name: "Testinis produktas (0,50 €)",
+    price: 0.5,
+    originalPrice: 0.5,
+    image: "/logo.png",
+    images: ["/logo.png"],
+    rating: 5.0,
+    reviews: 0,
+    discount: "—",
+    description: "Testinis produktas, skirtas atsiskaitymo proceso patikrinimui. Kaina: 0,50 €.",
+    features: [
+      "Skirtas testavimui",
+      "Nėra pristatymo mokesčio (užsakant tik šį produktą)",
+      "Greitas atsiskaitymo patikrinimas"
+    ],
+    colors: [{ name: "Standartas", value: "std" }],
+    sizes: [{ name: "Vienas dydis", value: "one" }],
+    category: "Testas",
+    tags: ["test", "demo", "0.50"],
+    stock: 9999,
+    isNew: false,
+    isPopular: false,
+    createdAt: new Date()
   }
 ];
