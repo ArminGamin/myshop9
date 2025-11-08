@@ -2492,15 +2492,15 @@ function HomePage() {
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4" /> kaleddovanos@gmail.com
               </li>
-              <li className="flex items-center gap-2">
-                <img src="https://cdn.simpleicons.org/instagram/FFFFFF" alt="Instagram" className="w-4 h-4" />
-                <a href="https://www.instagram.com/kaledukampelis" target="_blank" rel="noopener noreferrer" className="hover:text-white">
+              <li className="flex items-center gap-3 py-1">
+                <img src="https://cdn.simpleicons.org/instagram/FFFFFF" alt="Instagram" className="w-5 h-5 block" />
+                <a href="https://www.instagram.com/kaledukampelis" target="_blank" rel="noopener noreferrer" className="hover:text-white leading-none">
                   kaledukampelis
                 </a>
               </li>
-              <li className="flex items-center gap-2">
-                <img src="https://cdn.simpleicons.org/tiktok/FFFFFF" alt="TikTok" className="w-4 h-4" />
-                <a href="https://www.tiktok.com/@kaledukampelis" target="_blank" rel="noopener noreferrer" className="hover:text-white">
+              <li className="flex items-center gap-3 py-1">
+                <img src="https://cdn.simpleicons.org/tiktok/FFFFFF" alt="TikTok" className="w-5 h-5 block" />
+                <a href="https://www.tiktok.com/@kaledukampelis" target="_blank" rel="noopener noreferrer" className="hover:text-white leading-none">
                   kaledukampelis
                 </a>
               </li>
