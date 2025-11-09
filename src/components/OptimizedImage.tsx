@@ -10,11 +10,12 @@ type Props = {
   decoding?: "sync" | "async" | "auto";
   sizes?: string;
   srcSet?: string;
+  fetchPriority?: "high" | "low" | "auto";
 };
 
 // Renders a <picture> with AVIF/WebP where safely supported (Unsplash),
 // otherwise falls back to a plain <img>. Never breaks image display.
-export default function OptimizedImage({ src, alt, className, width, height, loading = "lazy", decoding = "async", sizes, srcSet }: Props) {
+export default function OptimizedImage({ src, alt, className, width, height, loading = "lazy", decoding = "async", sizes, srcSet, fetchPriority = "auto" }: Props) {
   const isUnsplash = /images\.unsplash\.com/.test(src);
 
   if (isUnsplash) {
@@ -27,12 +28,12 @@ export default function OptimizedImage({ src, alt, className, width, height, loa
       <picture>
         <source srcSet={avifSrc} type="image/avif" />
         <source srcSet={webpSrc} type="image/webp" />
-        <img src={src} alt={alt} className={className} width={width as any} height={height as any} loading={loading} decoding={decoding} sizes={sizes} srcSet={srcSet} />
+        <img src={src} alt={alt} className={className} width={width as any} height={height as any} loading={loading} decoding={decoding} sizes={sizes} srcSet={srcSet} fetchPriority={fetchPriority as any} />
       </picture>
     );
   }
 
-  return <img src={src} alt={alt} className={className} width={width as any} height={height as any} loading={loading} decoding={decoding} sizes={sizes} srcSet={srcSet} />;
+  return <img src={src} alt={alt} className={className} width={width as any} height={height as any} loading={loading} decoding={decoding} sizes={sizes} srcSet={srcSet} fetchPriority={fetchPriority as any} />;
 }
 
 

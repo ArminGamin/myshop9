@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense, useMemo, useCallback, lazy } from "react";
+import React, { useState, useEffect, Suspense, useMemo, useCallback, lazy, useRef } from "react";
 import {
   ShoppingCart,
   Heart,
@@ -278,6 +278,25 @@ function HomePage() {
     seconds: 0,
   });
   const [viewersCount, setViewersCount] = useState(12);
+  // Progressive product rendering for mobile - reduces main-thread work
+  const [visibleProducts, setVisibleProducts] = useState<number>(() => {
+    if (typeof window === 'undefined') return 8;
+    return window.innerWidth >= 768 ? 12 : 8;
+  });
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = loadMoreRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          setVisibleProducts((v) => Math.min(v + 8, products.length));
+        }
+      });
+    }, { rootMargin: '600px 0px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [products.length]);
 
   // Sort products by lowest price first for listing grid
   const productsSorted = useMemo(() => {
@@ -1137,8 +1156,9 @@ function HomePage() {
             Šiuo metu nėra prekių. Pridėkite naujų įrašų – aš paruošiau vietą nuotraukoms ir aprašymams.
           </div>
         ) : (
+        <>
         <div className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3`}>
-          {productsSorted.map((product, index) => (
+          {productsSorted.slice(0, visibleProducts).map((product, index) => (
             <div
               key={product.id}
               className={`cv-auto bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 group h-full flex flex-col ${productsSorted.length === 1 ? 'lg:col-span-2' : ''}`}
@@ -1154,6 +1174,7 @@ function HomePage() {
                     width={800}
                     height={600}
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    fetchPriority={index < 4 ? 'high' : 'low'}
                 />
               </div>
               <div className="p-4 sm:p-5 flex-1 flex flex-col">
@@ -1216,6 +1237,8 @@ function HomePage() {
             </div>
           ))}
           </div>
+        <div ref={loadMoreRef} aria-hidden className="h-6"></div>
+        </>
         )}
       </main>
 
