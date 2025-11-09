@@ -21,7 +21,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { Routes, Route, Link, useNavigate } from "react-router-dom";
-import { ThankYouModal } from "./components/ThankYouModal";
+const ThankYouModal = lazy(() => import("./components/ThankYouModal").then(m => ({ default: m.ThankYouModal })));
 import OptimizedImage from "./components/OptimizedImage";
 const LazySnowfall = lazy(() => import("./components/Snowfall"));
 const LazyCookieConsent = lazy(() => import("./components/CookieConsent"));
@@ -2509,13 +2509,17 @@ function HomePage() {
         </div>
       )}
 
-      {/* Thank You Modal */}
-      <ThankYouModal
-        isOpen={thankYouModalOpen}
-        onClose={() => setThankYouModalOpen(false)}
-        orderNumber={completedOrderNumber}
-        email={completedOrderEmail}
-      />
+      {/* Thank You Modal (lazy) */}
+      {thankYouModalOpen && (
+        <Suspense fallback={null}>
+          <ThankYouModal
+            isOpen={thankYouModalOpen}
+            onClose={() => setThankYouModalOpen(false)}
+            orderNumber={completedOrderNumber}
+            email={completedOrderEmail}
+          />
+        </Suspense>
+      )}
 
       {/* Footer */}
       <footer className="relative bg-slate-900 text-white overflow-hidden">
