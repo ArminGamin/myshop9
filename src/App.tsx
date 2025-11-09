@@ -34,6 +34,7 @@ const LazyStripeCardSection = lazy(() => import('./components/StripeCardSection'
 const LazyPayPalButton = lazy(() => import('./components/PayPalButton'));
 
 const STRIPE_PK = (import.meta as any).env?.VITE_STRIPE_PUBLISHABLE_KEY || '';
+const stripePromise = loadStripe(STRIPE_PK);
 
 // Bridge component that exposes a pay() function via ref so parent can trigger payment
 function StripePayBridge({
@@ -300,12 +301,6 @@ function HomePage() {
     return 12; // desktop
   });
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
-  const stripePromiseRef = useRef<any>(null);
-  useEffect(() => {
-    if (checkoutOpen && !stripePromiseRef.current && STRIPE_PK) {
-      stripePromiseRef.current = loadStripe(STRIPE_PK);
-    }
-  }, [checkoutOpen]);
   useEffect(() => {
     const el = loadMoreRef.current;
     if (!el) return;
@@ -2009,8 +2004,7 @@ function HomePage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg max-w-5xl w-full max-h-[95vh] overflow-y-auto">
             <div className="p-4">
-              {stripePromiseRef.current ? (
-              <Elements stripe={stripePromiseRef.current} options={{ appearance: { theme: 'stripe' } }}>
+              <Elements stripe={stripePromise} options={{ appearance: { theme: 'stripe' } }}>
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold">Apmokėjimas</h2>
                 <button
@@ -2463,11 +2457,6 @@ function HomePage() {
                 </div>
               </div>
               </Elements>
-              ) : (
-                <div className="py-10 text-center text-gray-600">
-                  Kraunama atsiskaitymo forma...
-                </div>
-              )}
             </div>
           </div>
         </div>
