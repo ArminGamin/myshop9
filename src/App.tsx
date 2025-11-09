@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef, Suspense } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef, Suspense, lazy } from "react";
 import {
   ShoppingCart,
   Heart,
@@ -34,7 +34,7 @@ import StripeCardSection from './components/StripeCardSection';
 import PayPalButton from './components/PayPalButton';
 
 const STRIPE_PK = (import.meta as any).env?.VITE_STRIPE_PUBLISHABLE_KEY || '';
-const stripePromise = loadStripe(STRIPE_PK);
+const stripePromise = STRIPE_PK ? loadStripe(STRIPE_PK) : null;
 
 // Bridge component that exposes a pay() function via ref so parent can trigger payment
 function StripePayBridge({
@@ -1961,6 +1961,7 @@ function HomePage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg max-w-5xl w-full max-h-[95vh] overflow-y-auto">
             <div className="p-4">
+              {stripePromise ? (
               <Elements stripe={stripePromise} options={{ appearance: { theme: 'stripe' } }}>
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold">Apmokėjimas</h2>
@@ -2410,6 +2411,11 @@ function HomePage() {
                 </div>
               </div>
               </Elements>
+              ) : (
+                <div className="py-8 text-center text-red-600 font-semibold">
+                  Stripe konfigūracija nerasta. Pridėkite VITE_STRIPE_PUBLISHABLE_KEY ir atnaujinkite.
+                </div>
+              )}
             </div>
           </div>
         </div>
