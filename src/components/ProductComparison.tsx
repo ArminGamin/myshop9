@@ -78,6 +78,10 @@ export const ProductComparison: React.FC<ProductComparisonProps> = ({
                             src={product.image}
                             alt={product.name}
                             className="w-24 h-24 object-cover rounded-lg mx-auto mb-2"
+                            loading="lazy"
+                            decoding="async"
+                            width="96"
+                            height="96"
                           />
                           <h3 className="font-semibold text-sm text-gray-900 mb-1 line-clamp-2">
                             {product.name}

@@ -57,32 +57,53 @@
     <!-- Removed dev-only preloads for production build -->
     
     <!-- Consider preloading the first visible product image only if stable -->
+    <link rel="preload" as="image" href="https://ae-pic-a1.aliexpress-media.com/kf/S612c6eb10fa5471ab8f81a12a5a305b42.jpg" />
     
     <!-- Google Website Translator will be lazy-loaded on demand -->
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NP96YPG80J"></script>
+    <!-- Google tag (gtag.js) - deferred to idle with queue -->
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-NP96YPG80J');
+      function gtag(){ dataLayer.push(arguments); }
+      (function loadGA(){
+        var load = function() {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=G-NP96YPG80J';
+          s.onload = function(){
+            gtag('js', new Date());
+            gtag('config', 'G-NP96YPG80J');
+          };
+          document.head.appendChild(s);
+        };
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(load, { timeout: 2000 });
+        } else {
+          window.addEventListener('load', load, { once: true });
+        }
+      })();
     </script>
 
-    <!-- Meta Pixel Code -->
+    <!-- Meta Pixel - deferred to idle, keep stub to queue events -->
     <script>
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', '1135180922149957');
-      fbq('track', 'PageView');
+      !function(f,b,e,v,n,t,s){
+        if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];
+      }(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
+      (function loadFB(){
+        var load = function(){
+          var t = document.createElement('script'); t.async = true; t.src = 'https://connect.facebook.net/en_US/fbevents.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(t, s);
+          fbq('init', '1135180922149957'); fbq('track', 'PageView');
+        };
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(load, { timeout: 2000 });
+        } else {
+          window.addEventListener('load', load, { once: true });
+        }
+      })();
     </script>
-    <!-- End Meta Pixel Code -->
 
     <!-- Critical CSS inline for above-the-fold content -->
     <style>

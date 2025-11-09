@@ -23,17 +23,17 @@ import {
 import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import { ThankYouModal } from "./components/ThankYouModal";
 import OptimizedImage from "./components/OptimizedImage";
-import Snowfall from "./components/Snowfall";
-import CookieConsent from "./components/CookieConsent";
+const LazySnowfall = lazy(() => import("./components/Snowfall"));
+const LazyCookieConsent = lazy(() => import("./components/CookieConsent"));
 import { useCartStore } from "./store/cartStore";
 import { useProductStore } from "./store/productStore";
 import { initialProducts } from "./data/products";
-import { Elements, useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-import StripeCardSection from './components/StripeCardSection';
-import PayPalButton from './components/PayPalButton';
+const LazyStripeCardSection = lazy(() => import('./components/StripeCardSection'));
+const LazyPayPalButton = lazy(() => import('./components/PayPalButton'));
 
-const stripePromise = loadStripe((import.meta as any).env?.VITE_STRIPE_PUBLISHABLE_KEY || '');
+const STRIPE_PK = (import.meta as any).env?.VITE_STRIPE_PUBLISHABLE_KEY || '';
 
 // Bridge component that exposes a pay() function via ref so parent can trigger payment
 function StripePayBridge({
@@ -278,12 +278,31 @@ function HomePage() {
     seconds: 0,
   });
   const [viewersCount, setViewersCount] = useState(12);
+  const [showSnow, setShowSnow] = useState(false);
+  const [showCookie, setShowCookie] = useState(false);
+  useEffect(() => {
+    const schedule = () => {
+      setShowSnow(true);
+      setShowCookie(true);
+    };
+    if ('requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(schedule, { timeout: 2500 });
+    } else {
+      setTimeout(schedule, 1800);
+    }
+  }, []);
   // Progressive product rendering for mobile - reduces main-thread work
   const [visibleProducts, setVisibleProducts] = useState<number>(() => {
     if (typeof window === 'undefined') return 8;
     return window.innerWidth >= 768 ? 12 : 8;
   });
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const stripePromiseRef = useRef<any>(null);
+  useEffect(() => {
+    if (checkoutOpen && !stripePromiseRef.current && STRIPE_PK) {
+      stripePromiseRef.current = loadStripe(STRIPE_PK);
+    }
+  }, [checkoutOpen]);
   useEffect(() => {
     const el = loadMoreRef.current;
     if (!el) return;
@@ -743,8 +762,12 @@ function HomePage() {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Global snowfall overlay for continuous flakes */}
-      <Snowfall position="fixed" zIndex={5} />
+      {/* Global snowfall overlay (idle-loaded) */}
+      {showSnow && (
+        <Suspense fallback={null}>
+          <LazySnowfall position="fixed" zIndex={5} />
+        </Suspense>
+      )}
       {/* Sale Banner */}
       <div className="relative bg-gradient-to-r from-red-600 to-green-600 text-white py-2 text-center text-sm sm:text-base font-semibold overflow-hidden">
         <div className="relative tracking-wide">🎁 {t.saleBanner} 🎁</div>
@@ -1514,6 +1537,8 @@ function HomePage() {
                       src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png"
                       className="h-6 opacity-60"
                       alt="Mastercard"
+                      loading="lazy"
+                      decoding="async"
                     />
                     <div className="bg-white border border-gray-300 px-2 py-1 rounded">
                       <span className="text-blue-600 font-bold text-sm">VISA</span>
@@ -1522,6 +1547,8 @@ function HomePage() {
                       src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
                       className="h-6 opacity-60"
                       alt="PayPal"
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
 
@@ -1979,7 +2006,8 @@ function HomePage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg max-w-5xl w-full max-h-[95vh] overflow-y-auto">
             <div className="p-4">
-              <Elements stripe={stripePromise} options={{ appearance: { theme: 'stripe' } }}>
+              {stripePromiseRef.current ? (
+              <Elements stripe={stripePromiseRef.current} options={{ appearance: { theme: 'stripe' } }}>
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold">Apmokėjimas</h2>
                 <button
@@ -2130,7 +2158,9 @@ function HomePage() {
                       <CreditCard className="w-4 h-4" />
                       <h3 className="text-base font-semibold">Mokėjimo Informacija</h3>
                     </div>
-                    <StripeCardSection />
+                    <Suspense fallback={<div className="py-6 text-gray-500">Kraunama Stripe forma…</div>}>
+                      <LazyStripeCardSection />
+                    </Suspense>
                       </div>
                   {/* Expose Stripe pay function to parent */}
                   <StripePayBridge
@@ -2159,6 +2189,8 @@ function HomePage() {
                           src={item.image}
                           alt={item.name}
                           className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded"
+                          loading="lazy"
+                          decoding="async"
                         />
                         <div className="flex-1">
                           <h4 className="font-semibold text-sm sm:text-base line-clamp-1">{item.name}</h4>
@@ -2214,7 +2246,8 @@ function HomePage() {
                         💛 Atsiskaitydami per PayPal, taikomas nedidelis apdorojimo mokestis (apie 2.5 %). Jis padeda padengti PayPal mokesčius ir užtikrina, kad galėtume išlaikyti mažas kainas visiems 🎄
                       </p>
                     </div>
-                    <PayPalButton
+                    <Suspense fallback={<div className="py-6 text-gray-500">Kraunama PayPal…</div>}>
+                    <LazyPayPalButton
                       amountCents={orderCents}
                       orderNumber={`ORD-${Date.now()}-${Math.floor(Math.random()*1000)}`}
                       customer={{
@@ -2232,6 +2265,7 @@ function HomePage() {
                         price: Number(it.price)
                       }))}
                     />
+                    </Suspense>
                   </div>
 
                   {/* Consent */}
@@ -2398,6 +2432,8 @@ function HomePage() {
                       src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png"
                       className="h-6 opacity-60"
                       alt="Mastercard"
+                      loading="lazy"
+                      decoding="async"
                     />
                     <div className="bg-white border border-gray-300 px-2 py-1 rounded">
                       <span className="text-blue-600 font-bold text-sm">VISA</span>
@@ -2406,6 +2442,8 @@ function HomePage() {
                       src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
                       className="h-6 opacity-60"
                       alt="PayPal"
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
 
@@ -2422,6 +2460,11 @@ function HomePage() {
                 </div>
               </div>
               </Elements>
+              ) : (
+                <div className="py-10 text-center text-gray-600">
+                  Kraunama atsiskaitymo forma...
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -2476,7 +2519,11 @@ function HomePage() {
 
       {/* Footer */}
       <footer className="relative bg-slate-900 text-white overflow-hidden">
-        <Snowfall position="absolute" zIndex={0} />
+        {showSnow && (
+          <Suspense fallback={null}>
+            <LazySnowfall position="absolute" zIndex={0} />
+          </Suspense>
+        )}
         <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-10 justify-items-center md:justify-items-start text-center md:text-left transform translate-x-1 md:translate-x-2">
           <div>
             <h4 className="font-bold text-lg mb-3">{t.shopName}</h4>
@@ -2517,13 +2564,13 @@ function HomePage() {
                 <span className="inline-flex items-center h-5">kaleddovanos@gmail.com</span>
               </li>
               <li className="flex items-center gap-3 py-1">
-                <img src="https://cdn.simpleicons.org/instagram/FFFFFF" alt="Instagram" className="w-5 h-5 block shrink-0" />
+                <img src="https://cdn.simpleicons.org/instagram/FFFFFF" alt="Instagram" className="w-5 h-5 block shrink-0" loading="lazy" decoding="async" />
                 <a href="https://www.instagram.com/kaledukampelis" target="_blank" rel="noopener noreferrer" className="hover:text-white inline-flex items-center h-5">
                   kaledukampelis
                 </a>
               </li>
               <li className="flex items-center gap-3 py-1">
-                <img src="https://cdn.simpleicons.org/tiktok/FFFFFF" alt="TikTok" className="w-5 h-5 block shrink-0" />
+                <img src="https://cdn.simpleicons.org/tiktok/FFFFFF" alt="TikTok" className="w-5 h-5 block shrink-0" loading="lazy" decoding="async" />
                 <a href="https://www.tiktok.com/@kaledukampelis" target="_blank" rel="noopener noreferrer" className="hover:text-white inline-flex items-center h-5">
                   kaledukampelis
                 </a>
@@ -2555,8 +2602,12 @@ function HomePage() {
         </div>
       </footer>
       
-      {/* Cookie Consent Banner */}
-      <CookieConsent />
+      {/* Cookie Consent Banner (idle-loaded) */}
+      {showCookie && (
+        <Suspense fallback={null}>
+          <LazyCookieConsent />
+        </Suspense>
+      )}
     </div>
     </>
   );
