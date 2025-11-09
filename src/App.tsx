@@ -294,7 +294,10 @@ function HomePage() {
   // Progressive product rendering for mobile - reduces main-thread work
   const [visibleProducts, setVisibleProducts] = useState<number>(() => {
     if (typeof window === 'undefined') return 8;
-    return window.innerWidth >= 768 ? 12 : 8;
+    const w = window.innerWidth;
+    if (w < 640) return 4; // fewer items initially on phones to improve LCP
+    if (w < 1024) return 8; // tablets
+    return 12; // desktop
   });
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const stripePromiseRef = useRef<any>(null);
@@ -1192,7 +1195,7 @@ function HomePage() {
                   src={product.image}
                   alt={`${product.name} - Premium Kalėdų dekoracija | Kalėdų Kampelis`}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  loading="lazy"
+                  loading={index === 0 ? "eager" : "lazy"}
                   decoding="async"
                     width={800}
                     height={600}
