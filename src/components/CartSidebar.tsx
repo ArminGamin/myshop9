@@ -140,11 +140,11 @@ linear-gradient(to top, rgba(254,242,242,1) 0%, rgba(255,255,255,0) 65%)',
                 </div>
 
                 <div className="flex justify-center space-x-3 pt-4">
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png" className="h-6 opacity-60" alt="Mastercard" loading="lazy" decoding="async" />
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png" className="h-6 opacity-60" alt="Mastercard" />
                   <div className="bg-white border border-gray-300 px-2 py-1 rounded">
                     <span className="text-blue-600 font-bold text-sm">VISA</span>
                   </div>
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" className="h-6 opacity-60" alt="PayPal" loading="lazy" decoding="async" />
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" className="h-6 opacity-60" alt="PayPal" />
                 </div>
 
                 <div className="flex items-center justify-center space-x-2 text-xs text-gray-500">

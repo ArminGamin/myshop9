@@ -56,56 +56,33 @@
     <link rel="dns-prefetch" href="https://api-m.paypal.com" />
     <!-- Removed dev-only preloads for production build -->
     
-    <!-- Preload first above-the-fold product images to improve LCP -->
-    <link rel="preload" as="image" href="https://ae-pic-a1.aliexpress-media.com/kf/S612c6eb10fa5471ab8f81a12a5a305b42.jpg" />
-    <link rel="preload" as="image" href="https://ae-pic-a1.aliexpress-media.com/kf/S255daedfa95e4aab86e8670962d5f04dD.jpg" />
-    <link rel="preload" as="image" href="https://ae-pic-a1.aliexpress-media.com/kf/S03fb1c7dcd6b49348c43a81e333fe66bF.jpg" />
+    <!-- Preloads removed (restore pre-optimization state) -->
     
     <!-- Google Website Translator will be lazy-loaded on demand -->
 
-    <!-- Google tag (gtag.js) - deferred to idle with queue -->
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NP96YPG80J"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){ dataLayer.push(arguments); }
-      (function loadGA(){
-        var load = function() {
-          var s = document.createElement('script');
-          s.async = true;
-          s.src = 'https://www.googletagmanager.com/gtag/js?id=G-NP96YPG80J';
-          s.onload = function(){
-            gtag('js', new Date());
-            gtag('config', 'G-NP96YPG80J');
-          };
-          document.head.appendChild(s);
-        };
-        if ('requestIdleCallback' in window) {
-          requestIdleCallback(load, { timeout: 2000 });
-        } else {
-          window.addEventListener('load', load, { once: true });
-        }
-      })();
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-NP96YPG80J');
     </script>
 
-    <!-- Meta Pixel - deferred to idle, keep stub to queue events -->
+    <!-- Meta Pixel Code -->
     <script>
-      !function(f,b,e,v,n,t,s){
-        if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];
-      }(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
-      (function loadFB(){
-        var load = function(){
-          var t = document.createElement('script'); t.async = true; t.src = 'https://connect.facebook.net/en_US/fbevents.js';
-          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(t, s);
-          fbq('init', '1135180922149957'); fbq('track', 'PageView');
-        };
-        if ('requestIdleCallback' in window) {
-          requestIdleCallback(load, { timeout: 2000 });
-        } else {
-          window.addEventListener('load', load, { once: true });
-        }
-      })();
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '1135180922149957');
+      fbq('track', 'PageView');
     </script>
+    <!-- End Meta Pixel Code -->
 
     <!-- Critical CSS inline for above-the-fold content -->
     <style>
@@ -553,16 +530,7 @@
     </script>
   </head>
   <body>
-    <!-- Minimal SSR-like LCP shell to show hero text immediately.
-         Removed automatically in src/main.tsx once React mounts. -->
-    <div id="lcp-shell" style="background-image:linear-gradient(90deg,#dc2626,#16a34a);color:#fff;">
-      <div style="max-width:1120px;margin:0 auto;padding:16px 24px 12px;">
-        <h1 style="margin:0;font-weight:800;line-height:1.1;">
-          <span style="display:block;font-size:28px;margin-bottom:6px;">Padarykite šias Kalėdas</span>
-          <span style="display:block;color:#fbbf24;font-size:26px;">Nepamirštamas!</span>
-        </h1>
-      </div>
-    </div>
+    
     <noscript><img height="1" width="1" style="display:none"
     src="https://www.facebook.com/tr?id=1135180922149957&ev=PageView&noscript=1"
     /></noscript>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense, useMemo, useCallback, lazy, useRef } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import {
   ShoppingCart,
   Heart,
@@ -21,17 +21,17 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { Routes, Route, Link, useNavigate } from "react-router-dom";
-const ThankYouModal = lazy(() => import("./components/ThankYouModal").then(m => ({ default: m.ThankYouModal })));
+import { ThankYouModal } from "./components/ThankYouModal";
 import OptimizedImage from "./components/OptimizedImage";
-const LazySnowfall = lazy(() => import("./components/Snowfall"));
-const LazyCookieConsent = lazy(() => import("./components/CookieConsent"));
+import Snowfall from "./components/Snowfall";
+import CookieConsent from "./components/CookieConsent";
 import { useCartStore } from "./store/cartStore";
 import { useProductStore } from "./store/productStore";
 import { initialProducts } from "./data/products";
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-const LazyStripeCardSection = lazy(() => import('./components/StripeCardSection'));
-const LazyPayPalButton = lazy(() => import('./components/PayPalButton'));
+import StripeCardSection from './components/StripeCardSection';
+import PayPalButton from './components/PayPalButton';
 
 const STRIPE_PK = (import.meta as any).env?.VITE_STRIPE_PUBLISHABLE_KEY || '';
 const stripePromise = loadStripe(STRIPE_PK);
@@ -279,41 +279,8 @@ function HomePage() {
     seconds: 0,
   });
   const [viewersCount, setViewersCount] = useState(12);
-  const [showSnow, setShowSnow] = useState(false);
-  const [showCookie, setShowCookie] = useState(false);
-  useEffect(() => {
-    const schedule = () => {
-      setShowSnow(true);
-      setShowCookie(true);
-    };
-    if ('requestIdleCallback' in window) {
-      (window as any).requestIdleCallback(schedule, { timeout: 2500 });
-    } else {
-      setTimeout(schedule, 1800);
-    }
-  }, []);
   // Progressive product rendering for mobile - reduces main-thread work
-  const [visibleProducts, setVisibleProducts] = useState<number>(() => {
-    if (typeof window === 'undefined') return 8;
-    const w = window.innerWidth;
-    if (w < 640) return 4; // fewer items initially on phones to improve LCP
-    if (w < 1024) return 8; // tablets
-    return 12; // desktop
-  });
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    const el = loadMoreRef.current;
-    if (!el) return;
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (e.isIntersecting) {
-          setVisibleProducts((v) => Math.min(v + 8, products.length));
-        }
-      });
-    }, { rootMargin: '600px 0px' });
-    io.observe(el);
-    return () => io.disconnect();
-  }, [products.length]);
+  // Full product list rendering (no progressive slicing)
 
   // Sort products by lowest price first for listing grid
   const productsSorted = useMemo(() => {
@@ -760,12 +727,8 @@ function HomePage() {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Global snowfall overlay (idle-loaded) */}
-      {showSnow && (
-        <Suspense fallback={null}>
-          <LazySnowfall position="fixed" zIndex={5} />
-        </Suspense>
-      )}
+      {/* Global snowfall overlay */}
+      <Snowfall position="fixed" zIndex={5} />
       {/* Sale Banner */}
       <div className="relative bg-gradient-to-r from-red-600 to-green-600 text-white py-2 text-center text-sm sm:text-base font-semibold overflow-hidden">
         <div className="relative tracking-wide">🎁 {t.saleBanner} 🎁</div>
@@ -1179,7 +1142,7 @@ function HomePage() {
         ) : (
         <>
         <div className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3`}>
-          {productsSorted.slice(0, visibleProducts).map((product, index) => (
+          {productsSorted.map((product, index) => (
             <div
               key={product.id}
               className={`cv-auto bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 group h-full flex flex-col ${productsSorted.length === 1 ? 'lg:col-span-2' : ''}`}
@@ -1190,12 +1153,11 @@ function HomePage() {
                   src={product.image}
                   alt={`${product.name} - Premium Kalėdų dekoracija | Kalėdų Kampelis`}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  loading={index === 0 ? "eager" : "lazy"}
+                  loading="lazy"
                   decoding="async"
                     width={800}
                     height={600}
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    fetchPriority={index < 4 ? 'high' : 'low'}
                 />
               </div>
               <div className="p-4 sm:p-5 flex-1 flex flex-col">
@@ -1258,7 +1220,6 @@ function HomePage() {
             </div>
           ))}
           </div>
-        <div ref={loadMoreRef} aria-hidden className="h-6"></div>
         </>
         )}
       </main>
@@ -1535,8 +1496,6 @@ function HomePage() {
                       src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png"
                       className="h-6 opacity-60"
                       alt="Mastercard"
-                      loading="lazy"
-                      decoding="async"
                     />
                     <div className="bg-white border border-gray-300 px-2 py-1 rounded">
                       <span className="text-blue-600 font-bold text-sm">VISA</span>
@@ -1545,8 +1504,6 @@ function HomePage() {
                       src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
                       className="h-6 opacity-60"
                       alt="PayPal"
-                      loading="lazy"
-                      decoding="async"
                     />
                   </div>
 
@@ -2155,9 +2112,7 @@ function HomePage() {
                       <CreditCard className="w-4 h-4" />
                       <h3 className="text-base font-semibold">Mokėjimo Informacija</h3>
                     </div>
-                    <Suspense fallback={<div className="py-6 text-gray-500">Kraunama Stripe forma…</div>}>
-                      <LazyStripeCardSection />
-                    </Suspense>
+                    <StripeCardSection />
                       </div>
                   {/* Expose Stripe pay function to parent */}
                   <StripePayBridge
@@ -2243,8 +2198,7 @@ function HomePage() {
                         💛 Atsiskaitydami per PayPal, taikomas nedidelis apdorojimo mokestis (apie 2.5 %). Jis padeda padengti PayPal mokesčius ir užtikrina, kad galėtume išlaikyti mažas kainas visiems 🎄
                       </p>
                     </div>
-                    <Suspense fallback={<div className="py-6 text-gray-500">Kraunama PayPal…</div>}>
-                    <LazyPayPalButton
+                    <PayPalButton
                       amountCents={orderCents}
                       orderNumber={`ORD-${Date.now()}-${Math.floor(Math.random()*1000)}`}
                       customer={{
@@ -2262,7 +2216,6 @@ function HomePage() {
                         price: Number(it.price)
                       }))}
                     />
-                    </Suspense>
                   </div>
 
                   {/* Consent */}
@@ -2501,25 +2454,17 @@ function HomePage() {
         </div>
       )}
 
-      {/* Thank You Modal (lazy) */}
-      {thankYouModalOpen && (
-        <Suspense fallback={null}>
-          <ThankYouModal
-            isOpen={thankYouModalOpen}
-            onClose={() => setThankYouModalOpen(false)}
-            orderNumber={completedOrderNumber}
-            email={completedOrderEmail}
-          />
-        </Suspense>
-      )}
+      {/* Thank You Modal */}
+      <ThankYouModal
+        isOpen={thankYouModalOpen}
+        onClose={() => setThankYouModalOpen(false)}
+        orderNumber={completedOrderNumber}
+        email={completedOrderEmail}
+      />
 
       {/* Footer */}
       <footer className="relative bg-slate-900 text-white overflow-hidden">
-        {showSnow && (
-          <Suspense fallback={null}>
-            <LazySnowfall position="absolute" zIndex={0} />
-          </Suspense>
-        )}
+        <Snowfall position="absolute" zIndex={0} />
         <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-10 justify-items-center md:justify-items-start text-center md:text-left transform translate-x-1 md:translate-x-2">
           <div>
             <h4 className="font-bold text-lg mb-3">{t.shopName}</h4>
@@ -2560,13 +2505,13 @@ function HomePage() {
                 <span className="inline-flex items-center h-5">kaleddovanos@gmail.com</span>
               </li>
               <li className="flex items-center gap-3 py-1">
-                <img src="https://cdn.simpleicons.org/instagram/FFFFFF" alt="Instagram" className="w-5 h-5 block shrink-0" loading="lazy" decoding="async" />
+                <img src="https://cdn.simpleicons.org/instagram/FFFFFF" alt="Instagram" className="w-5 h-5 block shrink-0" />
                 <a href="https://www.instagram.com/kaledukampelis" target="_blank" rel="noopener noreferrer" className="hover:text-white inline-flex items-center h-5">
                   kaledukampelis
                 </a>
               </li>
               <li className="flex items-center gap-3 py-1">
-                <img src="https://cdn.simpleicons.org/tiktok/FFFFFF" alt="TikTok" className="w-5 h-5 block shrink-0" loading="lazy" decoding="async" />
+                <img src="https://cdn.simpleicons.org/tiktok/FFFFFF" alt="TikTok" className="w-5 h-5 block shrink-0" />
                 <a href="https://www.tiktok.com/@kaledukampelis" target="_blank" rel="noopener noreferrer" className="hover:text-white inline-flex items-center h-5">
                   kaledukampelis
                 </a>
@@ -2598,12 +2543,8 @@ function HomePage() {
         </div>
       </footer>
       
-      {/* Cookie Consent Banner (idle-loaded) */}
-      {showCookie && (
-        <Suspense fallback={null}>
-          <LazyCookieConsent />
-        </Suspense>
-      )}
+      {/* Cookie Consent Banner */}
+      <CookieConsent />
     </div>
     </>
   );
