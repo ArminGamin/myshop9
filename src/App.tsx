@@ -274,6 +274,24 @@ function HomePage() {
   });
   const language = 'lt'; // Fixed to Lithuanian only
   
+  // Preload 'Kalėdinis Megztinis' images on idle for faster first-view on mobile
+  useEffect(() => {
+    const preload = () => {
+      ['/products/megztiniai/red.png','/products/megztiniai/green.png','/products/megztiniai/navy.png'].forEach(src => {
+        const img = new Image();
+        (img as any).loading = 'eager';
+        img.decoding = 'async';
+        img.src = src;
+      });
+    };
+    const w: any = typeof window !== 'undefined' ? window : null;
+    if (w && 'requestIdleCallback' in w) {
+      w.requestIdleCallback(preload, { timeout: 1500 });
+    } else {
+      setTimeout(preload, 800);
+    }
+  }, []);
+
   // Urgency and scarcity features
   const [urgencyTimer, setUrgencyTimer] = useState({
     hours: 0,
@@ -1165,6 +1183,7 @@ function HomePage() {
                     width={800}
                     height={600}
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    fetchPriority={product.id === 1008 ? 'high' : 'auto'}
                 />
               </div>
               <div className="p-4 sm:p-5 flex-1 flex flex-col">
