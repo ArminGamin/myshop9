@@ -5,7 +5,7 @@ export const initialProducts: Product[] = [
   {
     id: 1001,
     name: "Kalėdinis Durų Kilimėlis",
-    price: 9.99,
+    price: 10.99,
     originalPrice: 18.99,
     image: "https://ae-pic-a1.aliexpress-media.com/kf/S612c6eb10fa5471ab8f81a12a5a305b42.jpg",
     images: [
@@ -116,13 +116,59 @@ export const initialProducts: Product[] = [
     colors: [
       { name: "Juodas su raudonais akcentais", value: "black_red" }
     ],
+    sizeLabel: "Dydžiai",
+    // Keep legacy sizes for backwards compatibility; not used when sizeGroups is present
     sizes: [
-      { name: "XS", value: "xs_kids" },
-      { name: "S", value: "s_kids" },
-      { name: "M", value: "m_teens" },
-      { name: "L", value: "l_teens" },
-      { name: "XL", value: "xl_adult" },
-      { name: "XXL", value: "xxl_adult" }
+      { name: "M", value: "adult_m" },
+      { name: "L", value: "adult_l" },
+      { name: "XL", value: "adult_xl" },
+      { name: "XXL", value: "adult_xxl" }
+    ],
+    sizeGroups: [
+      {
+        label: "Tėtis",
+        sizes: [
+          { name: "XS", value: "dad_xs" },
+          { name: "S", value: "dad_s" },
+          { name: "M", value: "dad_m" },
+          { name: "L", value: "dad_l" },
+          { name: "XL", value: "dad_xl" },
+          { name: "XXL", value: "dad_xxl" }
+        ]
+      },
+      {
+        label: "Mama",
+        sizes: [
+          { name: "XS", value: "mom_xs" },
+          { name: "S", value: "mom_s" },
+          { name: "M", value: "mom_m" },
+          { name: "L", value: "mom_l" },
+          { name: "XL", value: "mom_xl" },
+          { name: "XXL", value: "mom_xxl" }
+        ]
+      },
+      {
+        label: "Sūnus",
+        sizes: [
+          { name: "XS", value: "son_xs" },
+          { name: "S", value: "son_s" },
+          { name: "M", value: "son_m" },
+          { name: "L", value: "son_l" },
+          { name: "XL", value: "son_xl" },
+          { name: "XXL", value: "son_xxl" }
+        ]
+      },
+      {
+        label: "Dukra",
+        sizes: [
+          { name: "XS", value: "daughter_xs" },
+          { name: "S", value: "daughter_s" },
+          { name: "M", value: "daughter_m" },
+          { name: "L", value: "daughter_l" },
+          { name: "XL", value: "daughter_xl" },
+          { name: "XXL", value: "daughter_xxl" }
+        ]
+      }
     ],
     category: "Drabužiai",
     tags: ["pyžamos", "kalėdos", "šeima", "šventinė dovana"],
@@ -134,7 +180,7 @@ export const initialProducts: Product[] = [
   {
     id: 1004,
     name: "Šviečiančios Dekoratyvinės Šakelės",
-    price: 11.99,
+    price: 12.99,
     originalPrice: 19.99,
     image: "https://ae-pic-a1.aliexpress-media.com/kf/S255daedfa95e4aab86e8670962d5f04dD.jpg",
     images: [
@@ -170,7 +216,7 @@ export const initialProducts: Product[] = [
   {
     id: 1005,
     name: "Kalėdinė Staltiesė",
-    price: 12.99,
+    price: 13.99,
     originalPrice: 24.99,
     image: "https://ae-pic-a1.aliexpress-media.com/kf/S03fb1c7dcd6b49348c43a81e333fe66bF.jpg",
     images: [
@@ -208,7 +254,7 @@ export const initialProducts: Product[] = [
       { name: "140×180 cm", value: "140x180" },
       { name: "Apvalus 150 cm", value: "round_150" }
     ],
-    pricesBySize: [12.99, 10.99],
+    pricesBySize: [13.99, 13.99],
     originalPricesBySize: [24.99, 21.99],
     category: "Namai",
     tags: ["kalėdinė staltiesė", "stalo užtiesalas", "šventinis stalas", "kalėdos", "namų dekoras"],
@@ -221,7 +267,7 @@ export const initialProducts: Product[] = [
   {
     id: 1006,
     name: "Pliušinis Žaislas",
-    price: 7.99,
+    price: 8.99,
     originalPrice: 14.99,
     image: "https://ae-pic-a1.aliexpress-media.com/kf/Sd0a54cae9f1d4760b4a22385c822a709u.jpg",
     images: [
@@ -252,7 +298,7 @@ export const initialProducts: Product[] = [
       { name: "Rožinė A", value: "pink_a" },
       { name: "Rožinė B", value: "pink_b" }
     ],
-    pricesByColor: [7.99, 7.99, 7.99, 7.99],
+    pricesByColor: [8.99, 8.99, 8.99, 8.99],
     originalPricesByColor: [14.99, 14.99, 14.99, 14.99],
     sizes: [
       { name: "Universalus", value: "universal" }
@@ -267,7 +313,7 @@ export const initialProducts: Product[] = [
   {
     id: 1007,
     name: "Kalėdiniai Raktų Pakabukai",
-    price: 5.99,
+    price: 6.99,
     originalPrice: 11.99,
     image: "https://ae-pic-a1.aliexpress-media.com/kf/S071cb82cce914403989faee9341768c2T.jpg",
     images: [
@@ -302,7 +348,7 @@ export const initialProducts: Product[] = [
       { name: "Sniego senis", value: "christmas_snowman" },
       { name: "Kalėdinė eglutė", value: "christmas_tree" }
     ],
-    pricesByColor: [5.99, 5.99, 5.99, 5.99, 5.99],
+    pricesByColor: [6.99, 6.99, 6.99, 6.99, 6.99],
     originalPricesByColor: [11.99, 11.99, 11.99, 11.99, 11.99],
     sizes: [
       { name: "Universalus", value: "universal" }
@@ -333,16 +379,16 @@ export const initialProducts: Product[] = [
     name: "Kalėdinis Megztinis",
     price: 19.99,
     originalPrice: 29.99,
-    image: "https://ae-pic-a1.aliexpress-media.com/kf/Sc5decea530e24a48942d4fcd70582ad37.jpg",
+    image: "/products/megztiniai/red.png",
     images: [
-      "https://ae-pic-a1.aliexpress-media.com/kf/Sc5decea530e24a48942d4fcd70582ad37.jpg",
-      "https://ae-pic-a1.aliexpress-media.com/kf/Sc39853661e8d4b09b330f44339610bd4I.jpg",
-      "https://ae-pic-a1.aliexpress-media.com/kf/S66dcceb97a8847bf91ef9d4d5dd492b6f.jpg"
+      "/products/megztiniai/red.png",
+      "/products/megztiniai/green.png",
+      "/products/megztiniai/navy.png"
     ],
     imagesByColor: [
-      ["https://ae-pic-a1.aliexpress-media.com/kf/Sc5decea530e24a48942d4fcd70582ad37.jpg"],
-      ["https://ae-pic-a1.aliexpress-media.com/kf/Sc39853661e8d4b09b330f44339610bd4I.jpg"],
-      ["https://ae-pic-a1.aliexpress-media.com/kf/S66dcceb97a8847bf91ef9d4d5dd492b6f.jpg"]
+      ["/products/megztiniai/red.png"],
+      ["/products/megztiniai/green.png"],
+      ["/products/megztiniai/navy.png"]
     ],
     rating: 4.8,
     reviews: 42,
@@ -357,8 +403,8 @@ export const initialProducts: Product[] = [
       "Puiki dovana Kalėdoms, poroms ir šeimai"
     ],
     colors: [
-      { name: "Žalia", value: "green" },
       { name: "Raudona", value: "red" },
+      { name: "Žalia", value: "green" },
       { name: "Tamsiai mėlyna", value: "navy_blue" }
     ],
     pricesByColor: [19.99, 19.99, 19.99],

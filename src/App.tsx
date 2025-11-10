@@ -224,6 +224,8 @@ function HomePage() {
   const [selectedColor, setSelectedColor] = useState(0);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState(0);
+  // For products that define multiple size groups (e.g., Adults, Kids)
+  const [selectedSizesByGroup, setSelectedSizesByGroup] = useState<number[]>([]);
   const [quantity, setQuantity] = useState(1);
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -1034,15 +1036,19 @@ function HomePage() {
                 const product = products.find(p => p.id === productId);
                 return product ? (
                   <div key={productId} className="w-16 h-16 rounded-lg overflow-hidden">
-                    <img
+                    <OptimizedImage
                       src={product.image}
                       alt={`${product.name} - Neseniai žiūrėtas produktas`}
                       className="w-full h-full object-cover cursor-pointer"
                       loading="lazy"
                       decoding="async"
+                      width={64}
+                      height={64}
+                      sizes="64px"
                       onClick={() => {
                         setSelectedProduct(product);
                         setSelectedImageIndex(0);
+                        setSelectedSizesByGroup(product.sizeGroups ? product.sizeGroups.map(() => 0) : []);
                         setProductModalOpen(true);
                       }}
                     />
@@ -1094,6 +1100,7 @@ function HomePage() {
                           setSelectedImageIndex(0);
                           setSelectedColor(0);
                           setSelectedSize(0);
+                        setSelectedSizesByGroup(product.sizeGroups ? product.sizeGroups.map(() => 0) : []);
                           setQuantity(1);
                           addToRecentlyViewed(product.id);
                           setProductModalOpen(true);
@@ -1157,7 +1164,7 @@ function HomePage() {
                   decoding="async"
                     width={800}
                     height={600}
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 />
               </div>
               <div className="p-4 sm:p-5 flex-1 flex flex-col">
@@ -1208,6 +1215,7 @@ function HomePage() {
                     setSelectedImageIndex(0);
                     setSelectedColor(0);
                     setSelectedSize(0);
+                    setSelectedSizesByGroup(product.sizeGroups ? product.sizeGroups.map(() => 0) : []);
                     setQuantity(1);
                     addToRecentlyViewed(product.id);
                     setProductModalOpen(true);
@@ -1551,14 +1559,15 @@ function HomePage() {
                     const product = products.find(p => p.id === productId);
                     return product ? (
                       <div key={productId} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                        <img
+                        <OptimizedImage
                           src={product.image}
                           alt={`${product.name} - Pageidavimų sąraše`}
                           className="w-20 h-20 object-cover rounded"
                           loading="lazy"
                           decoding="async"
-                          width="80"
-                          height="80"
+                          width={80}
+                          height={80}
+                          sizes="80px"
                         />
                         <div className="flex-1">
                           <h3 className="font-medium text-sm">{product.name}</h3>
@@ -1573,6 +1582,7 @@ function HomePage() {
                               setSelectedProduct(product);
                               setSelectedColor(0);
                               setSelectedSize(0);
+                              setSelectedSizesByGroup(product.sizeGroups ? product.sizeGroups.map(() => 0) : []);
                               setQuantity(1);
                               setWishlistOpen(false);
                               setProductModalOpen(true);
@@ -1634,7 +1644,7 @@ function HomePage() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Left Column - Images */}
                 <div>
-                  <div className="mb-3 bg-gray-50 rounded-2xl kk-red-contour kk-contour-inset-lg flex items-center justify-center overflow-hidden" style={{ minHeight: '400px' }}>
+                  <div className="mb-3 bg-gray-50 rounded-2xl kk-red-contour kk-contour-inset-lg flex items-center justify-center overflow-hidden min-h-[280px] sm:min-h-[400px]">
                     {(() => {
                       const imagesList = selectedProduct.imagesBySize
                         ? (selectedProduct.imagesBySize[selectedSize] || selectedProduct.images)
@@ -1647,8 +1657,10 @@ function HomePage() {
                       src={mainSrc}
                       alt={`${selectedProduct.name} - Produkto nuotrauka`}
                       className="w-full h-full object-contain p-4"
-                      loading="lazy"
+                      loading="eager"
                       decoding="async"
+                      sizes="100vw"
+                      fetchPriority="high"
                     />
                       );
                     })()}
@@ -1673,12 +1685,15 @@ function HomePage() {
                               }`}
                               title={`Variantas ${t.group + 1}-${t.idx + 1}`}
                             >
-                              <img
+                              <OptimizedImage
                                 src={resolveImagePath(t.url)}
                                 alt={`${selectedProduct.name} - Nuotrauka`}
                                 className="w-full h-full object-contain p-1"
                                 loading="lazy"
                                 decoding="async"
+                                width={64}
+                                height={64}
+                                sizes="64px"
                               />
                             </button>
                           ))}
@@ -1702,12 +1717,15 @@ function HomePage() {
                               }`}
                               title={`Variantas ${t.group + 1}-${t.idx + 1}`}
                             >
-                              <img
+                              <OptimizedImage
                                 src={resolveImagePath(t.url)}
                                 alt={`${selectedProduct.name} - Nuotrauka`}
                                 className="w-full h-full object-contain p-1"
                                 loading="lazy"
                                 decoding="async"
+                                width={64}
+                                height={64}
+                                sizes="64px"
                               />
                             </button>
                           ))}
@@ -1728,12 +1746,15 @@ function HomePage() {
                           }`}
                           title={`Variantas ${index + 1}`}
                         >
-                          <img
+                          <OptimizedImage
                             src={resolveImagePath(img)}
                             alt={`${selectedProduct.name} - Nuotrauka ${index + 1}`}
                             className="w-full h-full object-contain p-1"
                             loading="lazy"
                             decoding="async"
+                            width={64}
+                            height={64}
+                            sizes="64px"
                           />
                         </button>
                       ))}
@@ -1814,21 +1835,53 @@ function HomePage() {
                   {/* Size Selection */}
                   <div className="mb-4">
                     <h3 className="font-bold mb-3 text-base text-gray-900">{selectedProduct.sizeLabel || 'Dydis'}</h3>
-                    <div className="flex flex-wrap gap-3">
-                      {selectedProduct.sizes.map((size: any, index: number) => (
-                        <button
-                          key={index}
-                          onClick={() => { setSelectedSize(index); setSelectedImageIndex(0); }}
-                          className={`px-5 py-4 border-2 rounded-lg text-base font-bold touch-manipulation min-h-[52px] min-w-[60px] transition-all ${
-                            selectedSize === index
-                              ? 'border-red-500 bg-red-50 text-red-700 shadow-md'
-                              : 'border-gray-300 hover:border-gray-400 text-gray-800'
-                          }`}
-                        >
-                          {size.name}
-                        </button>
-                      ))}
-                    </div>
+                    {selectedProduct.sizeGroups && selectedProduct.sizeGroups.length > 0 ? (
+                      <div className="space-y-3">
+                        {selectedProduct.sizeGroups.map((group: any, gIndex: number) => (
+                          <div key={gIndex} className="mb-2">
+                            <div className="text-sm font-semibold text-gray-800 mb-2">{group.label}</div>
+                            <div className="flex gap-2 overflow-x-auto sm:flex-wrap sm:overflow-visible -mx-1 px-1 pb-1">
+                              {group.sizes.map((size: any, sIndex: number) => (
+                                <button
+                                  key={sIndex}
+                                  onClick={() => {
+                                    setSelectedSizesByGroup(prev => {
+                                      const next = [...prev];
+                                      next[gIndex] = sIndex;
+                                      return next;
+                                    });
+                                    setSelectedImageIndex(0);
+                                  }}
+                                  className={`px-3 py-2 border-2 rounded-xl text-sm font-bold touch-manipulation min-h-[40px] min-w-[48px] shrink-0 transition-all ${
+                                    (selectedSizesByGroup[gIndex] ?? 0) === sIndex
+                                      ? 'border-red-500 bg-red-50 text-red-700 shadow-md'
+                                      : 'border-gray-300 hover:border-gray-400 text-gray-800'
+                                  }`}
+                                >
+                                  {size.name}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="flex flex-wrap gap-3">
+                        {selectedProduct.sizes.map((size: any, index: number) => (
+                          <button
+                            key={index}
+                            onClick={() => { setSelectedSize(index); setSelectedImageIndex(0); }}
+                            className={`px-5 py-4 border-2 rounded-lg text-base font-bold touch-manipulation min-h-[52px] min-w-[60px] transition-all ${
+                              selectedSize === index
+                                ? 'border-red-500 bg-red-50 text-red-700 shadow-md'
+                                : 'border-gray-300 hover:border-gray-400 text-gray-800'
+                            }`}
+                          >
+                            {size.name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {/* Quantity */}
@@ -1904,6 +1957,13 @@ function HomePage() {
                         : (typeof selectedProduct.price === 'number' ? selectedProduct.price : parseFloat(selectedProduct.price));
                       const imagesListForCart = selectedProduct.imagesBySize ? (selectedProduct.imagesBySize[selectedSize] || selectedProduct.images) : selectedProduct.images;
                       const imageUrl = imagesListForCart?.[selectedImageIndex] || selectedProduct.image;
+                      const selectedSizeText = (selectedProduct.sizeGroups && selectedProduct.sizeGroups.length > 0)
+                        ? selectedProduct.sizeGroups.map((group: any, gIndex: number) => {
+                            const sIdx = selectedSizesByGroup[gIndex] ?? 0;
+                            const sizeName = group.sizes[sIdx]?.name || '';
+                            return `${group.label}: ${sizeName}`;
+                          }).join(' | ')
+                        : (selectedProduct.sizes[selectedSize]?.name || '');
                       addItem({
                         productId: selectedProduct.id,
                         name: selectedProduct.name,
@@ -1911,8 +1971,8 @@ function HomePage() {
                         image: imageUrl,
                         quantity: quantity,
                         selectedColor: selectedProduct.colors[selectedColor]?.name || '',
-                        selectedSize: selectedProduct.sizes[selectedSize]?.name || '',
-                        sizeLabel: (selectedProduct as any).sizeLabel || 'Dydis'
+                        selectedSize: selectedSizeText,
+                        sizeLabel: (selectedProduct as any).sizeGroups?.length ? 'Dydžiai' : ((selectedProduct as any).sizeLabel || 'Dydis')
                       });
                       setSuccessMessage(t.addedToCart);
                       setProductModalOpen(false);

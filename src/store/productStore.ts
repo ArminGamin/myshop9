@@ -17,6 +17,8 @@ export interface Product {
   features: string[];
   colors: { name: string; value: string }[];
   sizes: { name: string; value: string }[];
+  // Optional: multiple size groups (e.g., Adults and Kids), each with its own size list
+  sizeGroups?: { label: string; sizes: { name: string; value: string }[] }[];
   sizeLabel?: string; // optional UI label for sizes (e.g., "Tipas")
   pricesByColor?: number[]; // optional per-variant current prices (aligned with colors)
   originalPricesByColor?: number[]; // optional per-variant original prices
