@@ -2565,6 +2565,12 @@ function HomePage() {
                 <span className="inline-flex items-center h-5">kaleddovanos@gmail.com</span>
               </li>
               <li className="flex items-center gap-3 py-1">
+                <img src="https://cdn.simpleicons.org/facebook/FFFFFF" alt="Facebook" className="w-5 h-5 block shrink-0" />
+                <a href="https://www.facebook.com/profile.php?id=61583105739917" target="_blank" rel="noopener noreferrer" className="hover:text-white inline-flex items-center h-5">
+                  Kalėdų Kampelis
+                </a>
+              </li>
+              <li className="flex items-center gap-3 py-1">
                 <img src="https://cdn.simpleicons.org/instagram/FFFFFF" alt="Instagram" className="w-5 h-5 block shrink-0" />
                 <a href="https://www.instagram.com/kaledukampelis" target="_blank" rel="noopener noreferrer" className="hover:text-white inline-flex items-center h-5">
                   kaledukampelis
