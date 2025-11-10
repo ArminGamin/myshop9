@@ -292,6 +292,38 @@ function HomePage() {
     }
   }, []);
 
+  // Light-weight, network-aware prefetch of first image for all products to improve perceived speed
+  useEffect(() => {
+    if (!products || products.length === 0) return;
+    const nav: any = (typeof navigator !== 'undefined') ? (navigator as any) : null;
+    if (nav?.connection?.saveData) return; // respect data saver
+    const type = nav?.connection?.effectiveType || '';
+    if (/(^|\\b)2g(\\b|$)/i.test(String(type))) return; // avoid on very slow networks
+
+    const sources: string[] = products
+      .map((p: any) => p?.image || (p?.images && p.images[0]) || '')
+      .filter(Boolean);
+
+    let index = 0;
+    const burst = () => {
+      // Prefetch in small bursts to avoid blocking other requests
+      for (let k = 0; k < 3 && index < sources.length; k++, index++) {
+        const src = sources[index];
+        const img = new Image();
+        (img as any).loading = 'eager';
+        img.decoding = 'async';
+        img.src = src;
+      }
+      if (index < sources.length) setTimeout(burst, 200);
+    };
+
+    const w: any = typeof window !== 'undefined' ? window : null;
+    if (w && 'requestIdleCallback' in w) {
+      w.requestIdleCallback(burst, { timeout: 2000 });
+    } else {
+      setTimeout(burst, 600);
+    }
+  }, [products]);
   // Urgency and scarcity features
   const [urgencyTimer, setUrgencyTimer] = useState({
     hours: 0,
@@ -1178,12 +1210,12 @@ function HomePage() {
                   src={product.image}
                   alt={`${product.name} - Premium Kalėdų dekoracija | Kalėdų Kampelis`}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  loading="lazy"
+                  loading={index < 1 ? 'eager' : 'lazy'}
                   decoding="async"
                     width={800}
                     height={600}
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    fetchPriority={product.id === 1008 ? 'high' : 'auto'}
+                    fetchPriority={index < 4 ? 'high' : 'auto'}
                 />
               </div>
               <div className="p-4 sm:p-5 flex-1 flex flex-col">
