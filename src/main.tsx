@@ -63,6 +63,21 @@ if (import.meta.env.PROD) {
   });
 }
 
+// Capture UTM params for attribution
+(() => {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const utm = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'].reduce((acc, key) => {
+      const v = params.get(key);
+      if (v) acc[key] = v;
+      return acc;
+    }, {} as Record<string,string>);
+    if (Object.keys(utm).length) {
+      localStorage.setItem('utm_attribution', JSON.stringify({ ...utm, ts: Date.now() }));
+    }
+  } catch {}
+})();
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter>

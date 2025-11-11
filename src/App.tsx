@@ -20,7 +20,7 @@ import {
   Users,
   AlertTriangle,
 } from "lucide-react";
-import { Routes, Route, Link, useNavigate } from "react-router-dom";
+import { Routes, Route, Link, useNavigate, useLocation } from "react-router-dom";
 import { ThankYouModal } from "./components/ThankYouModal";
 import OptimizedImage from "./components/OptimizedImage";
 import Snowfall from "./components/Snowfall";
@@ -312,6 +312,7 @@ const PageWrapper = ({
 
 // --- Main Shop Page ---
 function HomePage() {
+  const location = useLocation();
   const { items: cartItems, totalItems, totalPrice, addItem, removeItem, updateQuantity, clearCart } = useCartStore();
   const { products, setProducts } = useProductStore();
   const [cartOpen, setCartOpen] = useState(false);
@@ -357,6 +358,82 @@ function HomePage() {
     const giftWrapCents = giftWrapping ? 299 : 0;   // €2.99 gift wrap (if enabled)
     return subtotalCents + shippingCents + giftWrapCents;
   }, [cartItems, isFreeShipping, giftWrapping]);
+
+  // Open product modal on /p/:id and inject per-product head tags
+  useEffect(() => {
+    const match = location.pathname.match(/^\/p\/(\d+)/);
+    if (match && products && products.length > 0) {
+      const idNum = Number(match[1]);
+      const p = products.find((pp: any) => pp.id === idNum);
+      if (p) {
+        setSelectedProduct(p);
+        setSelectedImageIndex(0);
+        setSelectedColor(0);
+        setSelectedSize(0);
+        setSelectedSizesByGroup(p.sizeGroups ? p.sizeGroups.map(() => 0) : []);
+        setQuantity(1);
+        setProductModalOpen(true);
+      }
+    }
+  }, [location.pathname, products]);
+
+  useEffect(() => {
+    let ld: HTMLScriptElement | null = null;
+    let canonicalEl: HTMLLinkElement | null = null;
+    let oldTitle: string | null = null;
+    let metaDesc: HTMLMetaElement | null = null;
+    if (productModalOpen && selectedProduct) {
+      const url = `https://kaledukampelis.com/p/${selectedProduct.id}`;
+      oldTitle = document.title;
+      document.title = `${selectedProduct.name} – Kalėdų Kampelis`;
+      metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) {
+        metaDesc.setAttribute('content', String(selectedProduct.description || 'Kalėdų dekoracijos ir dovanos.'));
+      }
+      canonicalEl = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+      if (!canonicalEl) {
+        canonicalEl = document.createElement('link');
+        canonicalEl.rel = 'canonical';
+        document.head.appendChild(canonicalEl);
+      }
+      canonicalEl.href = url;
+
+      ld = document.createElement('script');
+      ld.type = 'application/ld+json';
+      ld.text = JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "@id": url,
+        name: selectedProduct.name,
+        image: selectedProduct.images || [selectedProduct.image],
+        description: selectedProduct.description,
+        brand: { "@type": "Brand", name: "Kalėdų Kampelis" },
+        offers: {
+          "@type": "Offer",
+          price: selectedProduct.price,
+          priceCurrency: "EUR",
+          availability: "https://schema.org/InStock",
+          priceValidUntil: "2025-12-31"
+        },
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: selectedProduct.rating,
+          reviewCount: selectedProduct.reviews,
+          bestRating: 5,
+          worstRating: 1
+        }
+      });
+      document.head.appendChild(ld);
+    }
+    return () => {
+      if (ld && ld.parentNode) ld.parentNode.removeChild(ld);
+      const homeCanonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+      if (homeCanonical) {
+        homeCanonical.href = '/';
+      }
+      if (oldTitle) document.title = oldTitle;
+    };
+  }, [productModalOpen, selectedProduct]);
   const [checkoutFormData, setCheckoutFormData] = useState({
     email: '',
     name: '',
@@ -2812,6 +2889,7 @@ export default function App() {
     }>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/p/:id" element={<HomePage />} />
         <Route path="/apie-mus" element={<ApieMus />} />
         <Route path="/duk" element={<DUK />} />
         <Route path="/pristatymo-info" element={<PristatymoInfo />} />
