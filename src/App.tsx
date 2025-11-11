@@ -20,7 +20,7 @@ import {
   Users,
   AlertTriangle,
 } from "lucide-react";
-import { Routes, Route, Link, useNavigate } from "react-router-dom";
+import { Routes, Route, Link, useNavigate, useLocation } from "react-router-dom";
 import { ThankYouModal } from "./components/ThankYouModal";
 import OptimizedImage from "./components/OptimizedImage";
 import Snowfall from "./components/Snowfall";
@@ -312,6 +312,7 @@ const PageWrapper = ({
 
 // --- Main Shop Page ---
 function HomePage() {
+  const location = useLocation();
   const { items: cartItems, totalItems, totalPrice, addItem, removeItem, updateQuantity, clearCart } = useCartStore();
   const { products, setProducts } = useProductStore();
   const [cartOpen, setCartOpen] = useState(false);
@@ -357,6 +358,24 @@ function HomePage() {
     const giftWrapCents = giftWrapping ? 299 : 0;   // €2.99 gift wrap (if enabled)
     return subtotalCents + shippingCents + giftWrapCents;
   }, [cartItems, isFreeShipping, giftWrapping]);
+
+  // Open product modal for /p/:id paths
+  useEffect(() => {
+    const match = location.pathname.match(/^\/p\/(\d+)/);
+    if (match && products && products.length > 0) {
+      const idNum = Number(match[1]);
+      const p = products.find((pp: any) => pp.id === idNum);
+      if (p) {
+        setSelectedProduct(p);
+        setSelectedImageIndex(0);
+        setSelectedColor(0);
+        setSelectedSize(0);
+        setSelectedSizesByGroup(p.sizeGroups ? p.sizeGroups.map(() => 0) : []);
+        setQuantity(1);
+        setProductModalOpen(true);
+      }
+    }
+  }, [location.pathname, products]);
 
   // Per-route SEO injection removed per request
   const [checkoutFormData, setCheckoutFormData] = useState({
@@ -1332,12 +1351,12 @@ function HomePage() {
                   src={product.image}
                   alt={`${product.name} - Premium Kalėdų dekoracija | Kalėdų Kampelis`}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  loading="lazy"
+                  loading={index === 0 ? 'eager' : 'lazy'}
                   decoding="async"
                     width={800}
                     height={600}
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    fetchPriority="auto"
+                    fetchPriority={index === 0 ? 'high' : 'auto'}
                 />
               </div>
               <div className="p-4 sm:p-5 flex-1 flex flex-col">
@@ -2715,6 +2734,11 @@ function HomePage() {
               </Link>
             </p>
             <p className="mt-1">
+              <Link to="/blog" className="hover:text-white cursor-pointer">
+                Blogas
+              </Link>
+            </p>
+            <p className="mt-1">
               <Link to="/duk" className="hover:text-white cursor-pointer">
                 DUK
               </Link>
@@ -2814,8 +2838,12 @@ export default function App() {
     }>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/p/:id" element={<HomePage />} />
         <Route path="/apie-mus" element={<ApieMus />} />
         <Route path="/duk" element={<DUK />} />
+        <Route path="/blog" element={<BlogIndex />} />
+        <Route path="/blog/kaip-sukurti-tikra-kaledu-nuotaika-namuose" element={<BlogPostKaleda />} />
+        <Route path="/blog/kalediniu-dovanu-idejos-ir-sventinio-interjero-tendencijos-2025" element={<BlogPostDovanos2025 />} />
         <Route path="/pristatymo-info" element={<PristatymoInfo />} />
         <Route path="/grazinimai" element={<Grazinimai />} />
         <Route path="/privatumo-politika" element={<PrivatumoPolitika />} />
@@ -2823,3 +2851,147 @@ export default function App() {
     </Suspense>
   );
 }
+
+// --- Blog pages ---
+const BlogIndex = () => (
+  <PageWrapper title="Blogas">
+    <div className="space-y-6 text-gray-800">
+      <article className="bg-white rounded-xl shadow p-5">
+        <h2 className="text-2xl font-bold mb-2">
+          <Link to="/blog/kaip-sukurti-tikra-kaledu-nuotaika-namuose" className="text-red-600 hover:underline">
+            🎄 Kaip Sukurti Tikrą Kalėdų Nuotaiką Namuose
+          </Link>
+        </h2>
+        <p className="text-gray-700">
+          Dekoracijos, idėjos ir jaukumas – paprasti žingsniai, kaip namuose sukurti šventinę magiją.
+        </p>
+        <div className="mt-3">
+          <Link to="/blog/kaip-sukurti-tikra-kaledu-nuotaika-namuose" className="text-blue-600 hover:underline">
+            Skaityti →
+          </Link>
+        </div>
+      </article>
+      <article className="bg-white rounded-xl shadow p-5">
+        <h2 className="text-2xl font-bold mb-2">
+          <Link to="/blog/kalediniu-dovanu-idejos-ir-sventinio-interjero-tendencijos-2025" className="text-red-600 hover:underline">
+            🎁 Kalėdinių Dovanų Idėjos ir Šventinio Interjero Tendencijos 2025 Metams
+          </Link>
+        </h2>
+        <p className="text-gray-700">
+          Naujausios 2025 m. Kalėdų tendencijos: dovanų idėjos ir šventinis interjeras be streso – nuo natūralių akcentų iki žiemos pasakos.
+        </p>
+        <div className="mt-3">
+          <Link to="/blog/kalediniu-dovanu-idejos-ir-sventinio-interjero-tendencijos-2025" className="text-blue-600 hover:underline">
+            Skaityti →
+          </Link>
+        </div>
+      </article>
+    </div>
+  </PageWrapper>
+);
+
+const BlogPostKaleda = () => (
+  <PageWrapper title="Kaip Sukurti Tikrą Kalėdų Nuotaiką Namuose">
+    <article className="prose prose-lg max-w-none">
+      <p>Kai lauke pasirodo pirmosios snaigės, o miestus apgaubia šventinė šviesa, visi pradedame svajoti apie jaukius, šiltais kvapais ir švieselėmis alsuojančius namus. Kalėdų metas – tai ne tik dovanos, bet ir jausmas, kurį kuriame savo aplinkoje. Šiame straipsnyje pasidalinsime, kaip lengvai ir kūrybiškai susikurti tikrą Kalėdų nuotaiką namuose – nuo dekoracijų iki mažų detalių, kurios paverčia erdvę stebuklinga.</p>
+
+      <h3>✨ 1. Pradėkite nuo Kalėdinės Tematikos</h3>
+      <p>Pirmas žingsnis – pasirinkti Kalėdinės dekoracijos stilių. Štai kelios kryptys, kurios šiemet itin madingos:</p>
+      <ul>
+        <li>Klasikinis raudonos, žalios ir aukso derinys – amžinas pasirinkimas, kuriantis šilumą ir tradiciją.</li>
+        <li>Skandinaviškas minimalizmas – baltos, smėlio ir sidabro tonai, natūrali mediena, lininiai audiniai.</li>
+        <li>Modernus kalėdinis stilius – juoda, pilka, metaliniai akcentai su LED girliandomis ir geometrinėmis formomis.</li>
+      </ul>
+      <p>Nepriklausomai nuo pasirinkto stiliaus, stenkitės išlaikyti vientisumą – tegul kiekviena detalė dera prie bendros nuotaikos.</p>
+
+      <h3>🕯 2. Sukurkite Jaukų Apšvietimą</h3>
+      <p>Šviesa yra viena svarbiausių Kalėdų atmosferos dalių. Rinkitės LED girliandas, žvakides, švytinčius Kalėdų namelius ir stalo žibintus. Apšvietimas neturi būti ryškus – šiltos baltos ar gelsvos spalvos lemputės sukuria ramų, švelnų švytėjimą, kuris kviečia ilsėtis ir mėgautis akimirka.</p>
+      <p><em>🔎 kalėdinės girliandos, LED žvakidės, šventinis apšvietimas, jaukūs Kalėdų namai.</em></p>
+
+      <h3>🎁 3. Dekoruokite Stalą ir Svetainę</h3>
+      <p>Kalėdinis stalas – jūsų švenčių centras. Naudokite kalėdinius stalo takelius, puokštes su eglių šakelėmis, auksinius ar raudonus akcentus. Ant sofos paskleiskite minkštus pledus ir kalėdinius pagalvėlių užvalkalus.</p>
+      <p><em>🔎 kalėdinės stalo dekoracijos, šventinis stalas, kalėdiniai pledai, pagalvėlės su elniais.</em></p>
+
+      <h3>🌲 4. Nepamirškite Kvapų</h3>
+      <p>Kvapas turi magišką galią sukurti prisiminimus. Įsigykite kalėdinių kvapų žvakių ar difuzorių su cinamono, vanilės, pušies ar apelsinų natomis.</p>
+
+      <h3>🏠 5. Mažos Dekoracijos – Didelis Efektas</h3>
+      <ul>
+        <li>Kalėdiniai nameliai su švieselėmis ant palangės;</li>
+        <li>Mini eglutės ar vainikai ant durų;</li>
+        <li>Kilimas su žiemišku raštu svetainėje;</li>
+        <li>Kalėdiniai megztiniai šeimos nuotraukai ar vakarui prie židinio.</li>
+      </ul>
+      <p><em>🔎 kalėdiniai nameliai, šventiniai vainikai, žiemiški kilimai, kalėdiniai megztiniai.</em></p>
+
+      <h3>💡 6. Sukurkite Tradiciją</h3>
+      <p>Kalėdos – tai apie šeimą, šviesą ir prisiminimus. Sukurkite savo šeimos ritualą: kepkite imbierinius sausainius, kartu puoškit eglutę ar rašykite linkėjimus artimiesiems.</p>
+
+      <h3>🎅 7. Kur Rasti Kalėdinę Įkvėpimą</h3>
+      <ul>
+        <li>Kalėdiniai nameliai ir girliandos namams;</li>
+        <li>Jaukūs megztiniai ir pledai;</li>
+        <li>Dovanų idėjos visai šeimai;</li>
+        <li>Stalo dekoracijos ir šventiniai akcentai.</li>
+      </ul>
+
+      <h3>🌟 Apibendrinimas</h3>
+      <p>Sukurti šventinę nuotaiką nereikia daug – svarbiausia meilė detalėms ir noras dalintis džiaugsmu. Kalėdų Kampelis padeda tai padaryti lengvai: nuo šiltų dekoracijų iki dovanų idėjų, kurios sušildo širdį.</p>
+      <p>Tegul šios Kalėdos būna kupinos šviesos, kvapų ir šypsenų – juk būtent iš to ir gimsta tikras Kalėdų stebuklas. 🎄</p>
+    </article>
+  </PageWrapper>
+);
+
+const BlogPostDovanos2025 = () => (
+  <PageWrapper title="Kalėdinių Dovanų Idėjos ir Šventinio Interjero Tendencijos 2025 Metams">
+    <article className="prose prose-lg max-w-none">
+      <p>Artėjant žiemos šventėms, vis dažniau kyla klausimas – ką padovanoti artimiesiems ir kaip papuošti namus, kad juose vyrautų tikras Kalėdų jaukumas? Šiemet Kalėdos kviečia mus grįžti prie natūralumo, šviesos ir širdies šilumos. Šiame straipsnyje dalinamės naujausiomis Kalėdų 2025 tendencijomis, dovanų idėjomis ir būdais, kaip sukurti šventinį interjerą be streso.</p>
+
+      <h3>🎄 1. 2025-ųjų Kalėdų Stiliaus Kryptys</h3>
+      <p>Kiekvienais metais atsiranda naujų akcentų, tačiau šį sezoną išsiskiria trys aiškios kryptys:</p>
+      <ul>
+        <li><strong>Natūralus ir tvarus stilius</strong> – dekoracijos iš medžio, lino, vilnos, švelnios žemės spalvos ir rankų darbo detalės.</li>
+        <li><strong>Žiemos pasaka</strong> – baltos, pilkos, sidabrinės spalvos, švytinčios girliandos, stiklo dekoracijos ir ledo efektai.</li>
+        <li><strong>Šventinis prabangus blizgesys</strong> – auksiniai ir bordo tonai, aksomas, metaliniai akcentai ir spindesys.</li>
+      </ul>
+      <p><em>🔎 kalėdinės tendencijos 2025, šventinis interjeras, kalėdinės dekoracijos idėjos.</em></p>
+
+      <h3>🎁 2. Dovanų Idėjos Jam, Jai ir Vaikams</h3>
+      <p>Renkant dovanas, svarbiausia ne kaina, o dėmesys ir šiluma. Štai keli patikrinti variantai:</p>
+      <ul>
+        <li><strong>Jai:</strong> jaukus kalėdinis megztinis, kvapni žvakė su vanilės ar cinamono aromatu, stilingas puodelis žiemos rytams.</li>
+        <li><strong>Jam:</strong> šilta vilnonė kepurė, minimalistinis šalikų rinkinys, personalizuota dovanų dėžutė.</li>
+        <li><strong>Vaikams:</strong> šviečiantys kalėdiniai nameliai, spalvingos LED girliandos ar žaismingos eglutės dekoracijos.</li>
+      </ul>
+      <p><em>🔎 kalėdinės dovanos vyrams, kalėdinės dovanos moterims, kalėdinės dovanos vaikams, kalėdinės dovanos idėjos.</em></p>
+
+      <h3>🕯 3. Šventinė Nuotaika Per Kvapus ir Šviesą</h3>
+      <p>Kvapai ir šviesa yra nematomi, bet itin svarbūs Kalėdų pojūčiui. Naudokite šventinius difuzorius, cinamono ar pušies kvapo žvakes bei šiltos šviesos girliandas. Šiemet populiaru derinti natūralius kvapus su subtiliais LED akcentais – modernu ir jauku.</p>
+      <p><em>🔎 kalėdinės žvakės, šventiniai kvapai, LED dekoracijos, kalėdinis apšvietimas.</em></p>
+
+      <h3>🌟 4. Eglutės Puošimo Idėjos</h3>
+      <p>2025 metų eglučių puošimo tendencijos – minimalizmas ir natūralumas. Rinkitės medinius, veltinio ar rankų darbo ornamentus, popierines snaiges, šiaudines žvaigždes, baltus kaspinus ir varinių tonų girliandas.</p>
+      <p><em>🔎 eglutės puošimo idėjos, kalėdiniai žaisliukai, šiaudinės dekoracijos.</em></p>
+
+      <h3>🛍 5. Kaip Sutaupyti ir Vis tiek Sukurti Magiją</h3>
+      <p>Nebūtina išleisti daug, kad namai atrodytų įspūdingai. Užtenka kelių kokybiškų detalių – ryškesnės girliandos, kelių jaukių pagalvėlių ir kilimo su žiemišku raštu. Svarbiausia – suderintas stilius ir emocija.</p>
+      <p>Viską vienoje vietoje rasite Kalėdų Kampelyje – nuo šventinių dekoracijų ir megztinių iki dovanų idėjų visai šeimai.</p>
+      <p><em>🔎 šventinės prekės internetu, kalėdinės dovanos internetu, kalėdinis dekoras.</em></p>
+
+      <h3>💫 6. Mažos Detalės, Kurios Keičia Viską</h3>
+      <ul>
+        <li>Šventinis kilimėlis prie įėjimo;</li>
+        <li>Šviesesnės užuolaidos – daugiau šviesos ir šilumos;</li>
+        <li>Kalėdiniai nameliai ant palangės;</li>
+        <li>Kalėdinis vainikas ant durų.</li>
+      </ul>
+      <p><em>🔎 kalėdinis vainikas, šventinis kilimas, kalėdiniai nameliai, žiemos interjeras.</em></p>
+
+      <h3>❤️ 7. Dalinkitės Šviesa ir Gerumu</h3>
+      <p>Tikros Kalėdos – tai dalijimasis gerumu, šypsenomis ir dėmesiu. Padovanokite ką nors rankų darbo, išsiųskite atviruką ar apkabinkite seniai matytą žmogų – maži gestai kuria didelius jausmus.</p>
+
+      <h3>🎄 Apibendrinimas</h3>
+      <p>Šventinis laikotarpis – metas sustoti, įkvėpti žiemos oro ir pasimėgauti jaukumu. Kalėdų Kampelis pasirūpino, kad rastumėte viską vienoje vietoje – nuo kalėdinių dovanų iki šventinio dekoro. Tegul šios Kalėdos būna kupinos džiaugsmo, kūrybos ir tikro šventinio stebuklo! 🌟</p>
+    </article>
+  </PageWrapper>
+);

@@ -57,6 +57,9 @@ const pages = [
   '/pristatymo-info',
   '/grazinimai',
   '/privatumo-politika',
+  '/blog',
+  '/blog/kaip-sukurti-tikra-kaledu-nuotaika-namuose',
+  '/blog/kalediniu-dovanu-idejos-ir-sventinio-interjero-tendencijos-2025',
 ];
 const pagesXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
@@ -82,7 +85,7 @@ const productsXml = `<?xml version="1.0" encoding="UTF-8"?>
     .map(
       (id) => `
   <url>
-    <loc>${SITE_ORIGIN}/?product=${id}</loc>
+    <loc>${SITE_ORIGIN}/p/${id}</loc>
     <lastmod>${today}</lastmod>
   </url>`
     )

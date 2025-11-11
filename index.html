@@ -7,7 +7,7 @@
     <!-- Primary Meta Tags -->
     <title>Kalėdų Kampelis - Premium Kalėdų Dekoracijos | Transformuokite Savo Namus</title>
     <meta name="title" content="Kalėdų Kampelis - Premium Kalėdų Dekoracijos | Transformuokite Savo Namus" />
-    <meta name="description" content="Atraskite mūsų išskirtinę premium Kalėdų dekoracijų kolekciją. Iki 66% nuolaida pasirinktoms prekėms. Nemokamas pristatymas už 30€. Transformuokite savo namus šioms Kalėdoms!" />
+    <meta name="description" content="Kalėdų dekoracijos ir dovanos: girliandos, eglutės žaisliukai, durų kilimėliai, staltiesės, šeimos pižamos, kalėdiniai megztiniai ir šventinės idėjos. Iki 66% nuolaidos, nemokamas pristatymas nuo 30€." />
     <meta name="author" content="Kalėdų Kampelis" />
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
@@ -17,7 +17,7 @@
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://kaledukampelis.com/" />
     <meta property="og:title" content="Kalėdų Kampelis - Premium Kalėdų Dekoracijos | Transformuokite Savo Namus" />
-    <meta property="og:description" content="Atraskite mūsų išskirtinę premium Kalėdų dekoracijų kolekciją. Iki 66% nuolaida pasirinktoms prekėms. Nemokamas pristatymas už 30€." />
+    <meta property="og:description" content="Kalėdų dekoracijos ir dovanos: girliandos, eglutės žaisliukai, kilimėliai, staltiesės, pižamos, megztiniai ir šventinės idėjos. Iki 66% nuolaidos, nemokamas pristatymas nuo 30€." />
     <meta property="og:image" content="https://kaledukampelis.com/logo.png?v=3" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -28,7 +28,7 @@
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content="https://kaledukampelis.com/" />
     <meta property="twitter:title" content="Kalėdų Kampelis - Premium Kalėdų Dekoracijos | Transformuokite Savo Namus" />
-    <meta property="twitter:description" content="Atraskite mūsų išskirtinę premium Kalėdų dekoracijų kolekciją. Iki 66% nuolaida pasirinktoms prekėms. Nemokamas pristatymas už 30€." />
+    <meta property="twitter:description" content="Kalėdų dekoracijos: girliandos, eglutės žaisliukai, kilimėliai, staltiesės, šeimos pižamos, kalėdiniai megztiniai ir dovanų idėjos. Iki 66% nuolaidos, nemokamas pristatymas nuo 30€." />
     <meta property="twitter:image" content="https://kaledukampelis.com/logo.png?v=3" />
     
     <!-- Additional SEO -->
@@ -55,33 +55,47 @@
     <!-- Removed dev-only preloads for production build -->
     
     <!-- Preloads removed (restore pre-optimization state) -->
-    <!-- Preloads removed per request -->
+    <!-- Preload hero image for faster LCP -->
+    <link rel="preload" as="image" href="/products/megztiniai/red.webp" type="image/webp" fetchpriority="high" />
+    <link rel="preload" as="image" href="/products/megztiniai/red.png" type="image/png" fetchpriority="high" />
     
     <!-- Google Website Translator will be lazy-loaded on demand -->
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NP96YPG80J"></script>
+    <!-- Defer analytics to idle to avoid blocking LCP -->
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-NP96YPG80J');
+      (function loadAnalyticsLazy(){
+        var inject = function(){
+          try {
+            // GA4
+            var g = document.createElement('script');
+            g.async = true;
+            g.src = 'https://www.googletagmanager.com/gtag/js?id=G-NP96YPG80J';
+            document.head.appendChild(g);
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            window.gtag = gtag;
+            gtag('js', new Date());
+            gtag('config', 'G-NP96YPG80J');
+            // Meta Pixel
+            !function(f,b,e,v,n,t,s)
+            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+            n.queue=[];t=b.createElement(e);t.async=!0;
+            t.src=v;s=b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t,s)}(window, document,'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+            window.fbq && window.fbq('init', '1135180922149957');
+            window.fbq && window.fbq('track', 'PageView');
+          } catch(e) {}
+        };
+        if (window.requestIdleCallback) {
+          requestIdleCallback(inject, { timeout: 2000 });
+        } else {
+          setTimeout(inject, 1500);
+        }
+      })();
     </script>
-
-    <!-- Meta Pixel Code -->
-    <script>
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', '1135180922149957');
-      fbq('track', 'PageView');
-    </script>
-    <!-- End Meta Pixel Code -->
     
     <!-- Critical CSS inline for above-the-fold content -->
     <style>

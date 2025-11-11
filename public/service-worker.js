@@ -9,10 +9,8 @@ const IMAGE_CACHE = `${CACHE_VERSION}-images`;
 // Assets to cache immediately on install
 const STATIC_ASSETS = [
   '/',
-  '/index.html',
   '/manifest.json',
-  '/robots.txt',
-  '/sitemap.xml'
+  '/robots.txt'
 ];
 
 // Cache size limits
@@ -73,7 +71,15 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Allow default handling for documents and images
+  // Bypass HTML and XML entirely (no caching for documents/sitemaps)
+  if (request.destination === 'document' || /\.html?($|\?)/i.test(url.pathname) || /\.xml($|\?)/i.test(url.pathname)) {
+    return;
+  }
+
+  // Do not intercept hero images (ensure direct network path)
+  if (request.destination === 'image' && /^\/products\/megztiniai\//.test(url.pathname)) {
+    return;
+  }
 
   // Handle different types of requests with appropriate strategies
   if (isImageRequest(request)) {
