@@ -60,6 +60,9 @@ const pages = [
   '/blog',
   '/blog/kaip-sukurti-tikra-kaledu-nuotaika-namuose',
   '/blog/kalediniu-dovanu-idejos-ir-sventinio-interjero-tendencijos-2025',
+  '/blog/kaip-puosti-namus-kaledoms-mazame-bute',
+  '/blog/10-paprastu-budu-padaryti-namus-jaukesnius-ziema',
+  '/blog/kaip-pasiruosti-kaledoms-be-streso-planavimas-dekoracijos-ir-dovanos',
 ];
 const pagesXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"

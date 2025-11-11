@@ -2844,6 +2844,9 @@ export default function App() {
         <Route path="/blog" element={<BlogIndex />} />
         <Route path="/blog/kaip-sukurti-tikra-kaledu-nuotaika-namuose" element={<BlogPostKaleda />} />
         <Route path="/blog/kalediniu-dovanu-idejos-ir-sventinio-interjero-tendencijos-2025" element={<BlogPostDovanos2025 />} />
+        <Route path="/blog/kaip-puosti-namus-kaledoms-mazame-bute" element={<BlogPostMazameBute />} />
+        <Route path="/blog/10-paprastu-budu-padaryti-namus-jaukesnius-ziema" element={<BlogPost10Budu />} />
+        <Route path="/blog/kaip-pasiruosti-kaledoms-be-streso-planavimas-dekoracijos-ir-dovanos" element={<BlogPostBeStreso />} />
         <Route path="/pristatymo-info" element={<PristatymoInfo />} />
         <Route path="/grazinimai" element={<Grazinimai />} />
         <Route path="/privatumo-politika" element={<PrivatumoPolitika />} />
@@ -2882,6 +2885,51 @@ const BlogIndex = () => (
         </p>
         <div className="mt-3">
           <Link to="/blog/kalediniu-dovanu-idejos-ir-sventinio-interjero-tendencijos-2025" className="text-blue-600 hover:underline">
+            Skaityti →
+          </Link>
+        </div>
+      </article>
+      <article className="bg-white rounded-xl shadow p-5">
+        <h2 className="text-2xl font-bold mb-2">
+          <Link to="/blog/kaip-puosti-namus-kaledoms-mazame-bute" className="text-red-600 hover:underline">
+            🕯 Kaip Puošti Namus Kalėdoms Mažame Bute: Idėjos ir Patarimai
+          </Link>
+        </h2>
+        <p className="text-gray-700">
+          Mažos erdvės, didelis jaukumas – mini eglutės, LED girliandos, tekstilė ir vertikalūs akcentai be pertekliaus.
+        </p>
+        <div className="mt-3">
+          <Link to="/blog/kaip-puosti-namus-kaledoms-mazame-bute" className="text-blue-600 hover:underline">
+            Skaityti →
+          </Link>
+        </div>
+      </article>
+      <article className="bg-white rounded-xl shadow p-5">
+        <h2 className="text-2xl font-bold mb-2">
+          <Link to="/blog/10-paprastu-budu-padaryti-namus-jaukesnius-ziema" className="text-red-600 hover:underline">
+            🎄 10 Paprastų Būdų Padaryti Namus Jaukesnius Žiemą
+          </Link>
+        </h2>
+        <p className="text-gray-700">
+          Greiti „jaukumo“ laimėjimai: žvakės, kilimai, pagalvėlės, švieselės, gamtos akcentai ir žiemiška muzika.
+        </p>
+        <div className="mt-3">
+          <Link to="/blog/10-paprastu-budu-padaryti-namus-jaukesnius-ziema" className="text-blue-600 hover:underline">
+            Skaityti →
+          </Link>
+        </div>
+      </article>
+      <article className="bg-white rounded-xl shadow p-5">
+        <h2 className="text-2xl font-bold mb-2">
+          <Link to="/blog/kaip-pasiruosti-kaledoms-be-streso-planavimas-dekoracijos-ir-dovanos" className="text-red-600 hover:underline">
+            🎅 Kaip Pasiruošti Kalėdoms Be Streso: Planavimas, Dekoracijos ir Dovanos
+          </Link>
+        </h2>
+        <p className="text-gray-700">
+          Žingsnis po žingsnio planas: pasiruošimas lapkritį, puošimas gruodžio pradžioje, dovanų pakavimas ir paskutinės detalės.
+        </p>
+        <div className="mt-3">
+          <Link to="/blog/kaip-pasiruosti-kaledoms-be-streso-planavimas-dekoracijos-ir-dovanos" className="text-blue-600 hover:underline">
             Skaityti →
           </Link>
         </div>
@@ -2992,6 +3040,76 @@ const BlogPostDovanos2025 = () => (
 
       <h3>🎄 Apibendrinimas</h3>
       <p>Šventinis laikotarpis – metas sustoti, įkvėpti žiemos oro ir pasimėgauti jaukumu. Kalėdų Kampelis pasirūpino, kad rastumėte viską vienoje vietoje – nuo kalėdinių dovanų iki šventinio dekoro. Tegul šios Kalėdos būna kupinos džiaugsmo, kūrybos ir tikro šventinio stebuklo! 🌟</p>
+    </article>
+  </PageWrapper>
+);
+
+const BlogPostMazameBute = () => (
+  <PageWrapper title="Kaip Puošti Namus Kalėdoms Mažame Bute: Idėjos ir Patarimai">
+    <article className="prose prose-lg max-w-none">
+      <p>Gyvenate mažame bute, bet norite Kalėdų magijos? Nebūtina turėti didelės erdvės, kad sukurtumėte jaukumą ir šventinę atmosferą. Štai keli praktiški būdai, kaip papuošti mažą būstą Kalėdoms neapkraunant jo daiktais.</p>
+      <h3>✨ 1. Rinkitės Mažas, Bet Išraiškingas Dekoracijas</h3>
+      <p>Užuot pirkę didelę eglę, išbandykite miniatiūrines eglutes ar šviečiančius Kalėdų namelius. Ant sienų kabinkite LED girliandas – jos neužima vietos, bet suteikia magišką švytėjimą.</p>
+      <h3>🛋 2. Naudokite Tekstilę</h3>
+      <p>Kalėdiniai pagalvėlių užvalkalai, pledai ir stalo takeliai akimirksniu keičia nuotaiką. Svarbiausia – spalvų derinys: raudona, žalia, balta arba aukso tonai.</p>
+      <h3>🌿 3. Puoškite Vertikaliai</h3>
+      <p>Jei trūksta vietos, dekoruokite lentynas, duris ar sienas. Kabinkite vainikus, mini eglių šakas, naudokite lipdukus ar magnetines dekoracijas.</p>
+      <h3>🎁 4. Nepamirškite Kvapų ir Muzikos</h3>
+      <p>Įjunkite kalėdinę muziką, uždekite cinamono ar apelsinų žvakes – mažos detalės kuria didelį efektą.</p>
+      <p><em>🔎 kalėdinės dekoracijos butui, mažos erdvės puošimas, mini eglutės, kalėdinės girliandos.</em></p>
+    </article>
+  </PageWrapper>
+);
+
+const BlogPost10Budu = () => (
+  <PageWrapper title="10 Paprastų Būdų Padaryti Namus Jaukesnius Žiemą">
+    <article className="prose prose-lg max-w-none">
+      <p>Žiema – metas, kai norisi šilumos, šviesos ir jaukumo. Net jei už lango sninga, jūsų namai gali tapti šilumos oaze. Štai 10 paprastų, bet veiksmingų patarimų:</p>
+      <ul>
+        <li>Uždekite žvakes kasdien – rinkitės natūralius kvapus: vanilę, mišką, apelsiną.</li>
+        <li>Pakabinkite girliandas ne tik per Kalėdas, bet visai žiemai.</li>
+        <li>Naudokite storus kilimus – jie šildo ir sugeria garsus.</li>
+        <li>Pakeiskite pagalvėles į minkštus, žiemiškus tonus.</li>
+        <li>Papildykite apšvietimą – mažos lemputės ant spintų ar lentynų.</li>
+        <li>Papuoškite langus snaigėmis ar šviesos projekcija.</li>
+        <li>Laikykite šiltą pledą po ranka – tiek svetainėje, tiek miegamajame.</li>
+        <li>Įveskite gamtos akcentus: eglių šakos, džiovintos apelsinų riekelės, spyglių vainikai.</li>
+        <li>Kepkite imbierinius sausainius – kvapas = jaukumas.</li>
+        <li>Įjunkite šventinę muziką arba židinio garsus.</li>
+      </ul>
+      <p><em>🔎 žiemos jaukumas, šventinis interjeras, kalėdiniai kvapai, žiemos dekoracijos.</em></p>
+    </article>
+  </PageWrapper>
+);
+
+const BlogPostBeStreso = () => (
+  <PageWrapper title="Kaip Pasiruošti Kalėdoms Be Streso: Planavimas, Dekoracijos ir Dovanos">
+    <article className="prose prose-lg max-w-none">
+      <p>Kiekvienais metais daugelis sako „kitais metais pasiruošiu anksčiau“. Šiemet tikrai pavyks – tiesiog vadovaukitės šiuo žingsnis po žingsnio planu:</p>
+      <h3>📅 1. Pasiruošimas (Lapkritis)</h3>
+      <ul>
+        <li>Sudarykite dovanų sąrašą.</li>
+        <li>Patikrinkite, ką turite iš praėjusių metų.</li>
+        <li>Užsisakykite kalėdines dekoracijas iš anksto – lapkričio vidurys yra tobulas metas.</li>
+      </ul>
+      <h3>🎁 2. Puošimas (Gruodžio pradžia)</h3>
+      <ul>
+        <li>Pradėkite nuo pagrindinio kampelio – eglės ar stalo.</li>
+        <li>Naudokite šiltas spalvas ir LED girliandas.</li>
+        <li>Nepamirškite kalėdinių namelių, jie suteikia magijos pojūtį.</li>
+      </ul>
+      <h3>💌 3. Dovanų pakavimas (Gruodžio vidurys)</h3>
+      <ul>
+        <li>Naudokite kraft popierių, virveles ir džiovintus augalus – atrodo ekologiškai ir prabangiai.</li>
+        <li>Kiekvienai dovanai pridėkite rankų darbo atviruką.</li>
+      </ul>
+      <h3>🍪 4. Paskutinės detalės</h3>
+      <ul>
+        <li>Iš anksto pasiruoškite stalą ir indus.</li>
+        <li>Uždekite žvakes ir įjunkite kalėdinę muziką.</li>
+        <li>Atsipalaiduokite – Kalėdos turi būti džiaugsmas, ne vargas.</li>
+      </ul>
+      <p><em>🔎 kaip pasiruošti Kalėdoms, kalėdinis planas, dovanų pakavimas, šventinis pasiruošimas.</em></p>
     </article>
   </PageWrapper>
 );
