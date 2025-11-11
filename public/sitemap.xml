@@ -7,12 +7,12 @@
 
   <!-- Main Page -->
   <url>
-    <loc>https://kaledukampelis.lt/</loc>
+    <loc>https://kaledukampelis.com/</loc>
     <lastmod>2024-12-01</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <image:image>
-      <image:loc>https://images.unsplash.com/photo-1543589077-47d81606c1bf?w=1200&q=80&auto=format&fit=crop</image:loc>
+      <image:loc>https://images.unsplash.com/photo-1543589077-47d81606c1bf?w=1200&amp;q=80&amp;auto=format&amp;fit=crop</image:loc>
       <image:title>Kalėdų Kampelis - Premium Kalėdų Dekoracijos</image:title>
       <image:caption>Transformuokite savo namus šioms Kalėdoms su mūsų išskirtiniais dekoracijų pasiūlymais</image:caption>
     </image:image>
@@ -20,25 +20,25 @@
 
   <!-- Product Categories -->
   <url>
-    <loc>https://kaledukampelis.lt/kaledu-nameliai</loc>
+    <loc>https://kaledukampelis.com/kaledu-nameliai</loc>
     <lastmod>2024-12-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://kaledukampelis.lt/led-girliandos</loc>
+    <loc>https://kaledukampelis.com/led-girliandos</loc>
     <lastmod>2024-12-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://kaledukampelis.lt/kaledu-puokstes</loc>
+    <loc>https://kaledukampelis.com/kaledu-puokstes</loc>
     <lastmod>2024-12-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://kaledukampelis.lt/dekoracijos</loc>
+    <loc>https://kaledukampelis.com/dekoracijos</loc>
     <lastmod>2024-12-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -46,13 +46,13 @@
 
   <!-- Seasonal Pages -->
   <url>
-    <loc>https://kaledukampelis.lt/kaledu-pasiulymai</loc>
+    <loc>https://kaledukampelis.com/kaledu-pasiulymai</loc>
     <lastmod>2024-12-01</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://kaledukampelis.lt/nuolaidos</loc>
+    <loc>https://kaledukampelis.com/nuolaidos</loc>
     <lastmod>2024-12-01</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
@@ -61,19 +61,19 @@
   <!-- Info Pages -->
   
   <url>
-    <loc>https://kaledukampelis.lt/pristatymo-info</loc>
+    <loc>https://kaledukampelis.com/pristatymo-info</loc>
     <lastmod>2024-12-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://kaledukampelis.lt/grazinimai</loc>
+    <loc>https://kaledukampelis.com/grazinimai</loc>
     <lastmod>2024-12-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://kaledukampelis.lt/privatumo-politika</loc>
+    <loc>https://kaledukampelis.com/privatumo-politika</loc>
     <lastmod>2024-12-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
