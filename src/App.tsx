@@ -180,6 +180,104 @@ const ApieMus = () => (
       <p>
         Norėdami peržiūrėti visą kolekciją, grįžkite į pagrindinį puslapį ir slinkite žemyn iki skyriaus „Mūsų Produktai“.
       </p>
+
+      <div className="mt-8">
+        <h3 className="text-xl font-bold mb-4">DUK — Dažniausiai užduodami klausimai</h3>
+        <div className="space-y-3">
+          <details className="group rounded-lg border border-gray-200 p-4 bg-white">
+            <summary className="cursor-pointer font-semibold select-none">1️⃣ Ar pristatote į visą Lietuvą?</summary>
+            <p className="mt-2 text-gray-700">
+              Atsakymas: Taip, užsakymus pristatome į visus Lietuvos miestus ir miestelius. Užsakymams virš 30 € pristatymas yra nemokamas.
+            </p>
+          </details>
+
+          <details className="group rounded-lg border border-gray-200 p-4 bg-white">
+            <summary className="cursor-pointer font-semibold select-none">2️⃣ Kiek laiko trunka pristatymas?</summary>
+            <p className="mt-2 text-gray-700">
+              Atsakymas: Pristatymas paprastai trunka 8–12 darbo dienas, priklausomai nuo užsakymo kiekio. Per šventinį laikotarpį pristatymas gali užtrukti šiek tiek ilgiau.
+            </p>
+          </details>
+
+          <details className="group rounded-lg border border-gray-200 p-4 bg-white">
+            <summary className="cursor-pointer font-semibold select-none">3️⃣ Ar turite fizinę parduotuvę?</summary>
+            <p className="mt-2 text-gray-700">
+              Atsakymas: Šiuo metu dirbame tik internetu, tačiau siūlome greitą pristatymą visoje Lietuvoje ir saugų pirkimą internetu.
+            </p>
+          </details>
+
+          <details className="group rounded-lg border border-gray-200 p-4 bg-white">
+            <summary className="cursor-pointer font-semibold select-none">4️⃣ Kaip sužinoti, ar prekė yra sandėlyje?</summary>
+            <p className="mt-2 text-gray-700">
+              Atsakymas: Produktų puslapiuose nurodoma atsargų būsena. Jei matote žymą „Turime sandėlyje“, prekę galite užsisakyti iš karto.
+            </p>
+          </details>
+
+          <details className="group rounded-lg border border-gray-200 p-4 bg-white">
+            <summary className="cursor-pointer font-semibold select-none">5️⃣ Ar taikote nuolaidas arba akcijas?</summary>
+            <p className="mt-2 text-gray-700">
+              Atsakymas: Taip! Šventiniu laikotarpiu reguliariai siūlome iki 55 % nuolaidas pasirinktiems produktams. Sekite mūsų naujienas arba prisijunkite prie naujienlaiškio.
+            </p>
+          </details>
+
+          <details className="group rounded-lg border border-gray-200 p-4 bg-white">
+            <summary className="cursor-pointer font-semibold select-none">6️⃣ Kaip susisiekti, jei turiu klausimų?</summary>
+            <p className="mt-2 text-gray-700">
+              Atsakymas: Galite rašyti mums el. paštu <a href="mailto:kaleddovanos@gmail.com" className="text-red-600 underline">kaleddovanos@gmail.com</a> arba per Facebook ir Instagram žinutes. Atsakome per 24 valandas.
+            </p>
+          </details>
+        </div>
+      </div>
+    </div>
+  </PageWrapper>
+);
+
+const DUK = () => (
+  <PageWrapper title="DUK">
+    <div className="text-gray-800 space-y-4 text-lg font-medium">
+      <h2 className="text-2xl font-bold">Dažniausiai užduodami klausimai</h2>
+      <div className="space-y-3 mt-4">
+        <details className="group rounded-lg border border-gray-200 p-4 bg-white">
+          <summary className="cursor-pointer font-semibold select-none">1️⃣ Ar pristatote į visą Lietuvą?</summary>
+          <p className="mt-2 text-gray-700">
+            Atsakymas: Taip, užsakymus pristatome į visus Lietuvos miestus ir miestelius. Užsakymams virš 30 € pristatymas yra nemokamas.
+          </p>
+        </details>
+
+        <details className="group rounded-lg border border-gray-200 p-4 bg-white">
+          <summary className="cursor-pointer font-semibold select-none">2️⃣ Kiek laiko trunka pristatymas?</summary>
+          <p className="mt-2 text-gray-700">
+            Atsakymas: Pristatymas paprastai trunka 8–12 darbo dienas, priklausomai nuo užsakymo kiekio. Per šventinį laikotarpį pristatymas gali užtrukti šiek tiek ilgiau.
+          </p>
+        </details>
+
+        <details className="group rounded-lg border border-gray-200 p-4 bg-white">
+          <summary className="cursor-pointer font-semibold select-none">3️⃣ Ar turite fizinę parduotuvę?</summary>
+          <p className="mt-2 text-gray-700">
+            Atsakymas: Šiuo metu dirbame tik internetu, tačiau siūlome greitą pristatymą visoje Lietuvoje ir saugų pirkimą internetu.
+          </p>
+        </details>
+
+        <details className="group rounded-lg border border-gray-200 p-4 bg-white">
+          <summary className="cursor-pointer font-semibold select-none">4️⃣ Kaip sužinoti, ar prekė yra sandėlyje?</summary>
+          <p className="mt-2 text-gray-700">
+            Atsakymas: Produktų puslapiuose nurodoma atsargų būsena. Jei matote žymą „Turime sandėlyje“, prekę galite užsisakyti iš karto.
+          </p>
+        </details>
+
+        <details className="group rounded-lg border border-gray-200 p-4 bg-white">
+          <summary className="cursor-pointer font-semibold select-none">5️⃣ Ar taikote nuolaidas arba akcijas?</summary>
+          <p className="mt-2 text-gray-700">
+            Atsakymas: Taip! Šventiniu laikotarpiu reguliariai siūlome iki 55 % nuolaidas pasirinktiems produktams. Sekite mūsų naujienas arba prisijunkite prie naujienlaiškio.
+          </p>
+        </details>
+
+        <details className="group rounded-lg border border-gray-200 p-4 bg-white">
+          <summary className="cursor-pointer font-semibold select-none">6️⃣ Kaip susisiekti, jei turiu klausimų?</summary>
+          <p className="mt-2 text-gray-700">
+            Atsakymas: Galite rašyti mums el. paštu <a href="mailto:kaleddovanos@gmail.com" className="text-red-600 underline">kaleddovanos@gmail.com</a> arba per Facebook ir Instagram žinutes. Atsakome per 24 valandas.
+          </p>
+        </details>
+      </div>
     </div>
   </PageWrapper>
 );
@@ -1210,12 +1308,12 @@ function HomePage() {
                   src={product.image}
                   alt={`${product.name} - Premium Kalėdų dekoracija | Kalėdų Kampelis`}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  loading={index < 1 ? 'eager' : 'lazy'}
+                  loading="lazy"
                   decoding="async"
                     width={800}
                     height={600}
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    fetchPriority={index < 4 ? 'high' : 'auto'}
+                    fetchPriority="auto"
                 />
               </div>
               <div className="p-4 sm:p-5 flex-1 flex flex-col">
@@ -1708,10 +1806,10 @@ function HomePage() {
                       src={mainSrc}
                       alt={`${selectedProduct.name} - Produkto nuotrauka`}
                       className="w-full h-full object-contain p-4"
-                      loading="eager"
+                      loading="lazy"
                       decoding="async"
                       sizes="100vw"
-                      fetchPriority="high"
+                      fetchPriority="auto"
                     />
                       );
                     })()}
@@ -2587,6 +2685,11 @@ function HomePage() {
                 Apie mus
               </Link>
             </p>
+            <p className="mt-1">
+              <Link to="/duk" className="hover:text-white cursor-pointer">
+                DUK
+              </Link>
+            </p>
           </div>
           <div>
             <h5 className="font-semibold mb-3">Teisinė informacija</h5>
@@ -2616,19 +2719,19 @@ function HomePage() {
                 <span className="inline-flex items-center h-5">kaleddovanos@gmail.com</span>
               </li>
               <li className="flex items-center gap-3 py-1">
-                <img src="https://cdn.simpleicons.org/facebook/FFFFFF" alt="Facebook" className="w-5 h-5 block shrink-0" />
+                <img src="https://cdn.simpleicons.org/facebook/FFFFFF" alt="Facebook" className="w-5 h-5 block shrink-0" loading="lazy" decoding="async" />
                 <a href="https://www.facebook.com/profile.php?id=61583105739917" target="_blank" rel="noopener noreferrer" className="hover:text-white inline-flex items-center h-5">
                   Kalėdų Kampelis
                 </a>
               </li>
               <li className="flex items-center gap-3 py-1">
-                <img src="https://cdn.simpleicons.org/instagram/FFFFFF" alt="Instagram" className="w-5 h-5 block shrink-0" />
+                <img src="https://cdn.simpleicons.org/instagram/FFFFFF" alt="Instagram" className="w-5 h-5 block shrink-0" loading="lazy" decoding="async" />
                 <a href="https://www.instagram.com/kaledukampelis" target="_blank" rel="noopener noreferrer" className="hover:text-white inline-flex items-center h-5">
                   kaledukampelis
                 </a>
               </li>
               <li className="flex items-center gap-3 py-1">
-                <img src="https://cdn.simpleicons.org/tiktok/FFFFFF" alt="TikTok" className="w-5 h-5 block shrink-0" />
+                <img src="https://cdn.simpleicons.org/tiktok/FFFFFF" alt="TikTok" className="w-5 h-5 block shrink-0" loading="lazy" decoding="async" />
                 <a href="https://www.tiktok.com/@kaledukampelis" target="_blank" rel="noopener noreferrer" className="hover:text-white inline-flex items-center h-5">
                   kaledukampelis
                 </a>
@@ -2683,6 +2786,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/apie-mus" element={<ApieMus />} />
+        <Route path="/duk" element={<DUK />} />
         <Route path="/pristatymo-info" element={<PristatymoInfo />} />
         <Route path="/grazinimai" element={<Grazinimai />} />
         <Route path="/privatumo-politika" element={<PrivatumoPolitika />} />
