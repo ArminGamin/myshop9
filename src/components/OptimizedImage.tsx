@@ -13,8 +13,10 @@ type Props = {
   fetchPriority?: "high" | "low" | "auto";
 };
 
-// Renders a <picture> with AVIF/WebP where safely supported (Unsplash),
-// otherwise falls back to a plain <img>. Never breaks image display.
+// Renders a <picture> with AVIF/WebP where safely supported.
+// - For Unsplash: add fm=avif/webp params
+// For local assets, we keep a plain <img> to avoid broken images
+// when format variants are unavailable during development/deploy.
 export default function OptimizedImage({ src, alt, className, width, height, loading = "lazy", decoding = "async", sizes, srcSet, fetchPriority }: Props) {
   const isUnsplash = /images\.unsplash\.com/.test(src);
 

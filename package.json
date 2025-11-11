@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/generate-image-variants.js",
     "build": "vite build --mode production && npm run generate:sitemaps && npm run ping:sitemaps",
     "build:analyze": "vite build --mode production && npx vite-bundle-analyzer dist",
     "preview": "vite preview",
@@ -40,6 +41,7 @@
     "autoprefixer": "^10.4.17",
     "postcss": "^8.4.31",
     "rollup": "^4.52.5",
+    "sharp": "^0.33.4",
     "tailwindcss": "^3.4.13",
     "terser": "^5.44.0",
     "typescript": "^5.3.3",

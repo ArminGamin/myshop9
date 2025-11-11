@@ -9,10 +9,8 @@ const IMAGE_CACHE = `${CACHE_VERSION}-images`;
 // Assets to cache immediately on install
 const STATIC_ASSETS = [
   '/',
-  '/index.html',
   '/manifest.json',
-  '/robots.txt',
-  '/sitemap.xml'
+  '/robots.txt'
 ];
 
 // Cache size limits
@@ -70,6 +68,11 @@ self.addEventListener('fetch', (event) => {
 
   // Skip Chrome extensions and other non-http(s) requests
   if (!request.url.startsWith('http')) {
+    return;
+  }
+
+  // Bypass HTML and XML entirely (no caching for documents/sitemaps)
+  if (request.destination === 'document' || /\.html?($|\?)/i.test(url.pathname) || /\.xml($|\?)/i.test(url.pathname)) {
     return;
   }
 

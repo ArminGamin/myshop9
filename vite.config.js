@@ -16,6 +16,15 @@ export default defineConfig({
     target: 'es2020',
     minify: 'terser',
     // Let Vite handle chunking to preserve correct load order in production
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          stripe: ['@stripe/react-stripe-js', '@stripe/stripe-js'],
+          motion: ['framer-motion']
+        }
+      }
+    },
     terserOptions: {
       compress: {
         drop_console: true,
