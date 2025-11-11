@@ -2777,7 +2777,19 @@ function HomePage() {
 
       {/* Footer */}
       <footer className="relative bg-slate-900 text-white overflow-hidden">
-        <Snowfall position="absolute" zIndex={0} />
+        {/* Defer Snowfall to after first paint to reduce LCP */}
+        {(() => {
+          const [showSnow, setShowSnow] = React.useState(false);
+          React.useEffect(() => {
+            const w: any = typeof window !== 'undefined' ? window : null;
+            if (w && 'requestIdleCallback' in w) {
+              w.requestIdleCallback(() => setShowSnow(true), { timeout: 2000 });
+            } else {
+              setTimeout(() => setShowSnow(true), 1200);
+            }
+          }, []);
+          return showSnow ? <Snowfall position="absolute" zIndex={0} /> : null;
+        })()}
         <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-10 justify-items-center md:justify-items-start text-center md:text-left transform translate-x-1 md:translate-x-2">
           <div>
             <h4 className="font-bold text-lg mb-3">{t.shopName}</h4>
