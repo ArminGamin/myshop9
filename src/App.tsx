@@ -23,8 +23,7 @@ import {
 import { Routes, Route, Link, useNavigate, useLocation } from "react-router-dom";
 import OptimizedImage from "./components/OptimizedImage";
 import { ThankYouModal } from "./components/ThankYouModal";
-import CookieConsent from "./components/CookieConsent";
-import Snowfall from "./components/Snowfall";
+// Loaded on idle via simple state gating below to avoid layout thrash
 import { useCartStore } from "./store/cartStore";
 import { useProductStore } from "./store/productStore";
 import { initialProducts } from "./data/products";
@@ -32,9 +31,11 @@ import { Elements, useStripe, useElements, CardElement } from '@stripe/react-str
 import { loadStripe } from '@stripe/stripe-js';
 import StripeCardSection from './components/StripeCardSection';
 import PayPalButton from './components/PayPalButton';
+import Snowfall from "./components/Snowfall";
+import CookieConsent from "./components/CookieConsent";
 
-const STRIPE_PK = (import.meta as any).env?.VITE_STRIPE_PUBLISHABLE_KEY || '';
-const stripePromise = loadStripe(STRIPE_PK || '');
+const STRIPE_PK = (import.meta as any).env?.VITE_STRIPE_PUBLISHABLE_KEY;
+const stripePromise = STRIPE_PK ? loadStripe(STRIPE_PK) : null;
 
 // Bridge component that exposes a pay() function via ref so parent can trigger payment
 function StripePayBridge({
@@ -916,7 +917,7 @@ function HomePage() {
       onTouchEnd={handleTouchEnd}
     >
       {/* Global snowfall overlay */}
-      <Snowfall position="fixed" zIndex={5} />
+      {showSnow ? <Snowfall position="fixed" zIndex={5} /> : null}
       {/* Sale Banner */}
       <div className="relative bg-gradient-to-r from-red-600 to-green-600 text-white py-2 text-center text-sm sm:text-base font-semibold overflow-hidden">
         <div className="relative tracking-wide">🎁 {t.saleBanner} 🎁</div>
@@ -2235,6 +2236,7 @@ function HomePage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg max-w-5xl w-full max-h-[95vh] overflow-y-auto">
             <div className="p-4">
+              {stripePromise ? (
               <Elements stripe={stripePromise} options={{ appearance: { theme: 'stripe' } }}>
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold">Apmokėjimas</h2>
@@ -2487,7 +2489,8 @@ function HomePage() {
                       items={cartItems.map((it: any) => ({
                         name: it.name,
                         quantity: Number(it.quantity || 1),
-                        price: Number(it.price)
+                        price: Number(it.price),
+                        selectedColor: it.selectedColor || ''
                       }))}
                     />
                   </div>
@@ -2594,7 +2597,8 @@ function HomePage() {
                               items: cartItems.map((it: any) => ({
                                 name: it.name,
                                 quantity: Number(it.quantity || 1),
-                                price: Number(it.price)
+                                price: Number(it.price),
+                                selectedColor: it.selectedColor || ''
                               }))
                             })
                           });
@@ -2684,6 +2688,13 @@ function HomePage() {
                 </div>
               </div>
               </Elements>
+              ) : (
+                <div className="text-center">
+                  <p className="text-sm text-red-600 font-semibold">
+                    Kortelių mokėjimai laikinai nepasiekiami (neteisingas Stripe raktas).
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>

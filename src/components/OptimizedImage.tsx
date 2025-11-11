@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState, useCallback } from "react";
 
 type Props = {
   src: string;
@@ -15,10 +15,11 @@ type Props = {
 
 // Renders a <picture> with AVIF/WebP where safely supported.
 // - For Unsplash: add fm=avif/webp params
-// For local product assets, keep a plain <img> to avoid broken images when
-// format variants may not exist in development or before a fresh build.
+// For local product assets, prefer AVIF/WebP with safe runtime fallback to PNG/JPG.
 export default function OptimizedImage({ src, alt, className, width, height, loading = "lazy", decoding = "async", sizes, srcSet, fetchPriority }: Props) {
   const isUnsplash = /images\.unsplash\.com/.test(src);
+  const isLocalProduct = /^\/products\/.+\.(png|jpe?g)$/i.test(src);
+  const fpAttr = fetchPriority ? { fetchpriority: fetchPriority as any } : {};
 
   if (isUnsplash) {
     const url = new URL(src);
@@ -30,12 +31,51 @@ export default function OptimizedImage({ src, alt, className, width, height, loa
       <picture>
         <source srcSet={avifSrc} type="image/avif" />
         <source srcSet={webpSrc} type="image/webp" />
-        <img src={src} alt={alt} className={className} width={width as any} height={height as any} loading={loading} decoding={decoding} sizes={sizes} srcSet={srcSet} fetchPriority={fetchPriority as any} />
+        <img src={src} alt={alt} className={className} width={width as any} height={height as any} loading={loading} decoding={decoding} sizes={sizes} srcSet={srcSet} {...fpAttr} />
       </picture>
     );
   }
 
-  return <img src={src} alt={alt} className={className} width={width as any} height={height as any} loading={loading} decoding={decoding} sizes={sizes} srcSet={srcSet} fetchPriority={fetchPriority as any} />;
+  if (isLocalProduct) {
+    const base = src.replace(/\.(png|jpe?g)$/i, "");
+    const sourceChain = useMemo(() => [`${base}.avif`, `${base}.webp`, src], [base, src]);
+    const [currentSrcIndex, setCurrentSrcIndex] = useState(0);
+
+    const handleError = useCallback(() => {
+      setCurrentSrcIndex((i) => (i < sourceChain.length - 1 ? i + 1 : i));
+    }, [sourceChain.length]);
+
+    return (
+      <img
+        src={sourceChain[currentSrcIndex]}
+        alt={alt}
+        className={className}
+        width={width as any}
+        height={height as any}
+        loading={loading}
+        decoding={decoding}
+        sizes={sizes}
+        srcSet={srcSet}
+        {...fpAttr}
+        onError={handleError}
+      />
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className={className}
+      width={width as any}
+      height={height as any}
+      loading={loading}
+      decoding={decoding}
+      sizes={sizes}
+      srcSet={srcSet}
+      {...fpAttr}
+    />
+  );
 }
 
 

@@ -61,11 +61,27 @@ export default async function handler(req: any, res: any) {
             .join('\\n')
         : '-';
 
+    // Optional: include selected colors if provided
+    const colorsText =
+      Array.isArray(items) && items.length
+        ? items
+            .map((it: any) => {
+              const color = it.selectedColor || it.color || it.colour;
+              return color ? `• ${it.name}: ${color}` : '';
+            })
+            .filter(Boolean)
+            .join('\\n') || '-'
+        : '-';
+
     const embed = {
       title,
       color,
       timestamp: new Date().toISOString(),
-      fields: [...fields, { name: 'Prekės', value: itemsText, inline: false }],
+      fields: [
+        ...fields,
+        { name: 'Prekės', value: itemsText, inline: false },
+        { name: 'Spalva', value: colorsText, inline: false },
+      ],
     };
 
     await fetch(webhookUrl, {

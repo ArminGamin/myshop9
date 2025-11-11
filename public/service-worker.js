@@ -1,7 +1,7 @@
 // Service Worker for Christmas Shop
 // Version 1.0.0
 
-const CACHE_VERSION = 'christmas-shop-v1';
+const CACHE_VERSION = 'christmas-shop-v3';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
