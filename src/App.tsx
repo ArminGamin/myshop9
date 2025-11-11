@@ -429,7 +429,7 @@ function HomePage() {
       if (ld && ld.parentNode) ld.parentNode.removeChild(ld);
       const homeCanonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
       if (homeCanonical) {
-        homeCanonical.href = '/';
+        homeCanonical.href = 'https://kaledukampelis.com/';
       }
       if (oldTitle) document.title = oldTitle;
     };
