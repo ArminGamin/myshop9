@@ -20,7 +20,7 @@ import {
   Users,
   AlertTriangle,
 } from "lucide-react";
-import { Routes, Route, Link, useNavigate, useLocation } from "react-router-dom";
+import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import { ThankYouModal } from "./components/ThankYouModal";
 import OptimizedImage from "./components/OptimizedImage";
 import Snowfall from "./components/Snowfall";
@@ -312,7 +312,6 @@ const PageWrapper = ({
 
 // --- Main Shop Page ---
 function HomePage() {
-  const location = useLocation();
   const { items: cartItems, totalItems, totalPrice, addItem, removeItem, updateQuantity, clearCart } = useCartStore();
   const { products, setProducts } = useProductStore();
   const [cartOpen, setCartOpen] = useState(false);
@@ -359,81 +358,7 @@ function HomePage() {
     return subtotalCents + shippingCents + giftWrapCents;
   }, [cartItems, isFreeShipping, giftWrapping]);
 
-  // Open product modal on /p/:id and inject per-product head tags
-  useEffect(() => {
-    const match = location.pathname.match(/^\/p\/(\d+)/);
-    if (match && products && products.length > 0) {
-      const idNum = Number(match[1]);
-      const p = products.find((pp: any) => pp.id === idNum);
-      if (p) {
-        setSelectedProduct(p);
-        setSelectedImageIndex(0);
-        setSelectedColor(0);
-        setSelectedSize(0);
-        setSelectedSizesByGroup(p.sizeGroups ? p.sizeGroups.map(() => 0) : []);
-        setQuantity(1);
-        setProductModalOpen(true);
-      }
-    }
-  }, [location.pathname, products]);
-
-  useEffect(() => {
-    let ld: HTMLScriptElement | null = null;
-    let canonicalEl: HTMLLinkElement | null = null;
-    let oldTitle: string | null = null;
-    let metaDesc: HTMLMetaElement | null = null;
-    if (productModalOpen && selectedProduct) {
-      const url = `https://kaledukampelis.com/p/${selectedProduct.id}`;
-      oldTitle = document.title;
-      document.title = `${selectedProduct.name} – Kalėdų Kampelis`;
-      metaDesc = document.querySelector('meta[name="description"]');
-      if (metaDesc) {
-        metaDesc.setAttribute('content', String(selectedProduct.description || 'Kalėdų dekoracijos ir dovanos.'));
-      }
-      canonicalEl = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
-      if (!canonicalEl) {
-        canonicalEl = document.createElement('link');
-        canonicalEl.rel = 'canonical';
-        document.head.appendChild(canonicalEl);
-      }
-      canonicalEl.href = url;
-
-      ld = document.createElement('script');
-      ld.type = 'application/ld+json';
-      ld.text = JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "Product",
-        "@id": url,
-        name: selectedProduct.name,
-        image: selectedProduct.images || [selectedProduct.image],
-        description: selectedProduct.description,
-        brand: { "@type": "Brand", name: "Kalėdų Kampelis" },
-        offers: {
-          "@type": "Offer",
-          price: selectedProduct.price,
-          priceCurrency: "EUR",
-          availability: "https://schema.org/InStock",
-          priceValidUntil: "2025-12-31"
-        },
-        aggregateRating: {
-          "@type": "AggregateRating",
-          ratingValue: selectedProduct.rating,
-          reviewCount: selectedProduct.reviews,
-          bestRating: 5,
-          worstRating: 1
-        }
-      });
-      document.head.appendChild(ld);
-    }
-    return () => {
-      if (ld && ld.parentNode) ld.parentNode.removeChild(ld);
-      const homeCanonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
-      if (homeCanonical) {
-        homeCanonical.href = 'https://kaledukampelis.com/';
-      }
-      if (oldTitle) document.title = oldTitle;
-    };
-  }, [productModalOpen, selectedProduct]);
+  // Per-route SEO injection removed per request
   const [checkoutFormData, setCheckoutFormData] = useState({
     email: '',
     name: '',
@@ -1407,12 +1332,12 @@ function HomePage() {
                   src={product.image}
                   alt={`${product.name} - Premium Kalėdų dekoracija | Kalėdų Kampelis`}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  loading={index === 0 ? 'eager' : 'lazy'}
+                  loading="lazy"
                   decoding="async"
                     width={800}
                     height={600}
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    fetchPriority={index === 0 ? 'high' : 'auto'}
+                    fetchPriority="auto"
                 />
               </div>
               <div className="p-4 sm:p-5 flex-1 flex flex-col">
@@ -2777,19 +2702,7 @@ function HomePage() {
 
       {/* Footer */}
       <footer className="relative bg-slate-900 text-white overflow-hidden">
-        {/* Defer Snowfall to after first paint to reduce LCP */}
-        {(() => {
-          const [showSnow, setShowSnow] = React.useState(false);
-          React.useEffect(() => {
-            const w: any = typeof window !== 'undefined' ? window : null;
-            if (w && 'requestIdleCallback' in w) {
-              w.requestIdleCallback(() => setShowSnow(true), { timeout: 2000 });
-            } else {
-              setTimeout(() => setShowSnow(true), 1200);
-            }
-          }, []);
-          return showSnow ? <Snowfall position="absolute" zIndex={0} /> : null;
-        })()}
+        <Snowfall position="absolute" zIndex={0} />
         <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-10 justify-items-center md:justify-items-start text-center md:text-left transform translate-x-1 md:translate-x-2">
           <div>
             <h4 className="font-bold text-lg mb-3">{t.shopName}</h4>
@@ -2901,7 +2814,6 @@ export default function App() {
     }>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/p/:id" element={<HomePage />} />
         <Route path="/apie-mus" element={<ApieMus />} />
         <Route path="/duk" element={<DUK />} />
         <Route path="/pristatymo-info" element={<PristatymoInfo />} />

@@ -82,7 +82,7 @@ const productsXml = `<?xml version="1.0" encoding="UTF-8"?>
     .map(
       (id) => `
   <url>
-    <loc>${SITE_ORIGIN}/p/${id}</loc>
+    <loc>${SITE_ORIGIN}/?product=${id}</loc>
     <lastmod>${today}</lastmod>
   </url>`
     )

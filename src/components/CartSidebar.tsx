@@ -107,7 +107,7 @@ linear-gradient(to top, rgba(254,242,242,1) 0%, rgba(255,255,255,0) 65%)',
               <div className="space-y-4 mb-6">
                 {cartItems.map((item) => (
                   <div key={item.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                    <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded" width={64} height={64} loading="lazy" decoding="async" />
+                    <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded" loading="lazy" />
                     <div className="flex-1">
                       <h3 className="font-medium text-sm">{item.name}</h3>
                       {item.selectedColor && <p className="text-xs text-gray-500">Spalva: {item.selectedColor}</p>}

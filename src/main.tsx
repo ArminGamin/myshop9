@@ -35,48 +35,7 @@ if (import.meta.env.PROD) {
   (window as any).fbq('track', 'PageView');
 }
 
-// Core Web Vitals monitoring
-function reportWebVitals(metric: any) {
-  if (import.meta.env.PROD) {
-    // Send to analytics
-    if ((window as any).gtag) {
-      (window as any).gtag('event', metric.name, {
-        event_category: 'Web Vitals',
-        event_label: metric.id,
-        value: Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),
-        non_interaction: true,
-      });
-    }
-  }
-}
-
-// Monitor performance
-if (import.meta.env.PROD) {
-  import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-    getCLS(reportWebVitals);
-    getFID(reportWebVitals);
-    getFCP(reportWebVitals);
-    getLCP(reportWebVitals);
-    getTTFB(reportWebVitals);
-  }).catch(() => {
-    // Silently fail if web-vitals is not available
-  });
-}
-
-// Capture UTM params for attribution
-(() => {
-  try {
-    const params = new URLSearchParams(window.location.search);
-    const utm = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'].reduce((acc, key) => {
-      const v = params.get(key);
-      if (v) acc[key] = v;
-      return acc;
-    }, {} as Record<string,string>);
-    if (Object.keys(utm).length) {
-      localStorage.setItem('utm_attribution', JSON.stringify({ ...utm, ts: Date.now() }));
-    }
-  } catch {}
-})();
+// RUM and UTM tracking removed per request
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
