@@ -55,8 +55,9 @@
     <!-- Removed dev-only preloads for production build -->
     
     <!-- Preloads removed (restore pre-optimization state) -->
-    <!-- Preload default image for 'Kalėdinis Megztinis' to improve perceived speed on mobile -->
-    <link rel="preload" as="image" href="/products/megztiniai/red.png" fetchpriority="high" />
+    <!-- Preload hero image (local) for faster LCP -->
+    <link rel="preload" as="image" href="/products/megztiniai/red.webp" type="image/webp" fetchpriority="high" />
+    <link rel="preload" as="image" href="/products/megztiniai/red.png" type="image/png" fetchpriority="high" />
     
     <!-- Google Website Translator will be lazy-loaded on demand -->
 
