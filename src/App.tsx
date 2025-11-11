@@ -2126,8 +2126,13 @@ function HomePage() {
                         : (selectedProduct.pricesBySize && selectedProduct.pricesBySize[selectedSize] !== undefined)
                           ? selectedProduct.pricesBySize[selectedSize]
                         : (typeof selectedProduct.price === 'number' ? selectedProduct.price : parseFloat(selectedProduct.price));
-                      const imagesListForCart = selectedProduct.imagesBySize ? (selectedProduct.imagesBySize[selectedSize] || selectedProduct.images) : selectedProduct.images;
-                      const imageUrl = imagesListForCart?.[selectedImageIndex] || selectedProduct.image;
+                      const imagesListForCart =
+                        selectedProduct.imagesBySize
+                          ? (selectedProduct.imagesBySize[selectedSize] || selectedProduct.images)
+                          : (selectedProduct.imagesByColor
+                              ? (selectedProduct.imagesByColor[selectedColor] || selectedProduct.images)
+                              : selectedProduct.images);
+                      const imageUrl = (imagesListForCart && imagesListForCart[selectedImageIndex]) || imagesListForCart?.[0] || selectedProduct.image;
                       const selectedSizeText = (selectedProduct.sizeGroups && selectedProduct.sizeGroups.length > 0)
                         ? selectedProduct.sizeGroups.map((group: any, gIndex: number) => {
                             const sIdx = selectedSizesByGroup[gIndex] ?? 0;
