@@ -76,6 +76,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Do not intercept hero images (ensure direct network path)
+  if (request.destination === 'image' && /^\/products\/megztiniai\//.test(url.pathname)) {
+    return;
+  }
+
   // Handle different types of requests with appropriate strategies
   if (isImageRequest(request)) {
     event.respondWith(handleImageRequest(request));
