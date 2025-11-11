@@ -54,6 +54,9 @@
         }
       ]
     }
+  ],
+  "crons": [
+    { "path": "/api/ping-sitemaps", "schedule": "0 6 * * *" }
   ]
 }
 

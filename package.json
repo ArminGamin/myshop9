@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build --mode production",
+    "build": "vite build --mode production && npm run generate:sitemaps && npm run ping:sitemaps",
     "build:analyze": "vite build --mode production && npx vite-bundle-analyzer dist",
     "preview": "vite preview",
-    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "generate:sitemaps": "node scripts/generate-sitemaps.js",
+    "ping:sitemaps": "node scripts/ping-sitemaps.js"
   },
   "dependencies": {
     "@stripe/react-stripe-js": "^2.2.0",
