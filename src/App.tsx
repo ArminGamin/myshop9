@@ -900,13 +900,33 @@ function HomePage() {
             description: p.description,
             sku: `KK-${p.id}`,
             brand: { "@type": "Brand", name: "Kalėdų Kampelis" },
-            url: `${typeof window !== 'undefined' ? window.location.origin : 'https://kaledukampelis.com'}/?product=${p.id}`,
+            url: `https://kaledukampelis.com/?product=${p.id}`,
             offers: {
               "@type": "Offer",
               price: p.price,
               priceCurrency: "EUR",
               availability: "https://schema.org/InStock",
-              priceValidUntil: "2025-12-31"
+              priceValidUntil: "2025-12-31",
+              shippingDetails: {
+                "@type": "OfferShippingDetails",
+                "shippingRate": { "@type": "MonetaryAmount", "value": "2.99", "currency": "EUR" },
+                "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "LT" },
+                "deliveryTime": {
+                  "@type": "ShippingDeliveryTime",
+                  "handlingTime": { "@type": "QuantitativeValue", "minValue": 1, "maxValue": 2, "unitCode": "d" },
+                  "transitTime": { "@type": "QuantitativeValue", "minValue": 8, "maxValue": 12, "unitCode": "d" }
+                }
+              },
+              hasMerchantReturnPolicy: {
+                "@type": "MerchantReturnPolicy",
+                "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+                "merchantReturnDays": 30,
+                "applicableCountry": "LT",
+                "returnMethod": "https://schema.org/ReturnByMail",
+                "returnFees": "https://schema.org/FreeReturn",
+                "refundType": "https://schema.org/FullRefund",
+                "returnPolicyUrl": "https://kaledukampelis.com/grazinimai"
+              }
             },
             aggregateRating: {
               "@type": "AggregateRating",
