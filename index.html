@@ -113,369 +113,7 @@
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
     
-    <!-- Enhanced Structured Data - Organization & Store (lazy injected) -->
-    <script type="application/json" data-lazy-json>
-    {
-      "@context": "https://schema.org",
-      "@type": ["Store", "OnlineStore", "Organization"],
-      "@id": "https://kaledukampelis.com/#organization",
-      "name": "Kalėdų Kampelis",
-      "alternateName": "Christmas Corner",
-      "legalName": "Kalėdų Kampelis UAB",
-      "description": "Premium Kalėdų dekoracijų parduotuvė su išskirtiniais produktais ir nuolaidomis. Transformuokite savo namus šioms Kalėdoms!",
-      "url": "https://kaledukampelis.com",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://kaledukampelis.com/logo.png",
-        "width": "250",
-        "height": "60"
-      },
-      "image": {
-        "@type": "ImageObject",
-        "url": "https://kaledukampelis.com/logo.png?v=3",
-        "width": "1200",
-        "height": "630"
-      },
-      "telephone": "+37060523397",
-      "email": "kaleddovanos@gmail.com",
-      "address": {
-        "@type": "PostalAddress",
-        "addressCountry": "LT",
-        "addressRegion": "Vilnius",
-        "addressLocality": "Vilnius"
-      },
-      "openingHours": "Mo-Su 00:00-23:59",
-      "priceRange": "€6-€40",
-      "currenciesAccepted": "EUR",
-      "paymentAccepted": ["Cash", "Credit Card", "Debit Card", "PayPal", "Bank Transfer"],
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.7",
-        "reviewCount": "1247",
-        "bestRating": "5",
-        "worstRating": "1"
-      },
-      "foundingDate": "2020",
-      "slogan": "Transformuokite Savo Namus Šioms Kalėdoms",
-      "hasOfferCatalog": {
-        "@type": "OfferCatalog",
-        "name": "Kalėdų dekoracijos",
-        "description": "Premium Kalėdų dekoracijų kolekcija su LED apšvietimu",
-        "itemListElement": [
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Product",
-              "name": "Kalėdinis namelis su LED apšvietimu",
-              "description": "Sukurkite šiltą, šventinę atmosferą su šiuo gražiu LED apšviestu nameliu. Vandeniui atsparus, saugus naudojimas.",
-              "image": "https://images.unsplash.com/photo-1543589077-47d81606c1bf?w=900&q=80&auto=format&fit=crop",
-              "brand": {
-                "@type": "Brand",
-                "name": "Kalėdų Kampelis"
-              },
-              "category": "Kalėdų dekoracijos",
-              "aggregateRating": {
-                "@type": "AggregateRating",
-                "ratingValue": "4.8",
-                "reviewCount": "234"
-              }
-            },
-            "price": "12.99",
-            "priceCurrency": "EUR",
-            "availability": "https://schema.org/InStock",
-            "validFrom": "2024-01-01",
-            "priceValidUntil": "2025-12-31",
-            "seller": {
-              "@type": "Organization",
-              "name": "Kalėdų Kampelis"
-            }
-          }
-        ]
-      },
-      "sameAs": [
-        "https://www.facebook.com/kaledukampelis",
-        "https://www.instagram.com/kaledukampelis",
-        "https://www.tiktok.com/@kaledukampelis"
-      ],
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": {
-          "@type": "EntryPoint",
-          "urlTemplate": "https://kaledukampelis.com/?search={search_term_string}"
-        },
-        "query-input": "required name=search_term_string"
-      }
-    }
-    </script>
-
-    <!-- WebSite Schema (lazy injected) -->
-    <script type="application/json" data-lazy-json>
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "@id": "https://kaledukampelis.com/#website",
-      "url": "https://kaledukampelis.com",
-      "name": "Kalėdų Kampelis - Premium Kalėdų Dekoracijos",
-      "description": "Atraskite mūsų išskirtinę premium Kalėdų dekoracijų kolekciją",
-      "publisher": {
-        "@id": "https://kaledukampelis.com/#organization"
-      },
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": {
-          "@type": "EntryPoint",
-          "urlTemplate": "https://kaledukampelis.com/?search={search_term_string}"
-        },
-        "query-input": "required name=search_term_string"
-      },
-      "inLanguage": "lt-LT"
-    }
-    </script>
-
-    <!-- BreadcrumbList Schema (lazy injected) -->
-    <script type="application/json" data-lazy-json>
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Pagrindinis",
-          "item": "https://kaledukampelis.com"
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Kalėdų Dekoracijos",
-          "item": "https://kaledukampelis.com/#products"
-        }
-      ]
-    }
-    </script>
-
-    <!-- Product Collection Schema (lazy injected) -->
-    <script type="application/json" data-lazy-json>
-    {
-      "@context": "https://schema.org",
-      "@type": "ItemList",
-      "name": "Kalėdų dekoracijų kolekcija",
-      "description": "Geriausi Kalėdų dekoracijų pasiūlymai su nuolaidomis",
-      "numberOfItems": 6,
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "item": {
-            "@type": "Product",
-            "@id": "https://kaledukampelis.com/#product-led-house",
-            "name": "Kalėdinis namelis su LED apšvietimu",
-            "description": "Sukurkite šiltą, šventinę atmosferą su šiuo gražiu LED apšviestu nameliu",
-            "image": "https://images.unsplash.com/photo-1543589077-47d81606c1bf?w=900&q=80&auto=format&fit=crop",
-            "brand": {
-              "@type": "Brand",
-              "name": "Kalėdų Kampelis"
-            },
-            "sku": "KK-LED-001",
-            "category": "Kalėdų dekoracijos",
-            "offers": {
-              "@type": "Offer",
-              "price": "12.99",
-              "priceCurrency": "EUR",
-              "availability": "https://schema.org/InStock",
-              "priceValidUntil": "2025-12-31",
-              "itemCondition": "https://schema.org/NewCondition",
-              "seller": {
-                "@id": "https://kaledukampelis.com/#organization"
-              }
-            },
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": "4.8",
-              "reviewCount": "234",
-              "bestRating": "5",
-              "worstRating": "1"
-            }
-          }
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "item": {
-            "@type": "Product",
-            "@id": "https://kaledukampelis.com/#product-ornaments",
-            "name": "Kalėdinių žaisliukų rinkinys (24 vnt.)",
-            "description": "Premium stiklinių žaisliukų rinkinys su aukso akcentais",
-            "image": "https://images.unsplash.com/photo-1512389142860-9c449e58a543?w=900&q=80&auto=format&fit=crop",
-            "brand": {
-              "@type": "Brand",
-              "name": "Kalėdų Kampelis"
-            },
-            "sku": "KK-ORN-024",
-            "category": "Kalėdų žaisliukai",
-            "offers": {
-              "@type": "Offer",
-              "price": "18.99",
-              "priceCurrency": "EUR",
-              "availability": "https://schema.org/InStock",
-              "priceValidUntil": "2025-12-31",
-              "itemCondition": "https://schema.org/NewCondition",
-              "seller": {
-                "@id": "https://kaledukampelis.com/#organization"
-              }
-            },
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": "4.9",
-              "reviewCount": "189",
-              "bestRating": "5",
-              "worstRating": "1"
-            }
-          }
-        },
-        {
-          "@type": "ListItem",
-          "position": 3,
-          "item": {
-            "@type": "Product",
-            "@id": "https://kaledukampelis.com/#product-wreath",
-            "name": "Kalėdinė girlianda su eglės šakomis",
-            "description": "Natūralaus išvaizdos girlianda su LED apšvietimu",
-            "image": "https://images.unsplash.com/photo-1577305333874-2d4c8c64e6b5?w=900&q=80&auto=format&fit=crop",
-            "brand": {
-              "@type": "Brand",
-              "name": "Kalėdų Kampelis"
-            },
-            "sku": "KK-WRT-001",
-            "category": "Kalėdų girliandos",
-            "offers": {
-              "@type": "Offer",
-              "price": "24.99",
-              "priceCurrency": "EUR",
-              "availability": "https://schema.org/InStock",
-              "priceValidUntil": "2025-12-31",
-              "itemCondition": "https://schema.org/NewCondition",
-              "seller": {
-                "@id": "https://kaledukampelis.com/#organization"
-              }
-            },
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": "4.7",
-              "reviewCount": "156",
-              "bestRating": "5",
-              "worstRating": "1"
-            }
-          }
-        },
-        {
-          "@type": "ListItem",
-          "position": 4,
-          "item": {
-            "@type": "Product",
-            "@id": "https://kaledukampelis.com/#product-lights",
-            "name": "LED girlianda šiltai balta (300 LED)",
-            "description": "Energiją taupanti LED girlianda su 8 švietimo režimais",
-            "image": "https://images.unsplash.com/photo-1512389098783-66b81f86e199?w=900&q=80&auto=format&fit=crop",
-            "brand": {
-              "@type": "Brand",
-              "name": "Kalėdų Kampelis"
-            },
-            "sku": "KK-LED-300",
-            "category": "LED apšvietimas",
-            "offers": {
-              "@type": "Offer",
-              "price": "29.99",
-              "priceCurrency": "EUR",
-              "availability": "https://schema.org/InStock",
-              "priceValidUntil": "2025-12-31",
-              "itemCondition": "https://schema.org/NewCondition",
-              "seller": {
-                "@id": "https://kaledukampelis.com/#organization"
-              }
-            },
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": "4.6",
-              "reviewCount": "278",
-              "bestRating": "5",
-              "worstRating": "1"
-            }
-          }
-        },
-        {
-          "@type": "ListItem",
-          "position": 5,
-          "item": {
-            "@type": "Product",
-            "@id": "https://kaledukampelis.com/#product-advent",
-            "name": "Kalėdų advento kalendorius",
-            "description": "24 langelių advento kalendorius su nuostabiais ornamentais",
-            "image": "https://images.unsplash.com/photo-1544986581-efac024faf62?w=900&q=80&auto=format&fit=crop",
-            "brand": {
-              "@type": "Brand",
-              "name": "Kalėdų Kampelis"
-            },
-            "sku": "KK-ADV-024",
-            "category": "Advento kalendoriai",
-            "offers": {
-              "@type": "Offer",
-              "price": "34.99",
-              "priceCurrency": "EUR",
-              "availability": "https://schema.org/InStock",
-              "priceValidUntil": "2025-12-31",
-              "itemCondition": "https://schema.org/NewCondition",
-              "seller": {
-                "@id": "https://kaledukampelis.com/#organization"
-              }
-            },
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": "4.9",
-              "reviewCount": "312",
-              "bestRating": "5",
-              "worstRating": "1"
-            }
-          }
-        },
-        {
-          "@type": "ListItem",
-          "position": 6,
-          "item": {
-            "@type": "Product",
-            "@id": "https://kaledukampelis.com/#product-mug",
-            "name": "Kalėdinis puodelis su rankena",
-            "description": "Premium keramikinis puodelis su kalėdine tema",
-            "image": "https://images.unsplash.com/photo-1514517521153-1be72277b32f?w=900&q=80&auto=format&fit=crop",
-            "brand": {
-              "@type": "Brand",
-              "name": "Kalėdų Kampelis"
-            },
-            "sku": "KK-MUG-001",
-            "category": "Kalėdiniai puodeliai",
-            "offers": {
-              "@type": "Offer",
-              "price": "9.99",
-              "priceCurrency": "EUR",
-              "availability": "https://schema.org/InStock",
-              "priceValidUntil": "2025-12-31",
-              "itemCondition": "https://schema.org/NewCondition",
-              "seller": {
-                "@id": "https://kaledukampelis.com/#organization"
-              }
-            },
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": "4.5",
-              "reviewCount": "198",
-              "bestRating": "5",
-              "worstRating": "1"
-            }
-          }
-        }
-      ]
-    }
-    </script>
+    <!-- Removed legacy lazy JSON-LD blocks in favor of consolidated @graph below -->
 
     <!-- FAQ Schema moved into main @graph for rich results -->
 
@@ -508,6 +146,14 @@
           "@id": "https://kaledukampelis.com/#organization",
           "name": "Kalėdų Kampelis",
           "url": "https://kaledukampelis.com/",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Vilniaus g. 10",
+            "postalCode": "LT-01100",
+            "addressLocality": "Vilnius",
+            "addressRegion": "Vilniaus m.",
+            "addressCountry": "LT"
+          },
           "logo": "https://kaledukampelis.com/logo.png?v=3",
           "sameAs": [
             "https://www.facebook.com/profile.php?id=61583105739917"
@@ -532,11 +178,26 @@
             "https://kaledukampelis.com/products/megztiniai/navy.png"
           ],
           "brand": { "@type": "Brand", "name": "Kalėdų Kampelis" },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "reviewCount": "42",
+            "bestRating": "5",
+            "worstRating": "1"
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
+              "author": { "@type": "Person", "name": "Klientas" }
+            }
+          ],
           "offers": {
             "@type": "Offer",
             "price": "19.99",
             "priceCurrency": "EUR",
             "availability": "https://schema.org/InStock",
+            "priceValidUntil": "2025-12-31",
             "url": "https://kaledukampelis.com/"
           }
         },

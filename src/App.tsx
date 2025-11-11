@@ -900,11 +900,13 @@ function HomePage() {
             description: p.description,
             sku: `KK-${p.id}`,
             brand: { "@type": "Brand", name: "Kalėdų Kampelis" },
+            url: `${typeof window !== 'undefined' ? window.location.origin : 'https://kaledukampelis.com'}/?product=${p.id}`,
             offers: {
               "@type": "Offer",
               price: p.price,
               priceCurrency: "EUR",
-              availability: "https://schema.org/InStock"
+              availability: "https://schema.org/InStock",
+              priceValidUntil: "2025-12-31"
             },
             aggregateRating: {
               "@type": "AggregateRating",
