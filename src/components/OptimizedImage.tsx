@@ -15,8 +15,8 @@ type Props = {
 
 // Renders a <picture> with AVIF/WebP where safely supported.
 // - For Unsplash: add fm=avif/webp params
-// For local assets, we keep a plain <img> to avoid broken images
-// when format variants are unavailable during development/deploy.
+// For local product assets, keep a plain <img> to avoid broken images when
+// format variants may not exist in development or before a fresh build.
 export default function OptimizedImage({ src, alt, className, width, height, loading = "lazy", decoding = "async", sizes, srcSet, fetchPriority }: Props) {
   const isUnsplash = /images\.unsplash\.com/.test(src);
 

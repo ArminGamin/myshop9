@@ -22,9 +22,9 @@ import {
 } from "lucide-react";
 import { Routes, Route, Link, useNavigate, useLocation } from "react-router-dom";
 import OptimizedImage from "./components/OptimizedImage";
-const ThankYouModal = lazy(() => import("./components/ThankYouModal").then(m => ({ default: m.ThankYouModal })));
-const CookieConsent = lazy(() => import("./components/CookieConsent"));
-const SnowfallLazy = lazy(() => import("./components/Snowfall"));
+import { ThankYouModal } from "./components/ThankYouModal";
+import CookieConsent from "./components/CookieConsent";
+import Snowfall from "./components/Snowfall";
 import { useCartStore } from "./store/cartStore";
 import { useProductStore } from "./store/productStore";
 import { initialProducts } from "./data/products";
@@ -2738,7 +2738,7 @@ function HomePage() {
 
       {/* Footer */}
       <footer className="relative bg-slate-900 text-white overflow-hidden">
-        {showSnow ? <SnowfallLazy position="absolute" zIndex={0} /> : null}
+        {showSnow ? <Snowfall position="absolute" zIndex={0} /> : null}
         <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-10 justify-items-center md:justify-items-start text-center md:text-left transform translate-x-1 md:translate-x-2">
           <div>
             <h4 className="font-bold text-lg mb-3">{t.shopName}</h4>

@@ -13,12 +13,11 @@ async function ensureVariant(srcPath, formatExt) {
   const out = path.join(dir, `${base}.${formatExt}`);
   if (fs.existsSync(out)) return;
   try {
-    const stat = fs.statSync(srcPath);
-    // Resize/compress large images aggressively
-    const isHero = /megztiniai\/red\./i.test(srcPath);
+    // Resize/compress to reasonable bounds for web; keep hero slightly larger
+    const isHero = /megztiniai\/red\.(png|jpe?g)$/i.test(srcPath);
     const maxWidth = isHero ? 1600 : 1200;
     const maxHeight = isHero ? 1200 : 900;
-    const quality = formatExt === 'webp' ? 78 : 55; // avif file size is smaller at lower quality
+    const quality = formatExt === 'webp' ? 80 : 55; // avif can be lower quality visually similar
 
     const pipeline = sharp(srcPath).resize({ width: maxWidth, height: maxHeight, fit: 'inside', withoutEnlargement: true });
     await pipeline.toFormat(formatExt === 'webp' ? 'webp' : 'avif', { quality }).toFile(out);
@@ -39,14 +38,9 @@ async function walk(dir) {
     if (ent.isDirectory()) {
       await walk(p);
     } else if (ent.isFile() && isRaster(ent.name)) {
-      // Only generate for images >= 300KB (others are already small)
-      try {
-        const { size } = fs.statSync(p);
-        if (size >= 300 * 1024) {
-          await ensureVariant(p, 'webp');
-          await ensureVariant(p, 'avif');
-        }
-      } catch {}
+      // Always generate WebP/AVIF neighbors for each raster image
+      await ensureVariant(p, 'webp');
+      await ensureVariant(p, 'avif');
     }
   }
 }
