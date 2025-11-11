@@ -21,10 +21,10 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { Routes, Route, Link, useNavigate, useLocation } from "react-router-dom";
-import { ThankYouModal } from "./components/ThankYouModal";
 import OptimizedImage from "./components/OptimizedImage";
-import Snowfall from "./components/Snowfall";
-import CookieConsent from "./components/CookieConsent";
+const ThankYouModal = lazy(() => import("./components/ThankYouModal").then(m => ({ default: m.ThankYouModal })));
+const CookieConsent = lazy(() => import("./components/CookieConsent"));
+const SnowfallLazy = lazy(() => import("./components/Snowfall"));
 import { useCartStore } from "./store/cartStore";
 import { useProductStore } from "./store/productStore";
 import { initialProducts } from "./data/products";
@@ -340,6 +340,9 @@ function HomePage() {
   const [thankYouModalOpen, setThankYouModalOpen] = useState(false);
   const [completedOrderNumber, setCompletedOrderNumber] = useState('');
   const [completedOrderEmail, setCompletedOrderEmail] = useState('');
+  // Non-critical visuals deferred to idle
+  const [showSnow, setShowSnow] = useState(false);
+  const [showCookie, setShowCookie] = useState(false);
   // Free shipping threshold uses FLOOR of subtotal cents (no rounding up to qualify)
   const freeShippingCents = 3000; // €30.00
   const subtotalCentsFloor = useMemo(() => (
@@ -358,6 +361,20 @@ function HomePage() {
     const giftWrapCents = giftWrapping ? 299 : 0;   // €2.99 gift wrap (if enabled)
     return subtotalCents + shippingCents + giftWrapCents;
   }, [cartItems, isFreeShipping, giftWrapping]);
+
+  // Defer some non-critical UI to idle to reduce main-thread contention
+  useEffect(() => {
+    const w = typeof window !== 'undefined' ? (window as any) : null;
+    const schedule = (fn: () => void, timeout = 1500) => {
+      if (w && 'requestIdleCallback' in w) {
+        w.requestIdleCallback(fn, { timeout });
+      } else {
+        setTimeout(fn, timeout);
+      }
+    };
+    schedule(() => setShowSnow(true), 1200);
+    schedule(() => setShowCookie(true), 1000);
+  }, []);
 
   // Open product modal for /p/:id paths
   useEffect(() => {
@@ -2721,7 +2738,7 @@ function HomePage() {
 
       {/* Footer */}
       <footer className="relative bg-slate-900 text-white overflow-hidden">
-        <Snowfall position="absolute" zIndex={0} />
+        {showSnow ? <SnowfallLazy position="absolute" zIndex={0} /> : null}
         <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-10 justify-items-center md:justify-items-start text-center md:text-left transform translate-x-1 md:translate-x-2">
           <div>
             <h4 className="font-bold text-lg mb-3">{t.shopName}</h4>
@@ -2817,7 +2834,7 @@ function HomePage() {
       </footer>
       
       {/* Cookie Consent Banner */}
-      <CookieConsent />
+      {showCookie ? <CookieConsent /> : null}
     </div>
     </>
   );
